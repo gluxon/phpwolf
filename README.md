@@ -3,7 +3,7 @@ phpwolf
 
 What is this?
 -------------
-This is an IRC bot written in PHP, allowing users to play the popular Werewolf game. This implementation of wolf is very similar to [wolfbot-new](http://code.google.com/p/wolfbot-new/), and takes upon many of the same features.
+phpwolf is an IRC bot written in PHP, allowing users to play the popular Werewolf game. This implementation of wolf is very similar to [wolfbot-new](http://code.google.com/p/wolfbot-new/), and takes upon many of the same features.
 
 What is Werewolf?
 -----------------
