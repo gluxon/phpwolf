@@ -50,8 +50,8 @@ class wolf extends irc {
 	 * @param mixed $answer Answer to replace %answer%
 	 */
 	public function decode($string, $nick=null, $answer=null, $answer2=null) {
-		$return = str_replace("<bold2>", chr(2), $string);
-		$return = str_replace("</bold2>", chr(2), $return);
+		$return = str_replace("<bold>", chr(2), $string);
+		$return = str_replace("</bold>", chr(2), $return);
 
 		if ($nick != null) {
 			$return = str_replace("%nick%", $nick, $return);
