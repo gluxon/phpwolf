@@ -50,5 +50,7 @@ while (true) {
 		}
 
 	}
+
+	$wolf->runMaintenance();
 }
 ?>

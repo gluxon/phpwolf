@@ -15,19 +15,17 @@ $user["password"]="password";
 $channel["name"]="##phpwolf";
 
 // Admins array
-$admins = array("gluxon!~gluxon@unaffiliated/gluxon");
+$admins = array("gluxon!~gluxon@unaffiliated/gluxon", "Snuupy!~Snuupy@unaffiliated/snuupy");
 
 // Language
 $lang=$en_US;
 
 // Times (in seconds)
 $setting["game_wait"]=0;
+$setting["game_add_wait"]=20;
+$setting["game_add_wait_limit"]=2;
 $ping_wait=60 * 5;
 $night=60 * 2;
-
-$roles = array( 4 => array( 1, )
-
-);
 
 $roles = array(
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
