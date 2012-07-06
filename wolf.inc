@@ -50,8 +50,8 @@ class wolf extends irc {
 	 * @param mixed $answer Answer to replace %answer%
 	 */
 	public function decode($string, $nick=null, $answer=null, $answer2=null) {
-		$return = str_replace("<bold2>", chr(2), $string);
-		$return = str_replace("</bold2>", chr(2), $return);
+		$return = str_replace("<bold>", chr(2), $string);
+		$return = str_replace("</bold>", chr(2), $return);
 
 		if ($nick != null) {
 			$return = str_replace("%nick%", $nick, $return);
@@ -226,8 +226,8 @@ class wolf extends irc {
 			$this->say($nick, "This feature on phpwolf is not yet available.");
 		}
 
-		// !quit
-		else if ( $this->isCommand($command, 'quit') && $this->hasPermission($nick, $host, 'quit') ) {
+		// !quit and !leave
+		else if ( ( $this->isCommand($command, 'quit') || $this->isCommand($command, 'leave') ) && $this->hasPermission($nick, $host, 'quit') ) {
 			$this->removePlayer($recipient, $nick);
 
 			// Send quit message
@@ -616,11 +616,12 @@ class wolf extends irc {
 		$this->ongoing = false;
 
 		$players_list = "";
-		$devoice = '-';
 		foreach (array_keys($this->players) as $person) {
 			$players_list = $players_list . $person . " ";
 		}
 		$players_list = substr($players_list, 0, -1);
+
+		$devoice = '-';
 		for ($i=0; $i < count($this->players); $i++) {
 			$devoice = $devoice . 'v';
 		}
@@ -638,6 +639,7 @@ class wolf extends irc {
 			}
 		}
 
+		$roles_message = "";
 		if (isset($wolf)) {
 			$message_wolf = $this->decode($lang["end_roles"], null, $lang["wolf"], $wolf);
 			$roles_message = $roles_message . $message_wolf . " ";

@@ -30,7 +30,7 @@ $en_US["idle_die"]="<bold>auror</bold> didn't get out of bed for a very long tim
 // Utilities
 $en_US["help"]="(notice) Commands: <bold>help, simple, back, quit, stats, away, ping, start, retract, goat, shoot, votes, lynch, coin, wait, join, rules, admins</bold>";
 $en_US["ping"]="PING! %answer%";
-$en_US["coin_toss"]="<bold2>%nick%</bold2> tosses a coin into the air...";
+$en_US["coin_toss"]="<bold>%nick%</bold> tosses a coin into the air...";
 $en_US["coin_land"]="The coin lands on <bold>%answer%</bold>";
 $en_US["away"]="(notice) You are now marked as away.";
 $en_US["back"]="(notice) You are no longer marked as away.";
