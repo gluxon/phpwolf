@@ -2,6 +2,9 @@
 // Stop PHP from killing itself
 set_time_limit(0);
 
+// Custom Functions
+require("functions.inc");
+
 // Import locales
 require("locale.inc");
 

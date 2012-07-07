@@ -615,17 +615,21 @@ class wolf extends irc {
 		// No game is running now
 		$this->ongoing = false;
 
+		// Generate list of players
 		$players_list = "";
 		foreach (array_keys($this->players) as $person) {
 			$players_list = $players_list . $person . " ";
 		}
 		$players_list = substr($players_list, 0, -1);
 
-		$devoice = '-';
-		for ($i=0; $i < count($this->players); $i++) {
-			$devoice = $devoice . 'v';
+		$players_list_split = SplitByEveryNthOccurrence($players_list, ' ', 3);
+		foreach($players_list_split as $list) {
+			$devoice = '-';
+			for ($i=0; $i < count($this->players); $i++) {
+				$devoice = $devoice . 'v';
+			}
+			$this->sendData("MODE $channel $devoice $list");
 		}
-		$this->sendData("MODE $channel $devoice $players_list");
 
 		// Clear players
 		unset($this->players);
