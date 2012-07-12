@@ -604,10 +604,10 @@ class wolf extends irc {
 			if ($recipient == $this->channel) {
 				// ignore this, people are probably telling the seer to 'see' someone.
 			} else if ( !in_array($nick, $this->seer) ) {
-				$seer_see_not = $this->decode($lang["seer_see_not"]) 
+				$seer_see_not = $this->decode($lang["seer_see_not"]);
 				$this->say($nick, $seer_see_not);
 			} else if ( in_array($nick, $this->seer_seen) ) {
-				$seer_seen = $this->decode($lang["seer_seen"]) 
+				$seer_seen = $this->decode($lang["seer_seen"]);
 				$this->say($nick, $seer_seen);
 			} else {
 				$person = $this->nickAutocomplete($message);
