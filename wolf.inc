@@ -10,13 +10,27 @@ class wolf extends irc {
 	// List of people in the channel (for !ping)
 	private $people;
 
+	// Channel game is playing in
+	private $channel;
+
 	// $ongoing == true when game is running
 	private $ongoing;
 
 	// Time first person joined
 	private $game_wait;
-	
+
+	// Amount of times !wait has been extended
 	private $wait_extended;
+
+	// Role variables
+	public $role_names;
+	private $seer, $wolf, $cursed, $drunk, $harlot, $traitor, $gunner, $crow, $angel, $detective;
+
+	// Pre-generated end roles message
+	private $roles_message;
+
+	// Seen, visited, killed variables (per night)
+	private $seer_seen, $wolf_killed, $harlot_visited, $gunner_shot, $angel_guarded, $detective_ided;
 
 	public function __construct() {
 		$this->random = new random();
@@ -25,6 +39,27 @@ class wolf extends irc {
 
 		$this->ongoing = false;
 		$wait_extended = 0;
+
+		$this->seer = array();
+		$this->wolf = array();
+		$this->cursed = array();
+		$this->drunk = array();
+		$this->harlot = array();
+		$this->traitor = array();
+		$this->gunner = array();
+		$this->crow = array(); 
+		$this->angel = array();
+		$this->detective = array();
+		$this->role_names = array("seer", "wolf", "cursed", "drunk", "harlot", "traitor", "gunner", "crow", "angel", "detective");
+
+		$this->roles_message = '';
+
+		$this->seer_seen = array();
+		$this->wolf_killed = array();
+		$this->harlot_visited = array();
+		$this->gunner_shot = array();
+		$this->angel_guarded = array();
+		$this->detective_ided = array();
 	}
 
 	/**
@@ -34,9 +69,9 @@ class wolf extends irc {
 	* @param mixed $command the command the string should be
 	* @return boolean yes or no answer
 	*/
-	public function isCommand ($string, $command) {
+	public function isCommand ($string, $command, $no_operator=false) {
 		//if ( strtolower($string) == '.' . $command || strtolower($string) == '!' . $command ) {
-		if ( strtolower($string) == '!' . $command ) {
+		if ( strtolower($string) == '!' . $command || ($no_operator && strtolower($string) == $command) ) {
 			return true;
 		}
 		return false;
@@ -82,71 +117,71 @@ class wolf extends irc {
 			case 'help':
 				return true;
 				break;
-	
+
 			case 'simple':
 				return true;
 				break;
-	
+
 			case 'back':
 				return true;
 				break;
-	
+
 			case 'quit':
 				return true;
 				break;
-	
+
 			case 'stats':
 				return true;
 				break;
-	
+
 			case 'away':
 				return true;
 				break;
-	
+
 			case 'ping':
 				return true;
 				break;
-	
+
 			case 'start':
 				return true;
 				break;
-	
+
 			case 'retract':
 				return true;
 				break;
-	
+
 			case 'goat':
 				return true;
 				break;
-	
+
 			case 'shoot':
 				return true;
 				break;
-	
+
 			case 'votes':
 				return true;
 				break;
-	
+
 			case 'lynch':
 				return true;
 				break;
-	
+
 			case 'coin':
 				return true;
 				break;
-	
+
 			case 'wait':
 				return true;
 				break;
-	
+
 			case 'join':
 				return true;
 				break;
-	
+
 			case 'rules':
 				return true;
 				break;
-	
+
 			case 'admins':
 				return true;
 				break;
@@ -179,6 +214,77 @@ class wolf extends irc {
 	 */
 	public function nickAutocomplete($nick) {
 		return $nick;
+	}
+
+	/**
+	 * Check if the player is playing
+	 */
+	public function isPlaying($nick) {
+		foreach(array_keys($this->players) as $player) {
+			if ($player == $nick) {
+				return true;
+			}
+		}
+		return $false;
+	}
+
+	public function getRoles($nick) {
+		foreach($this->role_names as $role) {
+			foreach($this->$role as $person) {
+				if ($nick == $person) {
+					if (!isset($return)) {
+						$return = array($role);
+					} else {
+						array_push($return, $role);
+					}
+				}
+			}
+		}
+		if (isset($return)) {
+			return $return;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Return a list of all the players
+	 * 
+	 * @param mixed $nick Nick of player to not add
+	 * @param boolean $wolf Add wolf role to other wolves
+	 * @param boolean $reset Reset Times
+	 * @param mixed List of players
+	 */
+	public function listPlayers($wolf = false, $reset = false, $nick = null) {
+		global $lang;
+
+		$list = "";
+		if ($wolf) {
+			foreach($this->players as $key => &$value) {
+				if ($nick == null || $key != $nick) {
+					$list = $list . $key;
+					if ( in_array($key, $this->wolf) ) {
+						$list = $list . ' (' . $lang["wolf"] . ')';
+					} else if ( in_array($key, $this->traitor) ) {
+						$list = $list . ' (' . $lang["traitor"] . ')';
+					}
+					if ($reset) {
+						$value = time();
+					}
+					$list = $list . ', ';
+				}
+			}
+		} else {
+			foreach($this->players as $key => &$value) {
+				if ($nick == null || $key != $nick) {
+					$list = $list . $key . ', ';
+					if ($reset) {
+						$value = time();
+					}
+				}
+			}
+		}
+		return substr($list, 0, -2);
 	}
 
 	/**
@@ -228,19 +334,22 @@ class wolf extends irc {
 
 		// !quit and !leave
 		else if ( ( $this->isCommand($command, 'quit') || $this->isCommand($command, 'leave') ) && $this->hasPermission($nick, $host, 'quit') ) {
-			$this->removePlayer($recipient, $nick);
-
 			// Send quit message
-			if (isset($this->$nick)) foreach ($this->$nick as $value) {
+			$roles = $this->getRoles($nick);
+			foreach ($roles as $value) {
 				if ($value != 'gunner' || $value != 'cursed') {
 					$answer=$value;
 				}
 			}
-			if (!isset($answer) && $this->ongoing) {
-				$answer = "villager";
-			} else {
-				$answer = "person";
+			if (!isset($answer)) {
+				if ($this->ongoing) {
+					$answer = "villager";
+				} else {
+					$answer = "person";
+				}
 			}
+
+			$this->removePlayer($recipient, $nick);
 
 			$quit = $this->decode($lang["quit"], $nick, $answer);
 			$this->say($recipient, $quit);
@@ -260,11 +369,7 @@ class wolf extends irc {
 					$this->say($nick, $game_none);
 				} else {
 					// Return list of users and amount
-					$answer2 = "";
-					foreach (array_keys($this->players) as $key) {
-						$answer2 = $answer2 . $key . ', ';
-					}
-					$answer2 = substr($answer2, 0, -2);
+					$answer2 = $this->listPlayers();
 
 					$stats = $this->decode($lang["stats"], $nick, $answer, $answer2);
 					$this->say($recipient, $stats);
@@ -322,12 +427,8 @@ class wolf extends irc {
 			// Sucess!
 			else {
 				// Loop through players to generate list
-				$answer = "";
-				foreach($this->players as $key => &$value) {
-					$answer = $answer . $key . ", ";
-					$value = time();
-				}
-				$answer = substr($answer, 0, -2);
+				$answer = $this->listPlayers(false, true);
+
 				$game_welcome = $this->decode($lang["game_welcome"], null, $answer);
 				$this->say($recipient, $game_welcome);
 
@@ -335,6 +436,43 @@ class wolf extends irc {
 
 				// Assign roles
 				$this->assignRoles();
+
+				// Send night message
+				$night_first = $this->decode($lang["night_first"]);
+				$this->say($recipient, $night_first);
+
+				// Pre-Generate end message
+				foreach($this->role_names as $role) {
+
+					if ( count($this->$role) > 0) {
+						$role_list = '';
+						$i = 0;
+						$numItems = count($this->$role);
+	
+						foreach($this->$role as $person) {
+	
+							++$i;
+							// Last element
+							if ($numItems > 1) {
+								if ($i == $numItems) {
+									// Remove ', ', and replace with ' and ', then append $person
+									$role_list = substr($role_list, 0, -2) . ' and ' . $person ;
+								} else {
+									$role_list = $role_list . $person . ', ';
+								}
+							}
+						}
+
+						if ($numItems > 1) {
+							$this->roles_message = $this->roles_message . $this->decode($lang["end_roles_plural"], null, $lang[$role . '_plural'], $role_list) . ' ';
+						} else {
+							// This is a hackish workaround, $person is still the looped array since $numItems is 1
+							$this->roles_message = $this->roles_message . $this->decode($lang["end_roles"], null, $lang[$role], $person) . ' ';
+						}
+					}
+				}
+				$this->roles_message = substr($this->roles_message, 0, -1); // remove trailing space
+
 			}
 
 		}
@@ -422,6 +560,7 @@ class wolf extends irc {
 
 				// 1 player for player already added
 				if ( count($this->players) == 1 ) {
+					$this->channel = $recipient;
 					$game_start = $this->decode($lang["game_start"], $nick);
 					$this->say($recipient, $game_start);
 					$this->game_wait = time();
@@ -432,12 +571,15 @@ class wolf extends irc {
 
 		// !rules
 		else if ( $this->isCommand($command, 'rules') && $this->hasPermission($nick, $host, 'rules') ) {
-			$this->say($nick, "This feature on phpwolf is not yet available.");
+			$rules_part1 = $this->decode($lang["rules_part1"]);
+			$this->say($recipient, $rules_part1);
+			$rules_part2 = $this->decode($lang["rules_part2"]);
+			$this->say($recipient, $rules_part2);
 		}
 
 		// !admins
 		else if ( $this->isCommand($command, 'admins') && $this->hasPermission($nick, $host, 'admins') ) {
-			$this->say($nick, "This feature on phpwolf is not yet available.");
+			$this->say($recipient, "Snuupy is the man for that.");
 		}
 
 		/***** Admin commands *****/
@@ -454,7 +596,52 @@ class wolf extends irc {
 
 		// !fstop
 		else if ( $this->isCommand($command, 'fstop') && $this->hasPermission($nick, $host, 'fstop') ) {
-			$this->endGame($recipient);
+			$this->endGame($this->channel);
+		}
+
+		/***** Private Role Commands *****/
+		else if ( $this->isCommand($command, 'see', true) ) {
+			if ($recipient == $this->channel) {
+				// ignore this, people are probably telling the seer to 'see' someone.
+			} else if ( !in_array($nick, $this->seer) ) {
+				$seer_see_not = $this->decode($lang["seer_see_not"]) 
+				$this->say($nick, $seer_see_not);
+			} else if ( in_array($nick, $this->seer_seen) ) {
+				$seer_seen = $this->decode($lang["seer_seen"]) 
+				$this->say($nick, $seer_seen);
+			} else {
+				$person = $this->nickAutocomplete($message);
+
+				if ( $this->isPlaying($person) ) {
+
+					// parse this person
+					$person_roles = $this->getRoles($person);
+					if ($person_roles == null) {
+						$role = 'villager';
+					} else {
+						foreach($this->$person as $value) {
+							if ($value == 'cursed') {
+								$role = 'wolf';
+							} else if ($value == 'traitor') {
+								$role = 'villager';
+							} else {
+								$role = $value;
+							}
+						}
+					}
+
+					// Tell the seer who this guy is
+					$seer_see = $this->decode($lang["seer_see"], null, $person, $lang[$role]);
+					$this->say($nick, $seer_see);
+
+					// Add to list of seers that have seen tonight
+					array_push($this->seer_seen, $nick);
+				} else {
+					// This person wasn't playing
+					$not_playing=$this->decode($lang["not_playing"], null, $person);
+					$this->say($nick, $not_playing);
+				}
+			}
 		}
 
 	}
@@ -462,25 +649,31 @@ class wolf extends irc {
 	/**
 	 * Add a player to the game
 	 * 
-	 * @param mixed $recipient Channel
 	 * @param mixed $nick Nickname of player
 	 */
-	public function addPlayer($recipient, $nick) {
+	public function addPlayer($channel, $nick) {
 		$this->players[$nick] = time();
 		// Add Voice
-		$this->sendData("MODE $recipient +v $nick");
+		$this->sendData("MODE $channel +v $nick");
 	}
 
 	/**
 	 * Remove a player from the game
 	 * 
-	 * @param mixed $recipient Channel
 	 * @param mixed $nick Nickname of player
 	 */
-	public function removePlayer($recipient, $nick) {
+	public function removePlayer($channel, $nick) {
 		unset($this->players[$nick]);
 		// Remove Voice
-		$this->sendData("MODE $recipient -v $nick");
+		$this->sendData("MODE $channel -v $nick");
+
+		foreach($this->role_names as $role) {
+			foreach($this->$role as $key => $person) {
+				if ($nick == $person) {
+					unset($this->$role[$key]);
+				}
+			}
+		}
 	}
 
 	/**
@@ -488,6 +681,8 @@ class wolf extends irc {
 	 */
 	public function assignRoles() {
 		global $roles;
+
+		// Get the array of # of roles according to player amount
 		$player_amount = count($this->players);
 		foreach ($roles as $key => $value) {
 			if ( $player_amount >= $key ) {
@@ -498,16 +693,26 @@ class wolf extends irc {
 		}
 		$game_roles = $roles[$index];
 
+		// Define if there are multiple wolves
+		/*$this->multiple_wolves = NULL;
+		if ($game_roles["1"] > 1) {
+			$this->multiple_wolves = true;
+		}*/
+
 		// Reconstruct players array
 		$i=0;
 		foreach(array_keys($this->players) as $key) {
 			$players_sorted[$i] = $key;
 			$i++;
 		}
+
 		// Backup players for original
 		$this->players_original = $players_sorted;
 
+		// Start looping through each role and assign them
 		foreach($game_roles as $role => $amount) {
+
+			// Start by figuring out which role this is
 			switch($role) {
 				case 0: // Seer
 					$role_name = 'seer';
@@ -520,7 +725,7 @@ class wolf extends irc {
 				case 2: // Cursed
 					$role_name = 'cursed';
 				break;
-
+			
 				case 3: // Drunk
 					$role_name = 'drunk';
 				break;
@@ -549,58 +754,176 @@ class wolf extends irc {
 					$role_name = 'detective';
 				break;
 			}
-			echo "\n\n$role_name : ";
+			echo "\n$role_name : ";
+
+			// Assign each role the proper amount of times
 			for($i=1; $i <= $amount; $i++) {
-				echo "$role $amount ";
 
-				// Loop until role is given
+				// Loop until role is given to proper candidate
 				// NOTE: This will result in an infinite loop if settings are manipulated wrong
-
 				while(true) {
 					echo "Finding $role_name";
+					// Player index to receive role
 					$player_index = $this->random->getRandInt(0, $player_amount-1);
-					
-					if ( !isset($this->{$players_sorted[$player_index]}) ) {
-						// Assign a role to a person without one
-						if ( !isset($this->{$players_sorted[$player_index]}) ) {
-							$this->{$players_sorted[$player_index]} = array($role_name);
-							$this->say($players_sorted[$player_index], "You are a $role_name");
-							echo ": $players_sorted[$player_index]\n\n";
-							break;
-						}
-					} else {
-						echo ": $players_sorted[$player_index]\n\n";
-						// If the person is a seer, only give them gunner
-						if ( in_array('seer', $this->{$players_sorted[$player_index]}) && $role_name != 'gunner' ) {
-							continue;
-						}
-						// If the person is a drunk, only give them gunner
-						if ( in_array('drunk', $this->{$players_sorted[$player_index]}) && $role_name != 'gunner' ) {
-							continue;
-						}
-						// If the person is cursed, only give them traitor
-						if ( in_array('cursed', $this->{$players_sorted[$player_index]}) && $role_name != 'traitor' ) {
-							continue;
-						}
-						// If the person is already harlot, angel, or detective, do not give them another role
-						if ( in_array('harlot', $this->{$players_sorted[$player_index]}) || in_array('angel', $this->{$players_sorted[$player_index]}) || in_array('detective', $this->{$players_sorted[$player_index]}) ) {
-							continue;
-						}
-						// If the person is a wolf, they can't have anything else
-						if ( in_array('wolf', $this->{$players_sorted[$player_index]}) ) {
-							continue;
-						}
+					echo ": $players_sorted[$player_index]\n";
 
-						// Conditions satisfied, give another role!
-						array_push($this->{$players_sorted[$player_index]}, $role_name);
-						$this->say($players_sorted[$player_index], "You are a $role_name");
-						break;
+					// Do not assign if it's already assigned
+					if ( in_array($players_sorted[$player_index], $this->$role_name) ) {
+						continue;
 					}
+					// If the person is a seer, only give them gunner
+					if ( in_array($players_sorted[$player_index], $this->seer) && $role_name != 'gunner' ) {
+						continue;
+					}
+					// If the person is a drunk, only give them gunner
+					if ( in_array($players_sorted[$player_index], $this->drunk) && $role_name != 'gunner' ) {
+						continue;
+					}
+					// If the person is cursed, only give them traitor
+					if ( in_array($players_sorted[$player_index], $this->cursed) && $role_name != 'traitor' ) {
+						continue;
+					}
+					// If the person is already harlot, angel, or detective, do not give them another role
+					if ( in_array($players_sorted[$player_index], $this->harlot) || in_array($players_sorted[$player_index], $this->angel) || in_array($players_sorted[$player_index], $this->detective) ) {
+						continue;
+					}
+					// If the person is a wolf, they can't have anything else
+					if ( in_array($players_sorted[$player_index], $this->wolf) ) {
+						continue;
+					}
+
+					// Conditions satisfied, give another role!
+					array_push($this->$role_name, $players_sorted[$player_index]);
+					$this->sendDirections($players_sorted[$player_index], $role_name);
+					break;
 
 				}
 			}
-
 		}
+	}
+
+	/**
+	 * Send the role directions to the assigned player
+	 * 
+	 * @param mixed $nick Nickname of player
+	 * @param mixed $role Role player has been assigned
+	 */
+	public function sendDirections($nick, $role) {
+		global $lang;
+
+		switch($role) {
+			case 'seer': // Seer
+				// Role Assign
+				$seer_assign = $this->decode($lang["seer_assign"]);
+				$this->say($nick, $seer_assign);
+
+				// List players
+				$answer=$this->listPlayers(false, false, $nick);
+				$players_list = $this->decode($lang["players_list"], null, $answer);
+				$this->say($nick, $players_list);
+			break;
+
+			case 'wolf': // Wolf
+				// Role Assign
+				$wolf_assign = $this->decode($lang["wolf_assign"]);
+				$this->say($nick, $wolf_assign);
+
+				// Multiple wolves relay message
+				if ($this->wolf > 1) {
+					$wolf_multiple = $this->decode($lang["wolf_multiple"]);
+					$this->say($nick, $wolf_multiple);
+				}
+
+				// List players
+				$answer=$this->listPlayers(true, false, $nick);
+				$players_list = $this->decode($lang["players_list"], null, $answer);
+				$this->say($nick, $players_list);
+			break;
+
+			case 'cursed': // Cursed
+				// Do not say anything to the cursed
+			break;
+
+			case 'drunk': // Drunk
+				// Role Assign
+				$drunk_assign = $this->decode($lang["drunk_assign"]);
+				$this->say($nick, $drunk_assign);
+			break;
+
+			case 'harlot': // Harlot
+				// Role Assign
+				$harlot_assign = $this->decode($lang["harlot_assign"]);
+				$this->say($nick, $harlot_assign);
+
+				// List players
+				$answer=$this->listPlayers(false, false, $nick);
+				$players_list = $this->decode($lang["players_list"], null, $answer);
+				$this->say($nick, $players_list);
+			break;
+
+			case 'traitor': // Traitor
+				// Role Assign
+				$traitor_assign = $this->decode($lang["traitor_assign"]);
+				$this->say($nick, $traitor_assign);
+
+				// Multiple wolves relay message
+				if ($this->multiple_wolves) {
+					$wolf_multiple = $this->decode($lang["wolf_multiple"]);
+					$this->say($nick, $wolf_multiple);
+				}
+
+				// List players
+				$answer=$this->listPlayers(true, false, $nick);
+				$players_list = $this->decode($lang["players_list"], null, $answer);
+				$this->say($nick, $players_list);
+			break;
+
+			case 'gunner': // Gunner
+				// Role Assign
+				$gunner_assign = $this->decode($lang["gunner_assign"]);
+				$this->say($nick, $gunner_assign);
+			break;
+
+			case 'crow': // Crow
+				// There is no crow yet
+			break;
+
+			case 'angel': // Angel
+				// Role Assign
+				$angel_assign = $this->decode($lang["angel_assign"]);
+				$this->say($nick, $angel_assign);
+
+				// List players
+				$answer=$this->listPlayers(false, false, $nick);
+				$players_list = $this->decode($lang["players_list"], null, $answer);
+				$this->say($nick, $players_list);
+			break;
+
+			case 'detective': // Detective
+				// Role Assign
+				$detective_assign = $this->decode($lang["detective_assign"]);
+				$this->say($nick, $detective_assign);
+			break;
+		}
+	}
+
+	public function turnDay() {
+		global $lang;
+
+		// Night has ended, we can reset the night actions
+		$this->seer_seen = array();
+		$this->wolf_killed = array();
+		$this->harlot_visited = array();
+		$this->angel_guarded = array();
+
+		$day_turn = $this->decode($lang["day_turn"], null, "way too long");
+		$this->say($this->channel, $day_turn);
+	}
+
+	public function turnNight() {
+		// Day has ended, we can reset these actions
+		// NOTE: Do not reset gunner shots
+		$this->detective_ided = array();
 	}
 
 	/**
@@ -617,7 +940,7 @@ class wolf extends irc {
 
 		// Generate list of players
 		$players_list = "";
-		foreach (array_keys($this->players) as $person) {
+		foreach(array_keys($this->players) as $person) {
 			$players_list = $players_list . $person . " ";
 		}
 		$players_list = substr($players_list, 0, -1);
@@ -632,57 +955,31 @@ class wolf extends irc {
 		}
 
 		// Clear players
-		unset($this->players);
 		$this->players = array();
 
-		foreach($this->players_original as $people) {
-			if (isset($this->$people)) foreach($this->$people as $role) {
-				if (!empty($role)) {
-					$$role = $people;
-				}
-			}
-		}
+		// Send previously generated roles message
+		$this->say($channel, $this->roles_message);
 
-		$roles_message = "";
-		if (isset($wolf)) {
-			$message_wolf = $this->decode($lang["end_roles"], null, $lang["wolf"], $wolf);
-			$roles_message = $roles_message . $message_wolf . " ";
-		}
-		if (isset($seer)) {
-			$message_seer = $this->decode($lang["end_roles"], null, $lang["seer"], $seer);
-			$roles_message = $roles_message . $message_seer . " ";
-		}
-		if (isset($harlot)) {
-			$message_harlot = $this->decode($lang["end_roles"], null, $lang["harlot"], $harlot);
-			$roles_message = $roles_message . $message_harlot . " ";
-		}
-		if (isset($traitor)) {
-			$message_traitor = $this->decode($lang["end_roles"], null, $lang["traitor"], $traitor);
-			$roles_message = $roles_message . $message_traitor . " ";
-		}
-		if (isset($cursed)) {
-			$message_cursed = $this->decode($lang["end_roles"], null, $lang["cursed"], $cursed);
-			$roles_message = $roles_message . $message_cursed . " ";
-		}
-		if (isset($gunner)) {
-			$message_gunner = $this->decode($lang["end_roles"], null, $lang["gunner"], $gunner);
-			$roles_message = $roles_message . $message_gunner . " ";
-		}
-		if (isset($angel)) {
-			$message_angel = $this->decode($lang["end_roles"], null, $lang["angel"], $angel);
-			$roles_message = $roles_message . $message_angel . " ";
-		}
-		if (isset($detective)) {
-			$message_detective = $this->decode($lang["end_roles"], null, $lang["detective"], $detective);
-			$roles_message = $roles_message . $message_detective . " ";
-		}
-		if (isset($drunk)) {
-			$message_drunk = $this->decode($lang["end_roles"], null, $lang["drunk"], $drunk);
-			$roles_message = $roles_message . $message_drunk . " ";
-		}
+		// Clear all player roles
+		$this->seer = array();
+		$this->wolf = array();
+		$this->cursed = array();
+		$this->drunk = array();
+		$this->harlot = array();
+		$this->traitor = array();
+		$this->gunner = array();
+		$this->crow = array(); 
+		$this->angel = array();
+		$this->detective = array();
 
-		$roles_message = substr($roles_message, 0, -1);
-		$this->say($channel, $roles_message);
+		$this->seer_seen = array();
+		$this->wolf_killed = array();
+		$this->harlot_visited = array();
+		$this->gunner_shot = array();
+		$this->angel_guarded = array();
+		$this->detective_ided = array();
+		$this->roles_message = '';
+
 		unset($this->players_original);
 
 	}
