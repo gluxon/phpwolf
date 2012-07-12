@@ -4,24 +4,41 @@
 // Roles
 $en_US["seer"]="seer";
 $en_US["wolf"]="wolf";
-$en_US["wolf_plural"]="wolves";
 $en_US["cursed"]="cursed villager";
 $en_US["drunk"]="village drunk";
 $en_US["harlot"]="harlot";
 $en_US["traitor"]="traitor";
 $en_US["gunner"]="gunner";
+$en_US["crow"]="crow";
 $en_US["angel"]="guardian angel";
 $en_US["detective"]="detective";
+$en_US["villager"]="villager";
+
+$en_US["seer_plural"]="seers";
+$en_US["wolf_plural"]="wolves";
+$en_US["cursed_plural"]="cursed villagers";
+$en_US["drunk_plural"]="drunk villagers";
+$en_US["harlot_plural"]="harlots";
+$en_US["traitor_plural"]="traitors";
+$en_US["gunner_plural"]="gunners";
+$en_US["crow_plural"]="crows";
+$en_US["angel_plural"]="guardian angels";
+$en_US["detective_plural"]="detectives";
+$en_US["villager_plural"]="villagers";
 
 // Before Game
 $en_US["game_start"]="<bold>%nick%</bold> has started a game of Werewolf. Type \"!join\" to join. Type \"!start\" to start the game. Type \"!wait\" to increase join wait time.";
 $en_US["game_wait"]="Please wait at least %answer% more seconds.";
 $en_US["game_required"]="%nick%: Four or more players are required to play.";
-
 $en_US["game_welcome"]="%answer%: Welcome to Werewolf, the popular detective/social party game (a theme of Mafia).";
 
 // Night time
 $en_US["night_first"]="It is now nighttime. All players check for PMs from me for instructions. If you did not receive one, simply sit back, relax, and wait patiently for morning.";
+
+// Day time turn
+$en_US["day_turn"]="Night lasted <bold>00:16</bold>. It is now daytime. The villagers awake, thankful for surviving the night, and search the village... ";
+$en_US["day_victim"]="The dead body of <bold>%answer%</bold>, a <bold>%answer2</bold>, is found. Those remaining mourn his/her death.";
+$en_US["day_vote"]="The villagers must now vote for whom to lynch. Use \"!lynch <nick>\" to cast your vote. 4 votes are required to lynch.";
 
 // Maintenance
 $en_US["idle_warn"]="%nick%: <bold>You have been idling for a while. Please say something soon or you might be declared dead.</bold>";
@@ -38,6 +55,8 @@ $en_US["stats"]="%nick%: <bold>%answer%</bold> players: %answer2%";
 $en_US["stats_none"]="%nick%: There are no players.";
 $en_US["wait"]="<bold>%nick%</bold> increased the wait time by %answer% seconds.";
 $en_US["wait_limit"]="Limit has already been reached for extending the wait time.";
+$en_US["rules_part1"]="##phpwolf channel rules: 1) Be nice to others. 2) Do not share information after death. 3) No bots allowed. 4) Do not play with clones.";
+$en_US["rules_part2"]="5) Do not quit unless you need to leave. 6) No swearing and keep it family-friendly. 7) Do not paste PM's from the bot during the game. 8) Use common sense. 9) Waiting for timeouts is discouraged.";
 
 // Game commands
 $en_US["join"]="<bold>%nick%</bold> has joined the game.";
@@ -50,19 +69,28 @@ $en_US["join_already_playing"]="(notice) You're already playing!";
 $en_US["start_ongoing"]="(notice) Werewolf is already in play.";
 $en_US["not_playing"]="<bold>%nick%</bold> is currently not playing.";
 
+// Errors
+$en_US["not_playing"]="<bold>%answer%</bold> is not playing.";
+
 // End Game
 $en_US["win_villagers"]="Game over! All the wolves are dead! The villagers chop them up, BBQ them, and have a hearty meal.";
 $en_US["win_wolves"]="Game over! There are the same number of wolves as villagers. The wolves eat everyone and win.";
 $en_US["end_times"]="Game lasted <bold>12:56</bold>. <bold>08:39</bold> was day. <bold>04:17</bold> was night.";
 //The wolves were moriarty and Nascar1996
 $en_US["end_roles"]="The %answer% was <bold>%answer2%</bold>.";
+$en_US["end_roles_plural"]="The %answer% were <bold>%answer2%</bold>.";
 
 // Directions
 $en_US["seer_assign"]="You are a <bold>seer</bold>. It is your job to detect the wolves, you may have a vision once per night. Use \"see <nick>\" to see the role of a player.";
 $en_US["seer_list"]="Players: Arti_, genii-around, Grovyle";
+$en_US["seer_see"]="You have a vision; in this vision, you see that <bold>%answer%</bold> is a <bold>%answer2%</bold>!";
+
+$en_US["seer_see_not"]="Only a seer may use this command";
+$en_US["seer_seen"]="You may only have one vision per round.";
+$en_US["seer_see_day"]="You may only have visions at night.";
 
 $en_US["wolf_assign"]="You are a <bold>wolf</bold>. It is your job to kill all the villagers. Use \"kill <nick>\" to kill a villager.";
-$en_US["wolf_group"]="Also, if you PM me, your message will be relayed to other wolves.";
+$en_US["wolf_multiple"]="Also, if you PM me, your message will be relayed to other wolves.";
 $en_US["wolf_list"]="<bold>Players:</bold> auror (wolf), ishanyx, Mithadon, MrBenC, sheep, Snuupy, Surfcash";
 $en_US["wolf_kill"]="You have selected <bold>Snuupy</bold> to be killed.";
 $en_US["wolf_relay"]="<bold>auror</bold> says: kill snu";
@@ -72,8 +100,12 @@ $en_US["drunk_assign"]="You have been drinking too much! You are the <bold>villa
 $en_US["harlot_assign"]="You are a <bold>harlot</bold>. You may spend the night with one person per round. If you visit a victim of a wolf, or visit a wolf, you will die. Use !visit to visit a player.";
 $en_US["harlot_visit"]="You are spending the night with <bold>moriarty</bold>. Have a good time!";
 
+$en_US["traitor_assign"]="You are a <bold>traitor</bold>. You are exactly like a villager and not even a seer can see your true identity. Only detectives can.";
+$en_US["traitor_transform"]="<bold>The villagers, during their celebrations, are frightened as they hear a loud howl. The wolves are not gone!</bold>";
+$en_US["traitor_notify"]="HOOOOOOOOOWL. You have become... a wolf!";
+$en_US["traitor_avenge"]="It is up to you to avenge your fallen leaders!";
+
 $en_US["gunner_assign"]="You are a <bold>gunner</bold>. You hold a gun that shoots special silver bullets. You may only use it during the day. If you shoot a wolf, (s)he will die instantly, but if you shoot a villager, that villager will likely survive. There is also the possibility of the gun blowing up, and killing you with it, so take caution. You get 2 bullets.";
 
-// Events
-$en_US["traitor_wolf"]="<bold>The villagers, during their celebrations, are frightened as they hear a loud howl. The wolves are not gone!</bold>";
+$en_US["players_list"]="Players: %answer%";
 ?>
