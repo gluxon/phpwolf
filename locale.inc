@@ -34,11 +34,13 @@ $en_US["game_welcome"]="%answer%: Welcome to Werewolf, the popular detective/soc
 
 // Night time
 $en_US["night_first"]="It is now nighttime. All players check for PMs from me for instructions. If you did not receive one, simply sit back, relax, and wait patiently for morning.";
+$en_US["night_turn"]="Day lasted <bold>%answer%</bold>. It is now nighttime. All players check for PMs from me for instructions. If you did not receive one, simply sit back, relax, and wait patiently for morning.";
 
 // Day time turn
-$en_US["day_turn"]="Night lasted <bold>00:16</bold>. It is now daytime. The villagers awake, thankful for surviving the night, and search the village... ";
-$en_US["day_victim"]="The dead body of <bold>%answer%</bold>, a <bold>%answer2</bold>, is found. Those remaining mourn his/her death.";
-$en_US["day_vote"]="The villagers must now vote for whom to lynch. Use \"!lynch <nick>\" to cast your vote. 4 votes are required to lynch.";
+$en_US["day_turn"]="Night lasted <bold>%answer%</bold>. It is now daytime. The villagers awake, thankful for surviving the night, and search the village... ";
+$en_US["day_victim"]="The dead body of <bold>%answer%</bold>, a <bold>%answer2%</bold>, is found. Those remaining mourn his/her death.";
+$en_US["day_nokill"]="The body of a young penguin pet is found. All villagers, however, have survived.";
+$en_US["day_vote"]="The villagers must now vote for whom to lynch. Use \"!lynch <nick>\" to cast your vote. %answer% votes are required to lynch.";
 
 // Maintenance
 $en_US["idle_warn"]="%nick%: <bold>You have been idling for a while. Please say something soon or you might be declared dead.</bold>";
@@ -68,6 +70,7 @@ $en_US["ratelimit"]="(notice) This command is rate-limited. Please wait a while 
 $en_US["join_already_playing"]="(notice) You're already playing!";
 $en_US["start_ongoing"]="(notice) Werewolf is already in play.";
 $en_US["not_playing"]="<bold>%nick%</bold> is currently not playing.";
+$en_US["not_admin"]="(notice) You are not an admin.";
 
 // Errors
 $en_US["not_playing"]="<bold>%answer%</bold> is not playing.";
@@ -75,7 +78,7 @@ $en_US["not_playing"]="<bold>%answer%</bold> is not playing.";
 // End Game
 $en_US["win_villagers"]="Game over! All the wolves are dead! The villagers chop them up, BBQ them, and have a hearty meal.";
 $en_US["win_wolves"]="Game over! There are the same number of wolves as villagers. The wolves eat everyone and win.";
-$en_US["end_times"]="Game lasted <bold>12:56</bold>. <bold>08:39</bold> was day. <bold>04:17</bold> was night.";
+$en_US["end_times"]="Game lasted <bold>%answer%</bold>. <bold>%answer2%</bold> was day. <bold>%answer3%</bold> was night.";
 //The wolves were moriarty and Nascar1996
 $en_US["end_roles"]="The %answer% was <bold>%answer2%</bold>.";
 $en_US["end_roles_plural"]="The %answer% were <bold>%answer2%</bold>.";
@@ -90,9 +93,10 @@ $en_US["seer_seen"]="You may only have one vision per round.";
 $en_US["seer_see_day"]="You may only have visions at night.";
 
 $en_US["wolf_assign"]="You are a <bold>wolf</bold>. It is your job to kill all the villagers. Use \"kill <nick>\" to kill a villager.";
-$en_US["wolf_multiple"]="Also, if you PM me, your message will be relayed to other wolves.";
+//$en_US["wolf_multiple"]="Also, if you PM me, your message will be relayed to other wolves.";
+$en_US["wolf_multiple"]="Wolf relay has not been added yet.";
 $en_US["wolf_list"]="<bold>Players:</bold> auror (wolf), ishanyx, Mithadon, MrBenC, sheep, Snuupy, Surfcash";
-$en_US["wolf_kill"]="You have selected <bold>Snuupy</bold> to be killed.";
+$en_US["wolf_kill"]="You have selected <bold>%answer%</bold> to be killed.";
 $en_US["wolf_relay"]="<bold>auror</bold> says: kill snu";
 
 $en_US["drunk_assign"]="You have been drinking too much! You are the <bold>village drunk</bold>.";
