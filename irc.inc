@@ -32,6 +32,15 @@ class irc {
 	}
 
 	/**
+	 * Set blocking socket
+	 * 
+	 * @param boolean $boolean Yes or no to blocking socket (default yes)
+	 */
+	public function setBlocking($boolean) {
+		socket_set_blocking($this->socket, $boolean);
+	}
+
+	/**
 	 * Sends raw data
 	 *
 	 * @param mixed $data Data to send
