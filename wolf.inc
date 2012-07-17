@@ -427,10 +427,10 @@ class wolf extends irc {
 
 		// !stats
 		else if ( $this->isCommand($command, 'stats') && $this->hasPermission($nick, $host, 'stats') ) {
+
 			if ($recipient == $nick) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else {
-
 				// Get amount of players
 				$answer = count($this->players);
 				if ($answer == 0) {
@@ -445,7 +445,39 @@ class wolf extends irc {
 					$this->say($recipient, $stats);
 				}
 
+				if ($this->ongoing) {
+					$reply = '';
+					$specials_total = 0;
+
+					foreach($this->role_names as $role) {
+						$amount = count($this->$role);
+						if ($amount > 0) {
+							$specials_total = $specials_total + $amount;
+							$num = count($this->$role);
+							if ($num == 1) {
+								$reply = $reply . $num . ' ' . chr(2) . $lang[$role] . chr(2) . ', ';
+							} else {
+								$reply = $reply . $num . ' ' . chr(2) . $lang[$role . '_plural'] . chr(2) . ', ';
+							}
+						}
+					}
+
+					$player_total = count($this->players);
+					$villagers_total = $player_total - $specials_total;
+
+					if ($villagers_total == 1) {
+						$reply = substr($reply, 0, -2) . ' and ' . $villagers_total . ' ' . chr(2) . $lang["villager"] . chr(2);
+					} else {
+						$reply = substr($reply, 0, -2) . ' and ' . $villagers_total . ' ' . chr(2) . $lang["villager_plural"] . chr(2);
+					}
+
+					$stats_roles = $this->decode($lang["stats_roles"], $nick, $reply);
+					$this->say($recipient, $stats_roles);
+				}
+			
 			}
+			
+			
 		}
 
 		// !away
@@ -620,7 +652,7 @@ class wolf extends irc {
 
 		// !votes
 		else if ( $this->isCommand($command, 'votes') && $this->hasPermission($nick, $host, 'votes') ) {
-			$this->say($nick, "This feature on phpwolf is not yet available.");
+
 		}
 
 		// !lynch
