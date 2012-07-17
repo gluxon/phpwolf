@@ -6,31 +6,23 @@ class wolf extends irc {
 
 	// List of players
 	private $players, $players_original;
+	private $lynch, $away;
 
-	// List of people in the channel (for !ping)
-	private $people;
+	// Game stores
+	private $people, $channel, $ongoing;
 
-	// Channel game is playing in
-	private $channel;
-
-	// $ongoing == true when game is running
-	private $ongoing;
-
-	// Time first person joined
-	private $game_wait;
-
-	// Amount of times !wait has been extended
-	private $wait_extended;
+	// Counters
+	private $game_wait, $wait_extended, $last_ping;
 
 	// Role variables
 	public $role_names;
 	private $seer, $wolf, $cursed, $drunk, $harlot, $traitor, $gunner, $crow, $angel, $detective;
 
-	// Pre-generated end roles message
-	private $roles_message;
-
 	// Seen, visited, killed variables (per night)
 	private $seer_seen, $wolf_killed, $harlot_visited, $gunner_shot, $angel_guarded, $detective_ided;
+
+	// Pre-generated end roles message
+	private $roles_message;
 
 	// Day and night
 	private $isDay, $isNight;
@@ -41,12 +33,17 @@ class wolf extends irc {
 		$this->random = new random();
 		$this->players = array();
 		$this->people = array();
+		$this->lynch = array();
+		$this->away = array();
 
 		$this->ongoing = false;
-		$wait_extended = 0;
+		$this->wait_extended = 0;
+		$this->last_ping = 0;
 
 		$this->isDay = null;
 		$this->isNight = null;
+		$this->day_time = 0;
+		$this->night_time = 0;
 
 		$this->roles_message = '';
 
@@ -60,7 +57,7 @@ class wolf extends irc {
 		$this->crow = array(); 
 		$this->angel = array();
 		$this->detective = array();
-		$this->role_names = array("seer", "wolf", "cursed", "drunk", "harlot", "traitor", "gunner", "crow", "angel", "detective");
+		$this->role_names = array("wolf", "seer", "cursed", "drunk", "harlot", "traitor", "gunner", "crow", "angel", "detective");
 
 		$this->seer_seen = array();
 		$this->wolf_killed = array();
@@ -245,6 +242,10 @@ class wolf extends irc {
 					return true;
 				}
 			break;
+			
+			case 'nick':
+				return true;
+			break;
 
 		}
 	
@@ -255,7 +256,20 @@ class wolf extends irc {
 	 * Nickname auto-complete
 	 */
 	public function nickAutocomplete($nick) {
-		return $nick;
+		foreach(array_keys($this->players) as $player) {
+			if ( stripos($player, $nick) === 0 ) {
+				if (isset($return)) {
+					// There are more than 1 person with that name, return original nick
+					$return = $nick;
+				} else {
+					$return = $player;
+				}
+			}
+		}
+		if (!isset($return)) {
+			$return = $nick;
+		}
+		return $return;
 	}
 
 	/**
@@ -267,7 +281,7 @@ class wolf extends irc {
 				return true;
 			}
 		}
-		return $false;
+		return false;
 	}
 
 	public function getRoles($nick) {
@@ -338,7 +352,7 @@ class wolf extends irc {
 	 * @param mixed $host Host of sender
 	 */
 	public function commands($recipient, $message, $nick, $host) {
-		global $user, $lang, $setting, $irc;
+		global $user, $lang, $setting, $limit, $irc;
 
 		if ( strpbrk(" ", $message) ) {
 			$ex_message = explode(" ", $message, 2);
@@ -364,6 +378,11 @@ class wolf extends irc {
 			$this->say($nick, $help);
 		}
 
+		// !nick
+		else if ( $this->isCommand($command, 'nick') && $this->hasPermission($nick, $host, 'nick') ) {
+			$this->say($recipient, $this->nickAutocomplete($message));
+		}
+
 		// !simple
 		else if ( $this->isCommand($command, 'simple') && $this->hasPermission($nick, $host, 'simple') ) {
 			$this->say($nick, "This feature on phpwolf is not yet available.");
@@ -371,7 +390,16 @@ class wolf extends irc {
 
 		// !back
 		else if ( $this->isCommand($command, 'back') && $this->hasPermission($nick, $host, 'back') ) {
-			$this->notice($nick, "This feature on phpwolf is not yet available.");
+			if (in_array($nick, $this->away)) {
+				$index = array_search($nick, $this->away);
+				unset($this->away[$index]);
+
+				$back = $this->decode($lang["back"]);
+				$this->say($nick, $back);
+			} else {
+				$not_away = $this->decode($lang["not_away"]);
+				$this->say($nick, $not_away);
+			}
 		}
 
 		// !quit and !leave
@@ -422,19 +450,48 @@ class wolf extends irc {
 
 		// !away
 		else if ( $this->isCommand($command, 'away') && $this->hasPermission($nick, $host, 'away') ) {
-			$this->notice($nick, "This feature on phpwolf is not yet available.");
+			if (in_array($nick, $this->away)) {
+				$index = array_search($nick, $this->away);
+				unset($this->away[$index]);
+
+				$back = $this->decode($lang["back"]);
+				$this->say($nick, $back);
+			} else {
+				array_push($this->away, $nick);
+
+				$away = $this->decode($lang["away"]);
+				$this->say($nick, $away);
+			}
 		}
 
 		// !ping
 		else if ( $this->isCommand($command, 'ping') && $this->hasPermission($nick, $host, 'ping') ) {
-			// add pm and ratelimit protection
-			$list = "";
-			foreach($this->people as $person) {
-				$list = $list . $person . ' ';
+			if ($recipient == $nick) {
+				$this->say($nick, "This feature is not available in a pm.");
 			}
-			$list = substr($list, 0, -1);
-			$ping = $this->decode($lang["ping"], null, $list);
-			$this->say($recipient, $ping);
+			else if ($this->ongoing == false) {
+				if (time() - $this->last_ping > $limit["ping"]) {
+					$this->last_ping = time();
+
+					$list = "";
+					foreach($this->people as $person) {
+						if ( !in_array($person, $this->away) && !isset($this->players[$person]) ) {
+							$list = $list . $person . ' ';
+						}
+					}
+					$list = substr($list, 0, -1);
+					// This returns PING %answer% if $list is empty
+					$ping = $this->decode($lang["ping"], null, $list);
+					$this->say($recipient, $ping);
+				} else {
+					$ratelimit = $this->decode($lang["ratelimit"]);
+					$this->say($nick, $ratelimit);
+				}
+			} else {
+				$start_ongoing = $this->decode($lang["start_ongoing"]);
+				$this->say($nick, $start_ongoing);
+			}
+
 		}
 
 		// !start
@@ -531,7 +588,24 @@ class wolf extends irc {
 
 		// !retract
 		else if ( $this->isCommand($command, 'retract') && $this->hasPermission($nick, $host, 'retract') ) {
-			$this->say($nick, "This feature on phpwolf is not yet available.");
+
+			if ($recipient == $nick) {
+				$this->say($nick, "This feature is not available in a pm.");
+			} else if ($this->ongoing == false) {
+				$start_ongoing = $this->decode($lang["start_ongoing"]);
+				$this->say($nick, $start_ongoing);
+			} else if (!$this->isPlaying($nick)) {
+				// This person is not playing, let's just ignore them
+			} else if (!$this->isPlaying($victim)) {
+				$not_playing = $this->decode($lang["not_playing"], null, $victim);
+				$this->say($nick, $not_playing);
+			} else if ($this->isNight) {
+				$this->say($nick, "Error, it is not day time");
+			} else if (isset($this->lynch[$nick])) {
+				unset($this->lynch[$nick]);
+				$lynch = $this->decode($lang["lynch"], $nick, $victim);
+				$this->say($recipient, $lynch);
+			}
 		}
 
 		// !goat
@@ -550,8 +624,31 @@ class wolf extends irc {
 		}
 
 		// !lynch
-		else if ( $this->isCommand($command, 'lynch') && $this->hasPermission($nick, $host, 'lynch') ) {
-			$this->say($nick, "This feature on phpwolf is not yet available.");
+		else if ( $this->isCommand($command, 'lynch') || $this->isCommand($command, 'vote') && $this->hasPermission($nick, $host, 'lynch') ) {
+
+			if ($recipient == $nick) {
+				$this->say($nick, "This feature is not available in a pm.");
+			} else if ($this->ongoing) {
+				$message = explode(' ', $message, 2);
+				$victim = $this->nickAutocomplete($message["0"]);
+
+				if (!$this->isPlaying($nick)) {
+					// This person is not playing, let's just ignore them (and hope they go away)
+				} else if (!$this->isPlaying($victim)) {
+					$not_playing = $this->decode($lang["not_playing"], null, $victim);
+					$this->say($nick, $not_playing);
+				} else if ($this->isNight) {
+					$this->say($nick, "Error, it is not day time");
+				} else {
+					$this->lynch[$nick] = $victim;
+					$lynch = $this->decode($lang["lynch"], $nick, $victim);
+					$this->say($recipient, $lynch);
+				}
+			} else {
+				$start_ongoing = $this->decode($lang["start_ongoing"]);
+				$this->say($nick, $start_ongoing);
+			}
+
 		}
 
 		// !coin
@@ -570,7 +667,7 @@ class wolf extends irc {
 					$coin_land = $this->decode($lang["coin_land"], null, "tails");
 					$this->say($recipient, $coin_land);
 				} else {
-					$this->sary($recipient, "There as an error retrieving random.org results.");
+					$this->say($recipient, "There as an error retrieving random.org results.");
 				}
 			}
 		}
@@ -669,7 +766,7 @@ class wolf extends irc {
 
 		/***** Private Role Commands *****/
 		else if ( $this->isCommand($command, 'see', true) ) {
-			if ($recipient == $this->channel) {
+			if ($recipient == $this->channel || $this->isDay) {
 				// ignore this, people are probably telling the seer to 'see' someone.
 			} else if ( !in_array($nick, $this->seer) ) {
 				$seer_see_not = $this->decode($lang["seer_see_not"]);
@@ -713,7 +810,7 @@ class wolf extends irc {
 		}
 
 		else if ( $this->isCommand($command, 'kill', true) ) {
-			if ($recipient == $this->channel) {
+			if ($recipient == $this->channel || $this->isDay ) {
 				// ignore this, people are probably telling the seer to 'see' someone.
 			} else if ( !in_array($nick, $this->wolf) ) {
 				$this->say($nick, "You are not a wolf. good thing too!");
@@ -768,9 +865,9 @@ class wolf extends irc {
 		$this->sendData("MODE $channel -v $nick");
 
 		foreach($this->role_names as $role) {
-			foreach($this->$role as $key => $person) {
+			foreach($this->$role as $key => &$person) {
 				if ($nick == $person) {
-					unset($this->$role[$key]);
+					unset($this->{$role}[$key]);
 				}
 			}
 		}
@@ -929,7 +1026,7 @@ class wolf extends irc {
 				$this->say($nick, $wolf_assign);
 
 				// Multiple wolves relay message
-				if ($this->wolf > 1) {
+				if (count($this->wolf) > 1) {
 					$wolf_multiple = $this->decode($lang["wolf_multiple"]);
 					$this->say($nick, $wolf_multiple);
 				}
@@ -1048,22 +1145,31 @@ class wolf extends irc {
 			$this->removePlayer($this->channel, $victim);
 		}
 
-		$amount = count($this->players);
-
-		// If the number is odd, subtract 1
-		if ($amount % 2 != 0) {
-			$amount--;
+		// Check if game has finished
+		if (count($this->wolf) == 0) {
+			// All wolves are dead
+			$this->endGame($this->channel, 1);
+		} else if (count($this->players) / 2 <= count($this->wolf)) {
+			// Wolves equal villagers
+			$this->endGame($this->channel, 2);
+		} else { 
+			$amount = count($this->players);
+	
+			// If the number is odd, subtract 1
+			if ($amount % 2 != 0) {
+				$amount--;
+			}
+			// Lynch message, and how many required to kill a victim.
+			$day_vote = $this->decode($lang["day_vote"], null, $amount / 2 + 1);
+			$this->say($this->channel, $day_vote);
+	
+			// Set booleans for.... THE SUN
+			$this->isDay = true;
+			$this->isNight = false;
+	
+			$this->current_night_start = false;
+			$this->current_day_start = time();
 		}
-		// Lynch message, and how many required to kill a victim.
-		$day_vote = $this->decode($lang["day_vote"], null, $amount / 2 + 1);
-		$this->say($this->channel, $day_vote);
-
-		// Set booleans for.... THE SUN
-		$this->isDay = true;
-		$this->isNight = false;
-
-		$this->current_night_start = false;
-		$this->current_day_start = time();
 	}
 
 	/**
@@ -1079,16 +1185,56 @@ class wolf extends irc {
 		// NOTE: Do not reset gunner shots
 		$this->detective_ided = array();
 
-		$this->day_time = $this->day_time + $lasted_time;
-		$night_turn = $this->decode($lang["night_turn"], null, $this->formatSeconds($lasted_time));
-		$this->say($this->channel, $night_turn);
+		if ($victim == null) {
+			$night_nokill = $this->decode($lang["night_nokill"]);
+			$this->say($this->channel, $night_nokill);
+		} else {
+			$dead_guy_roles = $this->getRoles($victim);
+			if ($dead_guy_roles == false) {
+				$role_list = 'villager';
+			} else {
+				$role_list = '';
+				foreach ($dead_guy_roles as $role) {
+					if ($role != 'cursed' || $role != 'gunner') {
+						$role_list = $role_list . $role . ', ';
+					}
+				}
+				$role_list = substr($role_list, 0, -2);
+			}
 
-		// Set booleans for.... THE SUN
-		$this->isDay = false;
-		$this->isNight = true;
+			$night_victim = $this->decode($lang["night_victim"], null, $victim, $role_list);
+			$this->say($this->channel, $night_victim);
+			$this->removePlayer($this->channel, $victim);
+		}
 
-		$this->current_day_start = null;
-		$this->current_night_start = time();
+		// Check if game has finished
+		if (count($this->wolf) == 0) {
+			// All wolves are dead
+			$this->endGame($this->channel, 1);
+		} else if (count($this->players) / 2 <= count($this->wolf)) {
+			// Wolves equal villagers
+			$this->endGame($this->channel, 2);
+		} else {
+			// A wolf is still alive!
+			$this->day_time = $this->day_time + $lasted_time;
+			$night_turn = $this->decode($lang["night_turn"], null, $this->formatSeconds($lasted_time));
+			$this->say($this->channel, $night_turn);
+
+			// Set booleans for.... THE SUN
+			$this->isDay = false;
+			$this->isNight = true;
+
+			$this->current_day_start = null;
+			$this->current_night_start = time();
+
+			foreach($this->role_names as $role) {
+				if (count($this->$role) > 0) {
+					foreach($this->$role as $person) {
+						$this->sendDirections($person, $role);
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -1155,6 +1301,9 @@ class wolf extends irc {
 
 		// Clear players
 		$this->players = array();
+		$this->lynch = array();
+
+		$wait_extended = 0;
 
 		// Clear all player roles
 		$this->seer = array();
@@ -1175,6 +1324,13 @@ class wolf extends irc {
 		$this->angel_guarded = array();
 		$this->detective_ided = array();
 		$this->roles_message = '';
+
+		$this->roles_message = '';
+
+		$this->isDay = null;
+		$this->isNight = null;
+		$this->day_time = 0;
+		$this->night_time = 0;
 
 		unset($this->players_original);
 	}
@@ -1229,7 +1385,29 @@ class wolf extends irc {
 						$this->turnDay( $lasted_time, reset($this->wolf_killed) );
 					}
 				}
-				
+
+			} else if ($this->isDay) {
+				foreach($this->lynch as $lyncher => $lynchee) {
+					if (isset($$lynchee)) {
+						$$lynchee = $$lynchee +1;
+					} else {
+						$$lynchee = 1;
+					}
+				}
+
+				$amount = count($this->players);
+				// If the number is odd, subtract 1
+				if ($amount % 2 != 0) {
+					$amount--;
+				}
+				// Lynch message, and how many required to kill a victim.
+				$amount = $amount / 2 + 1;
+				foreach(array_keys($this->players) as $player) {
+					if ( isset($$player) && $$player >= $amount) {
+						$lasted_time = time() - $this->current_day_start;
+						$this->turnNight($lasted_time, $player);
+					}
+				}
 			}
 
 			// This function is being repeated called, sleep for a hundreth of a second
