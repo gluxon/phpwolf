@@ -35,6 +35,7 @@ $en_US["game_welcome"]="%answer%: Welcome to Werewolf, the popular detective/soc
 // Night time
 $en_US["night_first"]="It is now nighttime. All players check for PMs from me for instructions. If you did not receive one, simply sit back, relax, and wait patiently for morning.";
 $en_US["night_turn"]="Day lasted <bold>%answer%</bold>. It is now nighttime. All players check for PMs from me for instructions. If you did not receive one, simply sit back, relax, and wait patiently for morning.";
+$en_US["night_victim"]="The mob drags a protesting <bold>%answer%</bold> to the hanging tree. S/He succumbs to the will of the horde, and is hanged. It is discovered (s)he was a <bold>%answer2%</bold>.";
 
 // Day time turn
 $en_US["day_turn"]="Night lasted <bold>%answer%</bold>. It is now daytime. The villagers awake, thankful for surviving the night, and search the village... ";
@@ -63,6 +64,8 @@ $en_US["rules_part2"]="5) Do not quit unless you need to leave. 6) No swearing a
 // Game commands
 $en_US["join"]="<bold>%nick%</bold> has joined the game.";
 $en_US["quit"]="<bold>%nick%</bold> died of an unknown disease. S/He was a <bold>%answer%</bold>.";
+$en_US["lynch"]="<bold>%nick%</bold> votes for <bold>%answer%</bold>.";
+/* NOT OFFICIAL */$en_US["retract"]="<bold>%nick%</bold> has retracted their vote";
 
 // Notices
 $en_US["game_none"]="(notice) No game is currently running.";
@@ -71,6 +74,9 @@ $en_US["join_already_playing"]="(notice) You're already playing!";
 $en_US["start_ongoing"]="(notice) Werewolf is already in play.";
 $en_US["not_playing"]="<bold>%nick%</bold> is currently not playing.";
 $en_US["not_admin"]="(notice) You are not an admin.";
+$en_US["away"]="(notice) You are now marked as away.";
+$en_US["not_away"]="(notice) You are not marked as away.";
+$en_US["back"]="(notice) You are no longer marked as away.";
 
 // Errors
 $en_US["not_playing"]="<bold>%answer%</bold> is not playing.";
@@ -85,7 +91,6 @@ $en_US["end_roles_plural"]="The %answer% were <bold>%answer2%</bold>.";
 
 // Directions
 $en_US["seer_assign"]="You are a <bold>seer</bold>. It is your job to detect the wolves, you may have a vision once per night. Use \"see <nick>\" to see the role of a player.";
-$en_US["seer_list"]="Players: Arti_, genii-around, Grovyle";
 $en_US["seer_see"]="You have a vision; in this vision, you see that <bold>%answer%</bold> is a <bold>%answer2%</bold>!";
 
 $en_US["seer_see_not"]="Only a seer may use this command";
