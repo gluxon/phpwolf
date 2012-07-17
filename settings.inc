@@ -15,7 +15,7 @@ $user["password"]="password";
 $channel["name"]="##phpwolf";
 
 // Admins array
-$admins = array("gluxon!~gluxon@unaffiliated/gluxon", "Snuupy!~Snuupy@unaffiliated/snuupy");
+$admins = array("gluxon!~gluxon@unaffiliated/gluxon", "Snuupy!~Snuupy@unaffiliated/snuupy", 'jamamjan!~jcao219@pool-173-71-8-183.dllstx.fios.verizon.net', 'RainbowDashh!~Rabbit678@unaffiliated/rainbowdashh');
 
 // Language
 $lang=$en_US;
@@ -24,7 +24,7 @@ $lang=$en_US;
 $setting["game_wait"]=0;
 $setting["game_add_wait"]=20;
 $setting["game_add_wait_limit"]=2;
-$ping_wait=60 * 5;
+$limit["ping"]=60 * 5;
 $length["night"]=60 * 2;
 $length["day"]=60 * 15;
 
