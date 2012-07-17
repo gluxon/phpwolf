@@ -371,7 +371,7 @@ class wolf extends irc {
 
 		// !back
 		else if ( $this->isCommand($command, 'back') && $this->hasPermission($nick, $host, 'back') ) {
-			$this->say($nick, "This feature on phpwolf is not yet available.");
+			$this->notice($nick, "This feature on phpwolf is not yet available.");
 		}
 
 		// !quit and !leave
@@ -422,7 +422,7 @@ class wolf extends irc {
 
 		// !away
 		else if ( $this->isCommand($command, 'away') && $this->hasPermission($nick, $host, 'away') ) {
-			$this->say($nick, "This feature on phpwolf is not yet available.");
+			$this->notice($nick, "This feature on phpwolf is not yet available.");
 		}
 
 		// !ping
