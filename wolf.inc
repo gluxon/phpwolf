@@ -380,12 +380,12 @@ class wolf extends irc {
 
 		// !nick
 		else if ( $this->isCommand($command, 'nick') && $this->hasPermission($nick, $host, 'nick') ) {
-			$this->say($recipient, $this->nickAutocomplete($message));
+			$this->notice($recipient, $this->nickAutocomplete($message));
 		}
 
 		// !simple
 		else if ( $this->isCommand($command, 'simple') && $this->hasPermission($nick, $host, 'simple') ) {
-			$this->say($nick, "This feature on phpwolf is not yet available.");
+			$this->notice($nick, "This feature on phpwolf is not yet available.");
 		}
 
 		// !back
@@ -395,10 +395,10 @@ class wolf extends irc {
 				unset($this->away[$index]);
 
 				$back = $this->decode($lang["back"]);
-				$this->say($nick, $back);
+				$this->notice($nick, $back);
 			} else {
 				$not_away = $this->decode($lang["not_away"]);
-				$this->say($nick, $not_away);
+				$this->notice($nick, $not_away);
 			}
 		}
 
@@ -455,12 +455,12 @@ class wolf extends irc {
 				unset($this->away[$index]);
 
 				$back = $this->decode($lang["back"]);
-				$this->say($nick, $back);
+				$this->notice($nick, $back);
 			} else {
 				array_push($this->away, $nick);
 
 				$away = $this->decode($lang["away"]);
-				$this->say($nick, $away);
+				$this->notice($nick, $away);
 			}
 		}
 
@@ -520,7 +520,7 @@ class wolf extends irc {
 			// Game has already started
 			else if ($this->ongoing) {
 				$start_ongoing = $this->decode($lang["start_ongoing"], $nick);
-				$this->say($nick, $start_ongoing);
+				$this->notice($nick, $start_ongoing);
 			}
 
 			// Sucess!
@@ -636,9 +636,9 @@ class wolf extends irc {
 					// This person is not playing, let's just ignore them (and hope they go away)
 				} else if (!$this->isPlaying($victim)) {
 					$not_playing = $this->decode($lang["not_playing"], null, $victim);
-					$this->say($nick, $not_playing);
+					$this->notice($nick, $not_playing);
 				} else if ($this->isNight) {
-					$this->say($nick, "Error, it is not day time");
+					$this->notice($nick, "You can only lynch during the day.");
 				} else {
 					$this->lynch[$nick] = $victim;
 					$lynch = $this->decode($lang["lynch"], $nick, $victim);
