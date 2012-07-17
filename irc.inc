@@ -60,6 +60,16 @@ class irc {
 	}
 
 	/**
+	 * Sends a message to a room or user
+	 *
+	 * @param mixed $recipient An IRC room or user
+	 * @param mixed $message The message to be sent
+	 */
+        public function notice($recipient, $message) {
+                $this->sendData("NOTICE $recipient :$message");
+        }
+
+	/**
 	 * Sends password to NickServ
 	 *
 	 * @param mixed $password Password
