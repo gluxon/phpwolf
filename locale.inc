@@ -41,6 +41,8 @@ $en_US["night_victim"]="The mob drags a protesting <bold>%answer%</bold> to the 
 $en_US["day_turn"]="Night lasted <bold>%answer%</bold>. It is now daytime. The villagers awake, thankful for surviving the night, and search the village... ";
 $en_US["day_victim"]="The dead body of <bold>%answer%</bold>, a <bold>%answer2%</bold>, is found. Those remaining mourn his/her death.";
 $en_US["day_nokill"]="The body of a young penguin pet is found. All villagers, however, have survived.";
+$en_US["day_harlot"]="The wolves' selected victim was a harlot, but she wasn't home.";
+$en_US["day_harlot_dead"]="<bold>%answer%</bold>, a <bold>harlot</bold>, made the unfortunate mistake of visiting a wolf's house last night and is now dead.";
 $en_US["day_vote"]="The villagers must now vote for whom to lynch. Use \"!lynch <nick>\" to cast your vote. %answer% votes are required to lynch.";
 
 // Maintenance
@@ -56,6 +58,7 @@ $en_US["away"]="(notice) You are now marked as away.";
 $en_US["back"]="(notice) You are no longer marked as away.";
 $en_US["stats"]="%nick%: <bold>%answer%</bold> players: %answer2%";
 $en_US["stats_none"]="%nick%: There are no players.";
+$en_US["stats_roles"]="%nick%: There is %answer%";
 $en_US["wait"]="<bold>%nick%</bold> increased the wait time by %answer% seconds.";
 $en_US["wait_limit"]="Limit has already been reached for extending the wait time.";
 $en_US["rules_part1"]="##phpwolf channel rules: 1) Be nice to others. 2) Do not share information after death. 3) No bots allowed. 4) Do not play with clones.";
@@ -68,15 +71,15 @@ $en_US["lynch"]="<bold>%nick%</bold> votes for <bold>%answer%</bold>.";
 /* NOT OFFICIAL */$en_US["retract"]="<bold>%nick%</bold> has retracted their vote";
 
 // Notices
-$en_US["game_none"]="(notice) No game is currently running.";
-$en_US["ratelimit"]="(notice) This command is rate-limited. Please wait a while before using it again.";
-$en_US["join_already_playing"]="(notice) You're already playing!";
-$en_US["start_ongoing"]="(notice) Werewolf is already in play.";
+$en_US["game_none"]="No game is currently running.";
+$en_US["ratelimit"]="This command is rate-limited. Please wait a while before using it again.";
+$en_US["join_already_playing"]="You're already playing!";
+$en_US["start_ongoing"]="Werewolf is already in play.";
 $en_US["not_playing"]="<bold>%nick%</bold> is currently not playing.";
-$en_US["not_admin"]="(notice) You are not an admin.";
-$en_US["away"]="(notice) You are now marked as away.";
-$en_US["not_away"]="(notice) You are not marked as away.";
-$en_US["back"]="(notice) You are no longer marked as away.";
+$en_US["not_admin"]="You are not an admin.";
+$en_US["away"]="You are now marked as away.";
+$en_US["not_away"]="You are not marked as away.";
+$en_US["back"]="You are no longer marked as away.";
 
 // Errors
 $en_US["not_playing"]="<bold>%answer%</bold> is not playing.";
@@ -107,7 +110,7 @@ $en_US["wolf_relay"]="<bold>auror</bold> says: kill snu";
 $en_US["drunk_assign"]="You have been drinking too much! You are the <bold>village drunk</bold>.";
 
 $en_US["harlot_assign"]="You are a <bold>harlot</bold>. You may spend the night with one person per round. If you visit a victim of a wolf, or visit a wolf, you will die. Use !visit to visit a player.";
-$en_US["harlot_visit"]="You are spending the night with <bold>moriarty</bold>. Have a good time!";
+$en_US["harlot_visit"]="You are spending the night with <bold>%answer%</bold>. Have a good time!";
 
 $en_US["traitor_assign"]="You are a <bold>traitor</bold>. You are exactly like a villager and not even a seer can see your true identity. Only detectives can.";
 $en_US["traitor_transform"]="<bold>The villagers, during their celebrations, are frightened as they hear a loud howl. The wolves are not gone!</bold>";
