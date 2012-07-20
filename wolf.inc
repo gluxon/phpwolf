@@ -1240,9 +1240,15 @@ class wolf extends irc {
 
 					// Conditions satisfied, give another role!
 					array_push($this->$role_name, $players_sorted[$player_index]);
-					$this->sendDirections($players_sorted[$player_index], $role_name);
 					break;
-
+				}
+			}
+		}
+		// Roles have all been assigned, we can now send directions
+		foreach ($this->role_names as $role) {
+			if (count($this->$role) > 0) {
+				foreach ($this->$role as $player) {
+					$this->sendDirections($player, $role);
 				}
 			}
 		}
