@@ -63,6 +63,9 @@ $en_US["wait"]="<bold>%nick%</bold> increased the wait time by %answer% seconds.
 $en_US["wait_limit"]="Limit has already been reached for extending the wait time.";
 $en_US["rules_part1"]="##phpwolf channel rules: 1) Be nice to others. 2) Do not share information after death. 3) No bots allowed. 4) Do not play with clones.";
 $en_US["rules_part2"]="5) Do not quit unless you need to leave. 6) No swearing and keep it family-friendly. 7) Do not paste PM's from the bot during the game. 8) Use common sense. 9) Waiting for timeouts is discouraged.";
+//$en_US["votes"]="%nick%: njstein: 1 (gluxon), gluxon: 2 (Nascar1996 rwg), FoolsTP: 1 (Mithadon)";
+$en_US["votes"]="%nick%: %answer%";
+$en_US["votes_required"]="gluxon: 4 players, 3 votes required to lynch, 4 players available to vote.";
 
 // Game commands
 $en_US["join"]="<bold>%nick%</bold> has joined the game.";
