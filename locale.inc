@@ -104,11 +104,9 @@ $en_US["seer_seen"]="You may only have one vision per round.";
 $en_US["seer_see_day"]="You may only have visions at night.";
 
 $en_US["wolf_assign"]="You are a <bold>wolf</bold>. It is your job to kill all the villagers. Use \"kill <nick>\" to kill a villager.";
-//$en_US["wolf_multiple"]="Also, if you PM me, your message will be relayed to other wolves.";
-$en_US["wolf_multiple"]="Wolf relay has not been added yet.";
-$en_US["wolf_list"]="<bold>Players:</bold> auror (wolf), ishanyx, Mithadon, MrBenC, sheep, Snuupy, Surfcash";
+$en_US["wolf_multiple"]="Also, if you PM me, your message will be relayed to other wolves.";
 $en_US["wolf_kill"]="You have selected <bold>%answer%</bold> to be killed.";
-$en_US["wolf_relay"]="<bold>auror</bold> says: kill snu";
+$en_US["wolf_relay"]="<bold>%nick%</bold> says: %answer%";
 
 $en_US["drunk_assign"]="You have been drinking too much! You are the <bold>village drunk</bold>.";
 
