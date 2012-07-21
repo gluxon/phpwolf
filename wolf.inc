@@ -460,6 +460,16 @@ class wolf extends irc {
 		return substr($list, 0, -2);
 	}
 
+	public function relayToWolves($sender, $message) {
+		global $lang;
+		foreach($this->wolf as $wolf) {
+			if ($wolf != $sender) {
+				$wolf_relay = $this->decode($lang["wolf_relay"], $sender, $message);
+				$this->say($wolf, $wolf_relay);
+			}
+		}
+	}
+
 	/**
 	 * Run the corresponding command
 	 *
@@ -1751,17 +1761,32 @@ class wolf extends irc {
 
 					$message=implode(" ", $implode);
 
+					// Wolf relay for game
+					// If the game ongoing, recipient is phpwolf,          user is wolf,          and there is more than one wolf
+					if ($this->ongoing && $recipient == $user["nick"] && in_array($nick, $this->wolf) && count($this->wolf) > 1) {
+						$this->relayToWolves($nick, $message);
+					}
+
 					$this->commands($recipient, $message, $nick, $host);
 				break;
-				case 'QUIT':
-					// Remove from peoples list
-					$key = array_search($nick, $this->people);
-					unset($this->people[$key]);
-				break;
+				case 'KICK':
+				case 'QUIT': // Alias PART
+					$nick = $data["3"];
 				case 'PART':
 					// Remove from peoples list
 					$key = array_search($nick, $this->people);
 					unset($this->people[$key]);
+
+					$recipient = $data["2"];
+
+					// Quit update for game
+					if (isset($this->players[$nick])) {
+						$this->commands($recipient, "!quit", $nick, $host);
+					}
+					// Quit update for lynch
+					if (isset($this->lynch[$nick])) {
+						unset($this->lynch[$nick]);
+					}
 				break;
 				case 'JOIN':
 					// Add to peoples list
