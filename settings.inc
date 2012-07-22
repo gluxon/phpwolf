@@ -15,7 +15,7 @@ $user["password"]="password";
 $channel["name"]="##phpwolf";
 
 // Admins array
-$admins = array("gluxon!~gluxon@unaffiliated/gluxon", "Snuupy!~Snuupy@unaffiliated/snuupy", 'jamamjan!~jcao219@pool-173-71-8-183.dllstx.fios.verizon.net', 'RainbowDashh!~Rabbit678@unaffiliated/rainbowdashh');
+$admins = array("gluxon!~gluxon@unaffiliated/gluxon", "Snuupy!~Snuupy@unaffiliated/snuupy", 'jamamjan!~jcao219@pool-173-71-8-183.dllstx.fios.verizon.net', 'RainbowDashh!~Rabbit678@unaffiliated/rainbowdashh', "[ceradon]!~chatzilla@wikimedia/Ceradon");
 
 // Language
 $lang=$en_US;

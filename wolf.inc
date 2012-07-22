@@ -1143,16 +1143,24 @@ class wolf extends irc {
 		else if ( $this->isCommand($command, 'whoami', true) ) {
 			if ( $this->ongoing ) {
 				if ( $this->isPlaying($nick) ) {
-					$roles = $this->getRoles($nick)
-					if ( in_array("cursed", $roles) ) {
-						// Don't tell the cursed that he's cursed; it defeats the purpose.
-						$cu_roles = $roles;
-						$pos = array_search("cursed", $cu_roles);
-						$cu_roles = unset($cu_roles[$pos]);
-						$this->say($nick, "You currently hold the role(s): " . implode(", ", $cu_roles);
+					$roles = $this->getRoles($nick);
+					if ( is_array($roles) ) {
+						if ( in_array("cursed", $roles) ) {
+							// Don't tell the cursed that he's cursed; it defeats the purpose.
+							$cu_roles = $roles;
+							$pos = array_search("cursed", $cu_roles);
+							unset($cu_roles[$pos]);
+							$this->say($nick, "You currently hold the role(s): " . implode(", ", $cu_roles));
+						} else {
+							//Tell the player what roles they hold.
+							$this->say($nick, "You currently hold the role(s): " . implode(", ", $cu_roles));
+						}
 					} else {
-						//Tell the player what roles they hold.
-						$this->say($nick, "You currently hold the role(s): " . implode(", ", $cu_roles);
+						if ( $roles == "cursed" ) {
+							$this->say($nick, "You currently hold the role(s): villager");
+						} else {
+							$this->say($nick, "You currently hold the role(s): " . $roles);
+						}
 					}
 				} else {
 					//The person is not playing.
