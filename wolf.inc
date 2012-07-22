@@ -1140,6 +1140,29 @@ class wolf extends irc {
 			}
 		}
 
+		else if ( $this->isCommand($command, 'whoami', true) ) {
+			if ( $this->ongoing ) {
+				if ( $this->isPlaying($nick) ) {
+					$roles = $this->getRoles($nick)
+					if ( in_array("cursed", $roles) ) {
+						// Don't tell the cursed that he's cursed; it defeats the purpose.
+						$cu_roles = $roles;
+						$pos = array_search("cursed", $cu_roles);
+						$cu_roles = unset($cu_roles[$pos]);
+						$this->say($nick, "You currently hold the role(s): " . implode(", ", $cu_roles);
+					} else {
+						//Tell the player what roles they hold.
+						$this->say($nick, "You currently hold the role(s): " . implode(", ", $cu_roles);
+					}
+				} else {
+					//The person is not playing.
+					$this->say($nick, "You are not currently playing. Only players in the game may request this command.");
+				}
+			} else {
+				//No game is currently running.
+				$this->say($nick, $this->decode($lang["game_none"]));
+			}
+		}
 	}
 
 	/**
