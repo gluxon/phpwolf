@@ -468,6 +468,12 @@ class wolf extends irc {
 				$this->say($wolf, $wolf_relay);
 			}
 		}
+		foreach($this->traitor as $traitor) {
+			if ($traitor != $sender) {
+				$wolf_relay = $this->decode($lang["wolf_relay"], $sender, $message);
+				$this->say($wolf, $wolf_relay);
+			}
+		}
 	}
 
 	/**
@@ -753,9 +759,6 @@ class wolf extends irc {
 				// Assign roles
 				$this->assignRoles();
 
-				// We do not want socket blocking for werewolf
-				$irc->setBlocking(false);
-
 				// Send night message
 				$night_first = $this->decode($lang["night_first"]);
 				$this->say($recipient, $night_first);
@@ -797,6 +800,9 @@ class wolf extends irc {
 					}
 				}
 				$this->roles_message = substr($this->roles_message, 0, -1); // remove trailing space
+
+				// We do not want socket blocking for werewolf now
+				$irc->setBlocking(false);
 
 			}
 
@@ -1190,12 +1196,6 @@ class wolf extends irc {
 		$game_roles = $roles[$index];
 		$this->roles_set = $game_roles;
 
-		// Define if there are multiple wolves
-		/*$this->multiple_wolves = NULL;
-		if ($game_roles["1"] > 1) {
-			$this->multiple_wolves = true;
-		}*/
-
 		// Reconstruct players array
 		$i=0;
 		foreach(array_keys($this->players) as $key) {
@@ -1291,7 +1291,7 @@ class wolf extends irc {
 				$this->say($nick, $wolf_assign);
 
 				// Multiple wolves relay message
-				if (count($this->wolf) > 1) {
+				if (count($this->wolf) + count($this->traitor) > 1) {
 					$wolf_multiple = $this->decode($lang["wolf_multiple"]);
 					$this->say($nick, $wolf_multiple);
 				}
@@ -1329,7 +1329,7 @@ class wolf extends irc {
 				$this->say($nick, $traitor_assign);
 
 				// Multiple wolves relay message
-				if (count($this->wolf) > 1) {
+				if (count($this->wolf) + count($this->traitor) > 1) {
 					$wolf_multiple = $this->decode($lang["wolf_multiple"]);
 					$this->say($nick, $wolf_multiple);
 				}
@@ -1427,13 +1427,12 @@ class wolf extends irc {
 		$this->angel_guarded = array();
 
 		// Check if game has finished
-		if (count($this->wolf) == 0) {
-			// All wolves are dead
-			$this->endGame($this->channel, 1);
-		} else if (count($this->players) / 2 <= count($this->wolf)) {
+		// Only possible end scenario at begginning of day is wolves equaling villagers =>>
+		// since wolves can't get eaten
+		if (count($this->players) / 2 <= count($this->wolf)) {
 			// Wolves equal villagers
 			$this->endGame($this->channel, 2);
-		} else { 
+		} else {
 			$amount = count($this->players);
 
 			// If the number is odd, subtract 1
@@ -1466,6 +1465,9 @@ class wolf extends irc {
 		// NOTE: Do not reset gunner shots
 		$this->detective_ided = array();
 
+		// Clear lynches
+		$this->lynch = array();
+
 		if ($victim == null) {
 			$night_nokill = $this->decode($lang["night_nokill"]);
 			$this->say($this->channel, $night_nokill);
@@ -1489,14 +1491,26 @@ class wolf extends irc {
 		}
 
 		// Check if game has finished
-		if (count($this->wolf) == 0) {
-			// All wolves are dead
+		if (count($this->wolf) == 0 && count($this->traitor) == 0) {
+			// All evildoers are dead
 			$this->endGame($this->channel, 1);
-		} else if (count($this->players) / 2 <= count($this->wolf)) {
+		} else if (count($this->players) / 2 <= count($this->wolf) + count($this->traitor) ) {
 			// Wolves equal villagers
 			$this->endGame($this->channel, 2);
 		} else {
-			// A wolf is still alive!
+			// No more wolves, traitor transforms
+			if (count($this->wolf) == 0 && count($this->traitor) > 0) {
+				$traitor_transform = $this->decode($lang["traitor_transform"]);
+				$this->say($this->channel, $traitor_transform);
+
+				// Transform traitor and tell them
+				$lucky_traitor = reset($this->traitor);
+				array_push($this->wolf, $lucky_traitor);
+				$traitor_notify = $this->decode($lang["traitor_notify"]);
+				$this->say($lucky_traitor, $traitor_notify);
+				unset($this->traitor[key($this->traitor)]);
+			}
+
 			$this->day_time = $this->day_time + $lasted_time;
 			$night_turn = $this->decode($lang["night_turn"], null, $this->formatSeconds($lasted_time));
 			$this->say($this->channel, $night_turn);
@@ -1625,10 +1639,21 @@ class wolf extends irc {
 		if ($this->ongoing) {
 
 			// Check if game has finished
-			if (count($this->wolf) == 0) {
-				// All wolves are dead
+			if (count($this->wolf) == 0 && count($this->traitor) == 0 ) {
+				// All evildoers are dead
 				$this->endGame($this->channel, 1);
-			} else if (count($this->players) / 2 <= count($this->wolf)) {
+			} else if (count($this->wolf) == 0 && count($this->traitor) > 0) {
+				// No more wolves, traitor transforms
+				$traitor_transform = $this->decode($lang["traitor_transform"]);
+				$this->say($this->channel, $traitor_transform);
+
+				// Transform traitor and tell them
+				$lucky_traitor = reset($this->traitor);
+				array_push($this->wolf, $lucky_traitor);
+				$traitor_notify = $this->decode($lang["traitor_notify"]);
+				$this->say($lucky_traitor, $traitor_notify);
+				unset($this->traitor[key($this->traitor)]);
+			} else if (count($this->players) / 2 <= count($this->wolf) + count($this->traitor) ) {
 				// Wolves equal villagers
 				$this->endGame($this->channel, 2);
 			}
@@ -1671,7 +1696,10 @@ class wolf extends irc {
 							} else if ($role == 'detective') {
 
 							}
-							$i_role++;
+
+							if ($role != 'drunk' && $role != 'cursed' && $role != 'traitor' && $role != 'gunner' && $role != 'detective') {
+								$i_role++;
+							}
 						}
 					}
 					if ($i_role == $i_condition) {
@@ -1762,8 +1790,8 @@ class wolf extends irc {
 					$message=implode(" ", $implode);
 
 					// Wolf relay for game
-					// If the game ongoing, recipient is phpwolf,          user is wolf,          and there is more than one wolf
-					if ($this->ongoing && $recipient == $user["nick"] && in_array($nick, $this->wolf) && count($this->wolf) > 1) {
+					// If the game ongoing, recipient is phpwolf,          user is wolf or traitor,                         and there is more than one wolf
+					if ($this->ongoing && $recipient == $user["nick"] && ( in_array($nick, $this->wolf) || in_array($nick, $this->traitor) ) && count($this->wolf) > 1) {
 						$this->relayToWolves($nick, $message);
 					}
 
