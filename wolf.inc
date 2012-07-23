@@ -148,35 +148,35 @@ class wolf extends irc {
 
 			case 'help':
 				return true;
-				break;
+			break;
 
 			case 'simple':
 				return true;
-				break;
+			break;
 
 			case 'back':
 				return true;
-				break;
+			break;
 
 			case 'quit':
 				return true;
-				break;
+			break;
 
 			case 'stats':
 				return true;
-				break;
+			break;
 
 			case 'away':
 				return true;
-				break;
+			break;
 
 			case 'ping':
 				return true;
-				break;
+			break;
 
 			case 'start':
 				return true;
-				break;
+			break;
 
 			case 'retract':
 				return true;
@@ -184,39 +184,43 @@ class wolf extends irc {
 
 			case 'goat':
 				return true;
-				break;
+			break;
 
 			case 'shoot':
 				return true;
-				break;
+			break;
 
 			case 'votes':
 				return true;
-				break;
+			break;
 
 			case 'lynch':
 				return true;
-				break;
+			break;
 
 			case 'coin':
 				return true;
-				break;
+			break;
 
 			case 'wait':
 				return true;
-				break;
+			break;
 
 			case 'join':
 				return true;
-				break;
+			break;
 
 			case 'rules':
 				return true;
-				break;
+			break;
 
 			case 'admins':
 				return true;
-				break;
+			break;
+				
+			case 'whoami':
+				return true;
+			break;
 
 			case 'msg':
 				if (in_array($host, $admins)) {
@@ -963,6 +967,8 @@ class wolf extends irc {
 
 		}
 
+		
+
 		// !rules
 		else if ( $this->isCommand($command, 'rules') && $this->hasPermission($nick, $host, 'rules') ) {
 			$rules_part1 = $this->decode($lang["rules_part1"]);
@@ -1142,6 +1148,31 @@ class wolf extends irc {
 					// This person wasn't playing
 					$not_playing=$this->decode($lang["not_playing"], null, $person);
 					$this->notice($nick, $not_playing);
+				}
+			}
+		}
+
+		// whoami (needs official locale)
+		else if ( $this->isCommand($command, 'whoami', true) ) {
+			if (!$this->ongoing) {
+				//No game is currently running.
+				$this->say($nick, $this->decode($lang["game_none"]));
+			} else if ( !$this->isPlaying($nick) ) {
+				//The person is not playing.
+				$this->say($nick, "You are not currently playing. Only players in the game may request this command.");
+			} else {
+				$roles = $this->getRoles($nick);
+				if ($roles === false) {
+					$this->say($nick, "Ur a wullager.");
+				} else if ( in_array("cursed", $roles) ) {
+					// Don't tell the cursed that he's cursed; it defeats the purpose.
+					$cursed_roles = $roles;
+					$pos = array_search("cursed", $cursed_roles);
+					unset($cursed_roles[$pos]);
+					$this->say($nick, "You currently hold the role(s): " . implode(", ", $cursed_roles));
+				} else {
+					//Tell the player what roles they hold.
+					$this->say($nick, "You currently hold the role(s): " . implode(", ", $cursed_roles));
 				}
 			}
 		}
