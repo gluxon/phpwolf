@@ -15,7 +15,7 @@ $user["password"]="password";
 $channel["name"]="##phpwolf";
 
 // Admins array
-$admins = array("gluxon!~gluxon@unaffiliated/gluxon", "Snuupy!~Snuupy@unaffiliated/snuupy", 'jamamjan!~jcao219@pool-173-71-8-183.dllstx.fios.verizon.net', 'RainbowDashh!~Rabbit678@unaffiliated/rainbowdashh', "[ceradon]!~chatzilla@wikimedia/Ceradon");
+$admins = array("~gluxon@unaffiliated/gluxon", "~Snuupy@unaffiliated/snuupy", '~jcao219@wikibooks/Jcao219', '~chatzilla@wikimedia/Ceradon');
 
 // Language
 $lang=$en_US;
@@ -25,22 +25,23 @@ $setting["game_wait"]=0;
 $setting["game_add_wait"]=20;
 $setting["game_add_wait_limit"]=2;
 $limit["ping"]=60 * 5;
+$limit["stats"]=60 * 1/2;
 $length["night"]=60 * 2;
 $length["day"]=60 * 15;
 
 $roles = array(
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-// PLAYERS:           SEER    WOLF   CURSED   DRUNK   HARLOT  TRAITOR  GUNNER   CROW   ANGEL DETECTIVE  //
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-      4    => array(   1   ,   1   ,   0   ,   0   ,   0   ,    0   ,   0   ,   0   ,   0   ,   0   ), //
-      6    => array(   1   ,   1   ,   1   ,   1   ,   0   ,    0   ,   0   ,   0   ,   0   ,   0   ), //
-      8    => array(   1   ,   2   ,   1   ,   1   ,   1   ,    0   ,   0   ,   0   ,   0   ,   0   ), //
-      10   => array(   1   ,   2   ,   1   ,   1   ,   1   ,    1   ,   1   ,   0   ,   0   ,   0   ), //
-      11   => array(   1   ,   2   ,   1   ,   1   ,   1   ,    1   ,   1   ,   0   ,   1   ,   0   ), //
-      15   => array(   1   ,   3   ,   1   ,   1   ,   1   ,    1   ,   1   ,   0   ,   1   ,   1   ), //
-      22   => array(   1   ,   4   ,   1   ,   1   ,   1   ,    1   ,   1   ,   0   ,   1   ,   1   ), //
-      29   => array(   1   ,   5   ,   1   ,   1   ,   1   ,    1   ,   1   ,   0   ,   1   ,   1   )  //
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// PLAYERS:           SEER    WOLF   CURSED   DRUNK  HARLOT  TRAITOR  GUNNER   CROW   ANGEL DETECTIVE  //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+      4    => array(   1   ,   1   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ), //
+      6    => array(   1   ,   1   ,   1   ,   1   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ), //
+      8    => array(   1   ,   2   ,   1   ,   1   ,   1   ,   0   ,   0   ,   0   ,   0   ,   0   ), //
+      10   => array(   1   ,   2   ,   1   ,   1   ,   1   ,   1   ,   1   ,   0   ,   0   ,   0   ), //
+      11   => array(   1   ,   2   ,   1   ,   1   ,   1   ,   1   ,   1   ,   0   ,   1   ,   0   ), //
+      15   => array(   1   ,   3   ,   1   ,   1   ,   1   ,   1   ,   1   ,   0   ,   1   ,   1   ), //
+      22   => array(   1   ,   4   ,   1   ,   1   ,   1   ,   1   ,   1   ,   0   ,   1   ,   1   ), //
+      29   => array(   1   ,   5   ,   1   ,   1   ,   1   ,   1   ,   1   ,   0   ,   1   ,   1   )  //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
 );
 
 ?>
