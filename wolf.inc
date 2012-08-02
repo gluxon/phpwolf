@@ -229,6 +229,15 @@ class wolf extends irc {
 				}
 			break;
 
+			case 'deop':
+			case 'voice':
+			case 'devoice':
+			case 'op':
+				if (in_array($host, $admins)) {
+					return true;
+				}
+			break;
+
 			case 'fstart':
 				if (in_array($host, $admins)) {
 					return true;
@@ -998,6 +1007,54 @@ class wolf extends irc {
 		else if ( $this->isCommand($command, 'msg') && $this->hasPermission($nick, $host, 'msg') ) {
 			$message=explode(" ", $message, 2);
 			$this->say($message["0"], $message["1"]);
+		}
+
+		// !op
+		else if ( $this->isCommand($command, 'op') && $this->hasPermission($nick, $host, 'op') ) {
+			$message=explode(" ", $message);
+			if (empty($message["0"]) && $recipient != $nick) { 
+				$this->mode($recipient, '+o', $nick);
+			} else if (count($message) >= 2) {
+				$this->mode($message["0"], '+o', $message["1"]);
+			} else if (count($message) >= 1 && $recipient != $nick) {
+				$this->mode($recipient, '+o', $message["0"]);
+			}
+		}
+
+		// !deop
+		else if ( $this->isCommand($command, 'deop') && $this->hasPermission($nick, $host, 'deop') ) {
+			$message=explode(" ", $message);
+			if (empty($message["0"]) && $recipient != $nick) { 
+				$this->mode($recipient, '-o', $nick);
+			} else if (count($message) >= 2) {
+				$this->mode($message["0"], '-o', $message["1"]);
+			} else if (count($message) >= 1 && $recipient != $nick) {
+				$this->mode($recipient, '-o', $message["0"]);
+			}
+		}
+
+		// !voice
+		else if ( $this->isCommand($command, 'voice') && $this->hasPermission($nick, $host, 'voice') ) {
+			$message=explode(" ", $message);
+			if (empty($message["0"]) && $recipient != $nick) {
+				$this->mode($recipient, '+v', $nick);
+			} else if (count($message) >= 2) {
+				$this->mode($message["0"], '+v', $message["1"]);
+			} else if (count($message) >= 1 && $recipient != $nick) {
+				$this->mode($recipient, '+v', $message["0"]);
+			}
+		}
+
+		// !devoice
+		else if ( $this->isCommand($command, 'devoice') && $this->hasPermission($nick, $host, 'devoice') ) {
+			$message=explode(" ", $message);
+			if (empty($message["0"]) && $recipient != $nick) {
+				$this->mode($recipient, '-v', $nick);
+			} else if (count($message) >= 2) {
+				$this->mode($message["0"], '-v', $message["1"]);
+			} else if (count($message) >= 1 && $recipient != $nick) {
+				$this->mode($recipient, '-v', $message["0"]);
+			}
 		}
 
 		// !fstart
