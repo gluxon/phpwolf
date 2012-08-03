@@ -31,6 +31,9 @@ class wolf extends irc {
 	private $current_day_start, $current_night_start;
 	private $fday, $fnight;
 
+	// Goat
+	private $goat;
+
 	public function __construct() {
 		$this->random = new random();
 		$this->players = array();
@@ -47,6 +50,7 @@ class wolf extends irc {
 		$this->isNight = null;
 		$this->day_time = 0;
 		$this->night_time = 0;
+		$this->goat = true;
 
 		$this->fday = false;
 		$this->fnight = false;
@@ -275,6 +279,18 @@ class wolf extends irc {
 			break;
 			
 			case 'frestart':
+				if (in_array($host, $admins)) {
+					return true;
+				}
+			break;
+
+			case 'quiet':
+				if (in_array($host, $admins)) {
+					return true;
+				}
+			break;
+			
+			case 'unquiet':
 				if (in_array($host, $admins)) {
 					return true;
 				}
@@ -856,7 +872,23 @@ class wolf extends irc {
 
 		// !goat
 		else if ( $this->isCommand($command, 'goat') && $this->hasPermission($nick, $host, 'goat') ) {
-			$this->say($nick, "This feature on phpwolf is not yet available.");
+			$goated = $this->nickAutocomplete($message);
+			
+			if ($recipient == $nick) {
+				$this->say($nick, "This feature is not available in a pm.");
+			} else if ($this->ongoing==false){
+				$this->say($recipient, "No game is currently running.");
+			} else if (!$this->isPlaying($nick)) {
+				$this->say($recipient, "Player is not playing.");
+			} else if ($this->isNight) {
+				$this->say($recipient, "Error, it is not day time");
+			} else if ($this->goat==false) {
+				$this->say($recipient, "You can only do that once per day.");
+			}  else
+			{
+				$this->say($recipient, $nick ."'s goat walks by and kicks ". $goated);
+				$this->goat = false;
+			}
 		}
 
 		// !shoot
@@ -1054,6 +1086,24 @@ class wolf extends irc {
 				$this->mode($message["0"], '-v', $message["1"]);
 			} else if (count($message) >= 1 && $recipient != $nick) {
 				$this->mode($recipient, '-v', $message["0"]);
+			}
+		}
+
+		// !quiet
+		else if ( $this->isCommand($command, 'quiet') && $this->hasPermission($nick, $host, 'quiet')  ) {
+			if ($recipient == $nick) {
+				$this->say($nick, "This feature is not available in a pm.");
+			} else {
+			$this->say('ChanServ', "QUIET $recipient $message");
+			}
+		}
+		
+		// !unquiet
+		else if ( $this->isCommand($command, 'unquiet') && $this->hasPermission($nick, $host, 'unquiet') ) {
+			if ($recipient == $nick) {
+				$this->say($nick, "This feature is not available in a pm.");
+			} else {
+			$this->say('ChanServ', "UNQUIET $recipient $message");
 			}
 		}
 
@@ -1560,6 +1610,9 @@ class wolf extends irc {
 
 		// Clear lynches
 		$this->lynch = array();
+
+		// Reset goat
+		$this->goat = true;
 
 		if ($victim == null) {
 			$night_nokill = $this->decode($lang["night_nokill"]);
