@@ -81,6 +81,17 @@ class irc {
 	}
 
 	/**
+	 * Manipulate user modes in channel
+	 *
+	 * @param mixed $channel Channel
+	 * @param mixed $operation Modes to add/take
+	 * @param mixed $user User to operate on
+	 */
+	public function mode($channel, $operation, $user) {
+		$this->sendData("MODE $channel $operation $user");
+	}
+
+	/**
 	 * Sends the irc ident
 	 *
 	 * @param mixed $nick Nick
