@@ -66,6 +66,7 @@ $en_US["rules_part2"]="5) Do not quit unless you need to leave. 6) No swearing a
 //$en_US["votes"]="%nick%: njstein: 1 (gluxon), gluxon: 2 (Nascar1996 rwg), FoolsTP: 1 (Mithadon)";
 $en_US["votes"]="%nick%: %answer%";
 $en_US["votes_required"]="gluxon: 4 players, 3 votes required to lynch, 4 players available to vote.";
+$en_US["goat"]="<bold>%nick%</bold>'s goat walks by and kicks <bold>%answer%</bold>";
 
 // Game commands
 $en_US["join"]="<bold>%nick%</bold> has joined the game.";
