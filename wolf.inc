@@ -442,9 +442,9 @@ class wolf extends irc {
 						}
 					}
 				}
-	
+
 				$this->removePlayer($recipient, $nick);
-	
+
 				$quit = $this->decode($lang["quit"], $nick, $answer);
 				$this->say($recipient, $quit);
 			}
@@ -458,7 +458,7 @@ class wolf extends irc {
 				$ratelimit = $this->decode($lang["ratelimit"]);
 				$this->notice($nick, $ratelimit);
 			} else {
-				
+
 
 				// Get amount of players
 				$answer = count($this->players);
@@ -659,15 +659,12 @@ class wolf extends irc {
 				$this->notice($nick, $start_ongoing);
 			} else if (!$this->isPlaying($nick)) {
 				// This person is not playing, let's just ignore them
-			} else if (!$this->isPlaying($victim)) {
-				$not_playing = $this->decode($lang["not_playing"], null, $victim);
-				$this->notice($nick, $not_playing);
 			} else if ($this->isNight) {
 				$this->say($nick, "Error, it is not day time");
 			} else if (isset($this->lynch[$nick])) {
 				unset($this->lynch[$nick]);
-				$lynch = $this->decode($lang["lynch"], $nick, $victim);
-				$this->say($recipient, $lynch);
+				$retract = $this->decode($lang["retract"], $nick);
+				$this->say($recipient, $retract);
 			}
 		}
 
@@ -899,7 +896,7 @@ class wolf extends irc {
 				$this->mode($recipient, '+q', $message["0"]);
 			}
 		}
-		
+
 		// !unquiet
 		else if ( $this->isCommand($command, 'unquiet') && $this->isAdmin($host) ) {
 			$message=explode(" ", $message);
@@ -978,7 +975,7 @@ class wolf extends irc {
 		
 			// Send quit message
 			if (!$this->isPlaying($message)) {
-				$not_playing=$this->decode($lang["not_playing"], null, $person);
+				$not_playing=$this->decode($lang["not_playing"], null, $message);
 				$this->notice($nick, $not_playing);
 			} else {
 				$roles = $this->getRoles($message);
@@ -1743,7 +1740,7 @@ class wolf extends irc {
 							$$lynchee = 1;
 						}
 					}
-	
+
 					$amount = count($this->players);
 					// If the number is odd, subtract 1
 					if ($amount % 2 != 0) {
