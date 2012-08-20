@@ -602,7 +602,10 @@ class wolf extends irc {
 		// !fquit and !fleave
 		else if ( ( $this->isCommand($command, 'fquit') || $this->isCommand($command, 'fleave') ) && $this->hasPermission($nick, $host, 'fquit') ) {
 			// Trim off everything after a space
-			$message = substr($message, 0, strpos($message, " "));
+			$space = strpos($message, " ");
+			if ($space !== false) {
+				$message = substr($message, 0, $space);
+			}
 
 			// Send quit message
 			if (!$this->isPlaying($message)) {
@@ -1150,7 +1153,10 @@ class wolf extends irc {
 		// !fjoin
 		else if ( $this->isCommand($command, 'fjoin') && $this->hasPermission($nick, $host, 'fjoin') ) {
 			// Trim off everything after a space
-			$message = substr($message, 0, strpos($message, " "));
+			$space = strpos($message, " ");
+			if ($space !== false) {
+				$message = substr($message, 0, $space);
+			}
 
 			if ($recipient == $nick) {
 				$this->say($nick, "This feature is not available in a pm.");
