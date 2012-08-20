@@ -697,28 +697,33 @@ class wolf extends irc {
 		// !votes
 		else if ( $this->isCommand($command, 'votes') ) {
 			if ($recipient == $nick) {
-				$this->say($nick, "This feature is not available in a pm.");
+				// ignore
 			} else if (!$this->ongoing) {
-				$start_ongoing = $this->decode($lang["start_ongoing"]);
-				$this->notice($nick, $start_ongoing);
+				$game_none = $this->decode($lang["game_none"]);
+				$this->notice($nick, $game_none);
+			} else if ($this->isNight) {
+				$votes_night = $this->decode($lang["votes_night"]);
+				$this->notice($nick, $votes_night);
 			} else {
-				$defendant = array();
 				foreach($this->lynch as $prosecutor => $defendor) {
 					if (isset($defendants[$defendor])) {
-						array_push($defendants[$$defendor], $prosecutor);
-						$prosecution_amount[$defendor]++;
+						array_push($defendants[$defendor], $prosecutor);
 					} else {
 						$defendants[$defendor] = array($prosecutor);
-						$prosecution_amount[$defendor] = 1;
 					}
 				}
 				$votes_list = '';
 				foreach ($defendants as $defendor => $prosecutors) {
-					$votes_list = $votes_list . $defendor . ': ' . $prosecution_amount[$defendor] . ' (' . implode(' ', $prosecutors) . ')' . ', ';
+					$votes_list = $votes_list . $defendor . ': ' . count($prosecutors) . ' (' . implode(' ', $prosecutors) . ')' . ', ';
 				}
 				$votes_list = substr($votes_list, 0, -2);
-				$votes = $this->decode($lang["votes"], $nick, $votes_list);
-				$this->say($recipient, $votes);
+
+				if ($votes_list != false) {
+					$votes = $this->decode($lang["votes"], $nick, $votes_list);
+					$this->say($recipient, $votes);
+				} else {
+					// no votes yet
+				}
 			}
 		}
 
@@ -727,7 +732,10 @@ class wolf extends irc {
 
 			if ($recipient == $nick) {
 				$this->say($nick, "This feature is not available in a pm.");
-			} else if ($this->ongoing) {
+			} else if (!$this->ongoing) {
+				$game_none = $this->decode($lang["game_none"]);
+				$this->notice($nick, $game_none);
+			} else {
 				$message = explode(' ', $message, 2);
 				$victim = $this->nickAutocomplete($message["0"]);
 
@@ -737,17 +745,14 @@ class wolf extends irc {
 					$not_playing = $this->decode($lang["not_playing"], null, $victim);
 					$this->notice($nick, $not_playing);
 				} else if ($this->isNight) {
-					$this->say($nick, "Error, it is not day time");
+					$lynch_night = $this->decode($lang["lynch_night"], null, $victim);
+					$this->notice($nick, $lynch_night);
 				} else {
 					$this->lynch[$nick] = $victim;
 					$lynch = $this->decode($lang["lynch"], $nick, $victim);
 					$this->say($recipient, $lynch);
 				}
-			} else {
-				$start_ongoing = $this->decode($lang["start_ongoing"]);
-				$this->notice($nick, $start_ongoing);
 			}
-
 		}
 
 		// !coin
@@ -1007,7 +1012,7 @@ class wolf extends irc {
 			}
 			else if ($this->ongoing == false) {
 				$this->last_ping = time();
-		
+
 				$list = "";
 				foreach($this->people as $person) {
 					if ( !in_array($person, $this->away) && !isset($this->players[$person]) ) {
