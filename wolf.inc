@@ -146,163 +146,14 @@ class wolf extends irc {
 	* @param mixed $command Command
 	* @return bollean True or false
 	*/
-	public function hasPermission($nick, $host, $command) {
+	public function isAdmin($host) {
 		global $user, $admins;
 
-		switch($command) {
-
-			case 'help':
-				return true;
-			break;
-
-			case 'simple':
-				return true;
-			break;
-
-			case 'back':
-				return true;
-			break;
-
-			case 'quit':
-				return true;
-			break;
-
-			case 'stats':
-				return true;
-			break;
-
-			case 'away':
-				return true;
-			break;
-
-			case 'ping':
-				return true;
-			break;
-
-			case 'start':
-				return true;
-			break;
-
-			case 'retract':
-				return true;
-				break;
-
-			case 'goat':
-				return true;
-			break;
-
-			case 'shoot':
-				return true;
-			break;
-
-			case 'votes':
-				return true;
-			break;
-
-			case 'lynch':
-				return true;
-			break;
-
-			case 'coin':
-				return true;
-			break;
-
-			case 'wait':
-				return true;
-			break;
-
-			case 'join':
-				return true;
-			break;
-
-			case 'rules':
-				return true;
-			break;
-
-			case 'admins':
-				return true;
-			break;
-				
-			case 'whoami':
-				return true;
-			break;
-
-			case 'msg':
-				if (in_array($host, $admins)) {
-					return true;
-				}
-			break;
-
-			case 'deop':
-			case 'voice':
-			case 'devoice':
-			case 'op':
-				if (in_array($host, $admins)) {
-					return true;
-				}
-			break;
-
-			case 'fstart':
-				if (in_array($host, $admins)) {
-					return true;
-				}
-			break;
-
-			case 'fstop':
-				if (in_array($host, $admins)) {
-					return true;
-				}
-			break;
-
-			case 'fday':
-				if (in_array($host, $admins)) {
-					return true;
-				}
-				break;
-
-			case 'fnight':
-				if (in_array($host, $admins)) {
-					return true;
-				}
-			break;
-
-			case 'fjoin':
-				if (in_array($host, $admins)) {
-					return true;
-				}
-			break;
-
-			case 'fquit':
-				if (in_array($host, $admins)) {
-					return true;
-				}
-			break;
-			
-			case 'frestart':
-				if (in_array($host, $admins)) {
-					return true;
-				}
-			break;
-
-			case 'quiet':
-				if (in_array($host, $admins)) {
-					return true;
-				}
-			break;
-			
-			case 'unquiet':
-				if (in_array($host, $admins)) {
-					return true;
-				}
-			break;
-
-			case 'nick':
-				return true;
-			break;
-
+		if (in_array($host, $admins)) {
+			return true;
+		} else {
+			return false;
 		}
-
-		return false;
 	}
 
 	/**
@@ -538,7 +389,7 @@ class wolf extends irc {
 		}
 
 		// !help
-		if ( $this->isCommand($command, 'help') && $this->hasPermission($nick, $host, 'help') ) {
+		if ( $this->isCommand($command, 'help') ) {
 			$help = str_replace("<bold>", chr(2), $lang["help"]);
 			$help = str_replace("</bold>", chr(2), $help);
 
@@ -547,17 +398,17 @@ class wolf extends irc {
 		}
 
 		// !nick
-		else if ( $this->isCommand($command, 'nick') && $this->hasPermission($nick, $host, 'nick') ) {
+		else if ( $this->isCommand($command, 'nick') ) {
 			$this->say($recipient, $this->nickAutocomplete($message));
 		}
 
 		// !simple
-		else if ( $this->isCommand($command, 'simple') && $this->hasPermission($nick, $host, 'simple') ) {
+		else if ( $this->isCommand($command, 'simple') ) {
 			$this->say($nick, "This feature on phpwolf is not yet available.");
 		}
 
 		// !back
-		else if ( $this->isCommand($command, 'back') && $this->hasPermission($nick, $host, 'back') ) {
+		else if ( $this->isCommand($command, 'back') ) {
 			if (in_array($nick, $this->away)) {
 				$index = array_search($nick, $this->away);
 				unset($this->away[$index]);
@@ -571,7 +422,7 @@ class wolf extends irc {
 		}
 
 		// !quit and !leave
-		else if ( ( $this->isCommand($command, 'quit') || $this->isCommand($command, 'leave') ) && $this->hasPermission($nick, $host, 'quit') ) {
+		else if ( ( $this->isCommand($command, 'quit') || $this->isCommand($command, 'leave') ) ) {
 			if (!$this->isPlaying($nick)) {
 				$not_playing=$this->decode($lang["not_playing"], null, $person);
 				$this->notice($nick, $not_playing);
@@ -599,43 +450,8 @@ class wolf extends irc {
 			}
 		}
 
-		// !fquit and !fleave
-		else if ( ( $this->isCommand($command, 'fquit') || $this->isCommand($command, 'fleave') ) && $this->hasPermission($nick, $host, 'fquit') ) {
-			// Trim off everything after a space
-			$space = strpos($message, " ");
-			if ($space !== false) {
-				$message = substr($message, 0, $space);
-			}
-
-			// Send quit message
-			if (!$this->isPlaying($message)) {
-				$not_playing=$this->decode($lang["not_playing"], null, $person);
-				$this->notice($nick, $not_playing);
-			} else {
-				$roles = $this->getRoles($message);
-				if ($roles === false) {
-					if ($this->ongoing) {
-						$answer = "villager";
-					} else {
-						$answer = "person";
-					}
-				} else {
-					foreach ($roles as $value) {
-						if ($value != 'gunner' || $value != 'cursed') {
-							$answer=$value;
-						}
-					}
-				}
-
-				$this->removePlayer($recipient, $message);
-
-				$quit = $this->decode($lang["quit"], $message, $answer);
-				$this->say($recipient, $quit);
-			}
-		}
-
 		// !stats
-		else if ( $this->isCommand($command, 'stats') && $this->hasPermission($nick, $host, 'stats') ) {
+		else if ( $this->isCommand($command, 'stats') ) {
 			if ($recipient == $nick) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if (time() - $this->last_stats < $limit["stats"]) {
@@ -702,11 +518,10 @@ class wolf extends irc {
 			
 			}
 
-
 		}
 
 		// !away
-		else if ( $this->isCommand($command, 'away') && $this->hasPermission($nick, $host, 'away') ) {
+		else if ( $this->isCommand($command, 'away') ) {
 			if (in_array($nick, $this->away)) {
 				$index = array_search($nick, $this->away);
 				unset($this->away[$index]);
@@ -722,7 +537,7 @@ class wolf extends irc {
 		}
 
 		// !ping
-		else if ( $this->isCommand($command, 'ping') && $this->hasPermission($nick, $host, 'ping') ) {
+		else if ( $this->isCommand($command, 'ping') ) {
 			if ($recipient == $nick) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if ($this->ongoing) {
@@ -742,33 +557,8 @@ class wolf extends irc {
 
 		}
 
-		// !fping
-		else if ( $this->isCommand($command, 'fping') && $this->hasPermission($nick, $host, 'fping') ) {
-			if ($recipient == $nick) {
-				$this->say($nick, "This feature is not available in a pm.");
-			}
-			else if ($this->ongoing == false) {
-				$this->last_ping = time();
-		
-				$list = "";
-				foreach($this->people as $person) {
-					if ( !in_array($person, $this->away) && !isset($this->players[$person]) ) {
-						$list = $list . $person . ' ';
-					}
-				}
-				$list = substr($list, 0, -1);
-				// This returns PING %answer% if $list is empty
-				$ping = $this->decode($lang["ping"], null, $list);
-				$this->say($recipient, $ping);
-			} else {
-				$start_ongoing = $this->decode($lang["start_ongoing"]);
-				$this->notice($nick, $start_ongoing);
-			}
-		
-		}
-
 		// !start
-		else if ( $this->isCommand($command, 'start') && $this->hasPermission($nick, $host, 'start') ) {
+		else if ( $this->isCommand($command, 'start') ) {
 			$count = count($this->players);
 			$time = time() - $this->game_wait;
 
@@ -860,7 +650,7 @@ class wolf extends irc {
 		}
 
 		// !retract
-		else if ( $this->isCommand($command, 'retract') && $this->hasPermission($nick, $host, 'retract') ) {
+		else if ( $this->isCommand($command, 'retract') ) {
 
 			if ($recipient == $nick) {
 				$this->say($nick, "This feature is not available in a pm.");
@@ -882,7 +672,7 @@ class wolf extends irc {
 		}
 
 		// !goat
-		else if ( $this->isCommand($command, 'goat') && $this->hasPermission($nick, $host, 'goat') ) {
+		else if ( $this->isCommand($command, 'goat') ) {
 			if ($recipient == $nick) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if ($this->ongoing == false){
@@ -903,12 +693,12 @@ class wolf extends irc {
 		}
 
 		// !shoot
-		else if ( $this->isCommand($command, 'shoot') && $this->hasPermission($nick, $host, 'shoot') ) {
+		else if ( $this->isCommand($command, 'shoot') ) {
 			$this->say($nick, "This feature on phpwolf is not yet available.");
 		}
 
 		// !votes
-		else if ( $this->isCommand($command, 'votes') && $this->hasPermission($nick, $host, 'votes') ) {
+		else if ( $this->isCommand($command, 'votes') ) {
 			if ($recipient == $nick) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if (!$this->ongoing) {
@@ -936,7 +726,7 @@ class wolf extends irc {
 		}
 
 		// !lynch
-		else if ( $this->isCommand($command, 'lynch') || $this->isCommand($command, 'vote') && $this->hasPermission($nick, $host, 'lynch') ) {
+		else if ( $this->isCommand($command, 'lynch') || $this->isCommand($command, 'vote') ) {
 
 			if ($recipient == $nick) {
 				$this->say($nick, "This feature is not available in a pm.");
@@ -964,7 +754,7 @@ class wolf extends irc {
 		}
 
 		// !coin
-		else if ( $this->isCommand($command, 'coin') && $this->hasPermission($nick, $host, 'coin') ) {
+		else if ( $this->isCommand($command, 'coin') ) {
 			if ($recipient == $nick) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else {
@@ -985,7 +775,7 @@ class wolf extends irc {
 		}
 
 		// !wait
-		else if ( $this->isCommand($command, 'wait') && $this->hasPermission($nick, $host, 'wait') ) {
+		else if ( $this->isCommand($command, 'wait') ) {
 			if ($recipient == $nick) {
 				$this->say($nick, "This feature is not available in a pm.");
 			}
@@ -1006,7 +796,7 @@ class wolf extends irc {
 		}
 
 		// !join
-		else if ( $this->isCommand($command, 'join') && $this->hasPermission($nick, $host, 'join') ) {
+		else if ( $this->isCommand($command, 'join') ) {
 			if ($recipient == $nick) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if ( isset($this->players[$nick]) ) {
@@ -1030,10 +820,8 @@ class wolf extends irc {
 
 		}
 
-		
-
 		// !rules
-		else if ( $this->isCommand($command, 'rules') && $this->hasPermission($nick, $host, 'rules') ) {
+		else if ( $this->isCommand($command, 'rules') ) {
 			$rules_part1 = $this->decode($lang["rules_part1"]);
 			$this->say($recipient, $rules_part1);
 			$rules_part2 = $this->decode($lang["rules_part2"]);
@@ -1041,19 +829,19 @@ class wolf extends irc {
 		}
 
 		// !admins
-		else if ( $this->isCommand($command, 'admins') && $this->hasPermission($nick, $host, 'admins') ) {
+		else if ( $this->isCommand($command, 'admins') ) {
 			$this->say($recipient, "Snuupy is the man for that.");
 		}
 
 		/***** Admin commands *****/
 		// !msg
-		else if ( $this->isCommand($command, 'msg') && $this->hasPermission($nick, $host, 'msg') ) {
+		else if ( $this->isCommand($command, 'msg') && $this->isAdmin($host) ) {
 			$message=explode(" ", $message, 2);
 			$this->say($message["0"], $message["1"]);
 		}
 
 		// !op
-		else if ( $this->isCommand($command, 'op') && $this->hasPermission($nick, $host, 'op') ) {
+		else if ( $this->isCommand($command, 'op') && $this->isAdmin($host) ) {
 			$message=explode(" ", $message);
 			if (empty($message["0"]) && $recipient != $nick) { 
 				$this->mode($recipient, '+o', $nick);
@@ -1065,7 +853,7 @@ class wolf extends irc {
 		}
 
 		// !deop
-		else if ( $this->isCommand($command, 'deop') && $this->hasPermission($nick, $host, 'deop') ) {
+		else if ( $this->isCommand($command, 'deop') && $this->isAdmin($host) ) {
 			$message=explode(" ", $message);
 			if (empty($message["0"]) && $recipient != $nick) { 
 				$this->mode($recipient, '-o', $nick);
@@ -1077,7 +865,7 @@ class wolf extends irc {
 		}
 
 		// !voice
-		else if ( $this->isCommand($command, 'voice') && $this->hasPermission($nick, $host, 'voice') ) {
+		else if ( $this->isCommand($command, 'voice') && $this->isAdmin($host) ) {
 			$message=explode(" ", $message);
 			if (empty($message["0"]) && $recipient != $nick) {
 				$this->mode($recipient, '+v', $nick);
@@ -1089,7 +877,7 @@ class wolf extends irc {
 		}
 
 		// !devoice
-		else if ( $this->isCommand($command, 'devoice') && $this->hasPermission($nick, $host, 'devoice') ) {
+		else if ( $this->isCommand($command, 'devoice') && $this->isAdmin($host) ) {
 			$message=explode(" ", $message);
 			if (empty($message["0"]) && $recipient != $nick) {
 				$this->mode($recipient, '-v', $nick);
@@ -1101,7 +889,7 @@ class wolf extends irc {
 		}
 
 		// !quiet
-		else if ( $this->isCommand($command, 'quiet') && $this->hasPermission($nick, $host, 'quiet')  ) {
+		else if ( $this->isCommand($command, 'quiet') && $this->isAdmin($host)  ) {
 			$message=explode(" ", $message);
 			if (empty($message["0"]) && $recipient != $nick) {
 				$this->mode($recipient, '+q', $nick);
@@ -1113,7 +901,7 @@ class wolf extends irc {
 		}
 		
 		// !unquiet
-		else if ( $this->isCommand($command, 'unquiet') && $this->hasPermission($nick, $host, 'unquiet') ) {
+		else if ( $this->isCommand($command, 'unquiet') && $this->isAdmin($host) ) {
 			$message=explode(" ", $message);
 			if (empty($message["0"]) && $recipient != $nick) {
 				$this->mode($recipient, '-q', $nick);
@@ -1125,33 +913,33 @@ class wolf extends irc {
 		}
 
 		// !fstart
-		else if ( $this->isCommand($command, 'fstart') && $this->hasPermission($nick, $host, 'fstart') ) {
+		else if ( $this->isCommand($command, 'fstart') && $this->isAdmin($host) ) {
 			$this->game_wait = 0;
 		}
 
 		// !fstop
-		else if ( $this->isCommand($command, 'fstop') && $this->hasPermission($nick, $host, 'fstop') ) {
+		else if ( $this->isCommand($command, 'fstop') && $this->isAdmin($host) ) {
 			if ($this->ongoing) {
 				$this->endGame($this->channel);
 			}
 		}
 
 		// !fday
-		else if ( $this->isCommand($command, 'fday') && $this->hasPermission($nick, $host, 'fday') ) {
+		else if ( $this->isCommand($command, 'fday') && $this->isAdmin($host) ) {
 			if ($this->isNight && $this->ongoing) {
 				$this->fday = true;
 			}
 		}
 
 		// !fnight
-		else if ( $this->isCommand($command, 'fnight') && $this->hasPermission($nick, $host, 'fnight') ) {
+		else if ( $this->isCommand($command, 'fnight') && $this->isAdmin($host) ) {
 			if ($this->isDay && $this->ongoing) {
 				$this->fnight = true;
 			}
 		}
 
 		// !fjoin
-		else if ( $this->isCommand($command, 'fjoin') && $this->hasPermission($nick, $host, 'fjoin') ) {
+		else if ( $this->isCommand($command, 'fjoin') && $this->isAdmin($host) ) {
 			// Trim off everything after a space
 			$space = strpos($message, " ");
 			if ($space !== false) {
@@ -1180,8 +968,68 @@ class wolf extends irc {
 			}
 		}
 
+		// !fquit and !fleave
+		else if ( ( $this->isCommand($command, 'fquit') || $this->isCommand($command, 'fleave') ) && $this->isAdmin($host) ) {
+			// Trim off everything after a space
+			$space = strpos($message, " ");
+			if ($space !== false) {
+				$message = substr($message, 0, $space);
+			}
+		
+			// Send quit message
+			if (!$this->isPlaying($message)) {
+				$not_playing=$this->decode($lang["not_playing"], null, $person);
+				$this->notice($nick, $not_playing);
+			} else {
+				$roles = $this->getRoles($message);
+				if ($roles === false) {
+					if ($this->ongoing) {
+						$answer = "villager";
+					} else {
+						$answer = "person";
+					}
+				} else {
+					foreach ($roles as $value) {
+						if ($value != 'gunner' || $value != 'cursed') {
+							$answer=$value;
+						}
+					}
+				}
+		
+				$this->removePlayer($recipient, $message);
+		
+				$quit = $this->decode($lang["quit"], $message, $answer);
+				$this->say($recipient, $quit);
+			}
+		}
+
+		// !fping
+		else if ( $this->isCommand($command, 'fping') && $this->isAdmin($host) ) {
+			if ($recipient == $nick) {
+				$this->say($nick, "This feature is not available in a pm.");
+			}
+			else if ($this->ongoing == false) {
+				$this->last_ping = time();
+		
+				$list = "";
+				foreach($this->people as $person) {
+					if ( !in_array($person, $this->away) && !isset($this->players[$person]) ) {
+						$list = $list . $person . ' ';
+					}
+				}
+				$list = substr($list, 0, -1);
+				// This returns PING %answer% if $list is empty
+				$ping = $this->decode($lang["ping"], null, $list);
+				$this->say($recipient, $ping);
+			} else {
+				$start_ongoing = $this->decode($lang["start_ongoing"]);
+				$this->notice($nick, $start_ongoing);
+			}
+		
+		}
+
 		// !frestart
-		else if ( $this->isCommand($command, 'frestart') && $this->hasPermission($nick, $host, 'frestart') ) {
+		else if ( $this->isCommand($command, 'frestart') && $this->isAdmin($host) ) {
 			// Hack from -> http://debuggable.com/posts/restarting-a-php-command-line-script:4988968d-b9d0-4fe8-af30-05544834cda3
 			//echo "\nphpwolf: RESTARTING";
 			//die(exec('php ' . str_replace(' ', '\ ', getcwd()) . '/' . implode(' ', $GLOBALS['argv']) . ' > /dev/null &'));
