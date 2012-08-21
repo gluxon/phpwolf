@@ -15,13 +15,13 @@ $user["password"]="password";
 $channel["name"]="##phpwolf";
 
 // Admins array
-$admins = array("~gluxon@unaffiliated/gluxon", "~Snuupy@unaffiliated/snuupy", '~jcao219@wikibooks/Jcao219', '~chatzilla@wikimedia/Ceradon');
+$admins = array("~gluxon@unaffiliated/gluxon", "~Snuupy@unaffiliated/snuupy", '~jcao219@wikibooks/Jcao219', '~ceradon@wikimedia/Ceradon');
 
 // Language
 $lang=$en_US;
 
 // Times (in seconds)
-$setting["game_wait"]=0;
+$setting["game_wait"]=60;
 $setting["game_add_wait"]=20;
 $setting["game_add_wait_limit"]=2;
 $limit["ping"]=60 * 5;
