@@ -43,6 +43,8 @@ $en_US["day_victim"]="The dead body of <bold>%answer%</bold>, a <bold>%answer2%<
 $en_US["day_nokill"]="The body of a young penguin pet is found. All villagers, however, have survived.";
 $en_US["day_harlot"]="The wolves' selected victim was a harlot, but she wasn't home.";
 $en_US["day_harlot_dead"]="<bold>%answer%</bold>, a <bold>harlot</bold>, made the unfortunate mistake of visiting a wolf's house last night and is now dead.";
+$en_US["day_angel"]="<bold>%answer%</bold> was attacked by the wolves last night, but luckily, the guardian angel protected him/her.";
+$en_US["day_angel_dead"]="<bold>%answer%</bold>, a <bold>guardian angel</bold> made the unfortunate mistake of guarding a wolf last night, attempted to escape, but failed and is now dead.";
 $en_US["day_vote"]="The villagers must now vote for whom to lynch. Use \"!lynch <nick>\" to cast your vote. %answer% votes are required to lynch.";
 
 // Maintenance
@@ -65,14 +67,16 @@ $en_US["rules_part1"]="##phpwolf channel rules: 1) Be nice to others. 2) Do not 
 $en_US["rules_part2"]="5) Do not quit unless you need to leave. 6) No swearing and keep it family-friendly. 7) Do not paste PM's from the bot during the game. 8) Use common sense. 9) Waiting for timeouts is discouraged.";
 //$en_US["votes"]="%nick%: njstein: 1 (gluxon), gluxon: 2 (Nascar1996 rwg), FoolsTP: 1 (Mithadon)";
 $en_US["votes"]="%nick%: %answer%";
-$en_US["votes_required"]="gluxon: 4 players, 3 votes required to lynch, 4 players available to vote.";
+$en_US["votes_required"]="%nick%: <bold>%answer%</bold> players, <bold>%answer2%</bold> votes required to lynch, <bold>%answer%</bold> players available to vote.";
+$en_US["votes_night"]="Voting is only during the day.";
 $en_US["goat"]="<bold>%nick%</bold>'s goat walks by and kicks <bold>%answer%</bold>";
 
 // Game commands
 $en_US["join"]="<bold>%nick%</bold> has joined the game.";
 $en_US["quit"]="<bold>%nick%</bold> died of an unknown disease. S/He was a <bold>%answer%</bold>.";
 $en_US["lynch"]="<bold>%nick%</bold> votes for <bold>%answer%</bold>.";
-/* NOT OFFICIAL */$en_US["retract"]="<bold>%nick%</bold> has retracted their vote";
+$en_US["lynch_night"]="Lynching is only allowed during the day. Please wait patiently for morning.";
+/* NOT OFFICIAL */$en_US["retract"]="<bold>%nick%</bold> has retracted their vote.";
 
 // Notices
 $en_US["game_none"]="No game is currently running.";
@@ -99,7 +103,6 @@ $en_US["end_roles_plural"]="The %answer% were <bold>%answer2%</bold>.";
 // Directions
 $en_US["seer_assign"]="You are a <bold>seer</bold>. It is your job to detect the wolves, you may have a vision once per night. Use \"see <nick>\" to see the role of a player.";
 $en_US["seer_see"]="You have a vision; in this vision, you see that <bold>%answer%</bold> is a <bold>%answer2%</bold>!";
-
 $en_US["seer_see_not"]="Only a seer may use this command";
 $en_US["seer_seen"]="You may only have one vision per round.";
 $en_US["seer_see_day"]="You may only have visions at night.";
@@ -113,6 +116,10 @@ $en_US["drunk_assign"]="You have been drinking too much! You are the <bold>villa
 
 $en_US["harlot_assign"]="You are a <bold>harlot</bold>. You may spend the night with one person per round. If you visit a victim of a wolf, or visit a wolf, you will die. Use !visit to visit a player.";
 $en_US["harlot_visit"]="You are spending the night with <bold>%answer%</bold>. Have a good time!";
+$en_US["harlot_visit_not"]="Only a harlot may use this command.";
+$en_US["harlot_visit_self"]="You have chosen to stay home for the night.";
+$en_US["harlot_visited"]="You are already spending the night with <bold>%answer%</bold>.";
+$en_US["harlot_day"]="You may only visit someone at night.";
 
 $en_US["traitor_assign"]="You are a <bold>traitor</bold>. You are exactly like a villager and not even a seer can see your true identity. Only detectives can.";
 $en_US["traitor_transform"]="<bold>The villagers, during their celebrations, are frightened as they hear a loud howl. The wolves are not gone!</bold>";
@@ -120,6 +127,14 @@ $en_US["traitor_notify"]="HOOOOOOOOOWL. You have become... a wolf!";
 $en_US["traitor_avenge"]="It is up to you to avenge your fallen leaders!";
 
 $en_US["gunner_assign"]="You are a <bold>gunner</bold>. You hold a gun that shoots special silver bullets. You may only use it during the day. If you shoot a wolf, (s)he will die instantly, but if you shoot a villager, that villager will likely survive. There is also the possibility of the gun blowing up, and killing you with it, so take caution. You get 2 bullets.";
+
+$en_US["angel_assign"]="You are a <bold>guardian angel</bold>. It is your job to protect the villagers. If you guard a wolf, there is a 50/50 chance of you dying, if you guard a victim, they will live. Use !guard to guard a player.";
+$en_US["angel_guard"]="You are protecting <bold>%answer%</bold> tonight. Farewell!";
+$en_US["angel_guard_notify"]="You can sleep well tonight, for a guardian angel is protecting you.";
+$en_US["angel_guard_not"]="Only a guardian angel may use this command.";
+$en_US["angel_guard_self"]="You may not guard yourself.";
+$en_US["angel_guarded"]="You are already protecting %answer%.";
+$en_US["angel_day"]="You may only protect people at night.";
 
 $en_US["players_list"]="Players: %answer%";
 ?>
