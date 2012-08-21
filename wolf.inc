@@ -721,6 +721,17 @@ class wolf extends irc {
 				if ($votes_list != false) {
 					$votes = $this->decode($lang["votes"], $nick, $votes_list);
 					$this->say($recipient, $votes);
+
+					$amount = count($this->players);
+					// If the number is odd, subtract 1
+					if ($amount % 2 != 0) {
+						$amount--;
+					}
+
+					// players available to vote is subtracted from unexistant idle mechanism
+					$votes_required = $this->decode($lang["votes_required"], $nick, $amount, $amount / 2 + 1);
+					$this->say($recipient, $votes_required);
+					
 				} else {
 					// no votes yet
 				}
@@ -1109,29 +1120,85 @@ class wolf extends irc {
 		}
 
 		else if ( $this->isCommand($command, 'visit', true) ) {
-			if ($recipient == $this->channel || $this->isDay ) {
+			if ($recipient == $this->channel) {
 				// ignore this
+			} else if ($this->isDay) {
+				// It's daytime
+				$harlot_day=$this->decode($lang["harlot_day"]);
+				$this->notice($nick, $harlot_day);
 			} else if ( !in_array($nick, $this->harlot) ) {
-				$this->say($nick, "You are not a harlot");
+				// This person isn't the harlot
+				$harlot_visit_not=$this->decode($lang["harlot_visit_not"], null, $person);
+				$this->notice($nick, $harlot_visit_not);
 			} else if ( isset($this->harlot_visited[$nick])) {
-				$this->say($nick, "You are already visiting blah");
+				// You've already visited
+				$harlot_visited=$this->decode($lang["harlot_visited"], null, $this->harlot_visited[$nick]);
+				$this->notice($nick, $harlot_visited);
 			} else {
 				$person = $this->nickAutocomplete($message);
 
-				if ( $this->isPlaying($person) ) {
-					$not_playing=$this->decode($lang["not_playing"], null, $person);
+				if ( !$this->isPlaying($person) ) {
+					$not_playing=$this->decode($lang["not_playing"], $person);
 					$this->notice($nick, $not_playing);
 				} else {
 					// This person has been selected for death.
 					$this->harlot_visited[$nick] = $person;
 
-					// Send Message
-					$harlot_visit = $this->decode($lang["harlot_visit"], null, $person);
-					$this->say($nick, $harlot_visit);
+					if ($nick == $person) {
+						// harlot is visiting themselves
+						$harlot_visit_self=$this->decode($lang["harlot_visit_self"]);
+						$this->notice($nick, $harlot_visit_self);
+					} else {
+						// Send Message
+						$harlot_visit = $this->decode($lang["harlot_visit"], null, $person);
+						$this->say($nick, $harlot_visit);
 
-					// Send Message to hostess
-					$harlot_visit = $this->decode($lang["harlot_visit"], null, $nick);
-					$this->say($person, $harlot_visit);
+						// Send Message to hostess
+						$harlot_visit = $this->decode($lang["harlot_visit"], null, $nick);
+						$this->say($person, $harlot_visit);
+					}
+
+				}
+			}
+		}
+
+		else if ( $this->isCommand($command, 'guard', true) ) {
+			if ($recipient == $this->channel) {
+				// ignore this
+			} else if ($this->isDay) {
+				// It's daytime
+				$angel_day=$this->decode($lang["angel_day"]);
+				$this->notice($nick, $angel_day);
+			} else if ( !in_array($nick, $this->angel) ) {
+				// This person isn't the angel
+				$angel_guard_not=$this->decode($lang["angel_guard_not"]);
+				$this->notice($nick, $angel_guard_not);
+			} else if ( isset($this->angel_guarded[$nick]) ) {
+				// You've already guarded
+				$angel_guarded=$this->decode($lang["angel_guarded"], null, $this->angel_guarded[$nick]);
+				$this->say($nick, $angel_guarded);
+			} else {
+				$person = $this->nickAutocomplete($message);
+
+				if ( !$this->isPlaying($person) ) {
+					// The visited guarding person isn't playing
+					$not_playing=$this->decode($lang["not_playing"], $person);
+					$this->notice($nick, $not_playing);
+				} else if ($nick == $person) {
+					// Guarding self isn't allowed
+					$angel_guard_self=$this->decode($lang["angel_guard_self"]);
+					$this->say($nick, $angel_guard_self);
+				} else {
+					// This person has been selected for death.
+					$this->angel_guarded[$nick] = $person;
+
+					// Send Message
+					$angel_guard = $this->decode($lang["angel_guard"], null, $person);
+					$this->say($nick, $angel_guard);
+
+					// Send Message to protected villager
+					$angel_guard_notify = $this->decode($lang["angel_guard_notify"], null, $nick);
+					$this->say($person, $angel_guard_notify);
 
 				}
 			}
@@ -1401,39 +1468,55 @@ class wolf extends irc {
 		if ($victim == null) {
 			$day_nokill = $this->decode($lang["day_nokill"]);
 			$this->say($this->channel, $day_nokill);
+
+		// If the harlot is selected, and he/she is not home...
+		} else if ( isset($this->harlot_visited[$victim]) && $this->harlot_visited[$victim] != $victim && in_array($victim, $this->harlot) ) {
+			$day_harlot = $this->decode($lang["day_harlot"]);
+			$this->say($this->channel, $day_harlot);
+
+		// Victim was protected by GA
+		} else if ( in_array($victim, $this->angel_guarded) ) {
+			$day_angel = $this->decode($lang["day_angel"], null, $victim);
+			$this->say($this->channel, $day_angel);
+
 		} else {
-			// If the harlot is selected, and he/she is not home...
-			if ( in_array($victim, $this->harlot) && isset($this->harlot_visited[$victim]) ) {
-				$day_harlot = $this->decode($lang["day_harlot"]);
-				$this->say($this->channel, $day_harlot);
+			$dead_guy_roles = $this->getRoles($victim);
+			if ($dead_guy_roles == false) {
+				$role_list = 'villager';
 			} else {
-				$dead_guy_roles = $this->getRoles($victim);
-				if ($dead_guy_roles == false) {
-					$role_list = 'villager';
-				} else {
-					$role_list = '';
-					foreach ($dead_guy_roles as $role) {
-						if ($role != 'cursed' || $role != 'gunner') {
-							$role_list = $role_list . $role . ', ';
-						}
+				$role_list = '';
+				foreach ($dead_guy_roles as $role) {
+					if ($role != 'cursed' || $role != 'gunner') {
+						$role_list = $role_list . $role . ', ';
 					}
-					$role_list = substr($role_list, 0, -2);
 				}
-				
-				$day_victim = $this->decode($lang["day_victim"], null, $victim, $role_list);
-				$this->say($this->channel, $day_victim);
-				$this->removePlayer($this->channel, $victim);
+				$role_list = substr($role_list, 0, -2);
 			}
 
-			// If the harlot visits a wolf!
-			foreach($this->harlot as $harlot) {
-				if ( isset($this->harlot_visited[$harlot]) && in_array($this->harlot_visited[$harlot], $this->wolf) ) {
-					$day_harlot_dead = $this->decode($lang["day_harlot_dead"], null, $harlot);
-					$this->say($this->channel, $day_harlot_dead);
-					$this->removePlayer($this->channel, $harlot);
+			$day_victim = $this->decode($lang["day_victim"], null, $victim, $role_list);
+			$this->say($this->channel, $day_victim);
+			$this->removePlayer($this->channel, $victim);
+		}
+
+		// If the harlot visits a wolf!
+		foreach($this->harlot as $harlot) {
+			if ( isset($this->harlot_visited[$harlot]) && in_array($this->harlot_visited[$harlot], $this->wolf) ) {
+				$day_harlot_dead = $this->decode($lang["day_harlot_dead"], null, $harlot);
+				$this->say($this->channel, $day_harlot_dead);
+				$this->removePlayer($this->channel, $harlot);
+			}
+		}
+
+		// If the GA guards a wolf!
+		foreach($this->angel as $angel) {
+			// 50% chance of death
+			if ($this->random->getRandInt(1, 2) == '1') {
+				if ( isset($this->angel_guarded[$angel]) && in_array($this->angel_guarded[$angel], $this->wolf) ) {
+					$day_angel_dead = $this->decode($lang["day_angel_dead"], null, $angel);
+					$this->say($this->channel, $day_angel_dead);
+					$this->removePlayer($this->channel, $angel);
 				}
 			}
-
 		}
 
 		// Night has ended, we can reset the night actions
@@ -1488,8 +1571,9 @@ class wolf extends irc {
 		$this->goat_switch = true;
 
 		if ($victim == null) {
-			$night_nokill = $this->decode($lang["night_nokill"]);
-			$this->say($this->channel, $night_nokill);
+			// I don't believe there's a message for no kill at night
+			/*$night_nokill = $this->decode($lang["night_nokill"]);
+			$this->say($this->channel, $night_nokill);*/
 		} else {
 			$dead_guy_roles = $this->getRoles($victim);
 			if ($dead_guy_roles == false) {
@@ -1711,9 +1795,9 @@ class wolf extends irc {
 									$i_condition++;
 								}
 							} else if ($role == 'angel') {
-
-							} else if ($role == 'detective') {
-
+								if (count($this->angel_guarded) == count($this->angel)) {
+									$i_condition++;
+								}
 							}
 
 							if ($role != 'drunk' && $role != 'cursed' && $role != 'traitor' && $role != 'gunner' && $role != 'detective') {
