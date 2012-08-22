@@ -83,14 +83,13 @@ $en_US["game_none"]="No game is currently running.";
 $en_US["ratelimit"]="This command is rate-limited. Please wait a while before using it again.";
 $en_US["join_already_playing"]="You're already playing!";
 $en_US["start_ongoing"]="Werewolf is already in play.";
-$en_US["not_playing"]="<bold>%nick%</bold> is currently not playing.";
+$en_US["not_playing"]="<bold>%answer%</bold> is currently not playing.";
+$en_US["not_playing_self"]="You're not currently playing.";
 $en_US["not_admin"]="You are not an admin.";
 $en_US["away"]="You are now marked as away.";
 $en_US["not_away"]="You are not marked as away.";
 $en_US["back"]="You are no longer marked as away.";
-
-// Errors
-$en_US["not_playing"]="<bold>%answer%</bold> is not playing.";
+$en_US["parameters"]="Not enough parameters.";
 
 // End Game
 $en_US["win_villagers"]="Game over! All the wolves are dead! The villagers chop them up, BBQ them, and have a hearty meal.";
