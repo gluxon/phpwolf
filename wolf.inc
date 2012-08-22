@@ -295,10 +295,11 @@ class wolf extends irc {
 	/**
 	 * Return a list of all the players
 	 * 
-	 * @param mixed $nick Nick of player to not add
+	 * 
 	 * @param boolean $wolf Add wolf role to other wolves
 	 * @param boolean $reset Reset Times
-	 * @param mixed List of players
+	 * @param mixed $nick Nick of player to not add
+	 * @return mixed List of players
 	 */
 	public function listPlayers($wolf = false, $reset = false, $nick = null) {
 		global $lang;
@@ -332,6 +333,12 @@ class wolf extends irc {
 		return substr($list, 0, -2);
 	}
 
+	/**
+	 * Send a message to the rest of the wolves
+	 * 
+	 * @param mixed $send Nickname of sender
+	 * @param mixed $message Message being sent
+	 */
 	public function relayToWolves($sender, $message) {
 		global $lang;
 		foreach($this->wolf as $wolf) {
@@ -1848,6 +1855,7 @@ class wolf extends irc {
 	/**
 	 * Runs the bot functions
 	 *
+	 * @param Socket $socket Socket of IRC Class
 	 * @param array $data explodeData() return
 	 */
 	public function run($socket, $data) {
