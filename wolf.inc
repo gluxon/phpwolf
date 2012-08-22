@@ -988,7 +988,7 @@ class wolf extends irc {
 			if ($space !== false) {
 				$message = substr($message, 0, $space);
 			}
-		
+
 			// Send quit message
 			if (!$this->isPlaying($message)) {
 				$not_playing=$this->decode($lang["not_playing"], null, $message);
@@ -1486,7 +1486,7 @@ class wolf extends irc {
 			} else {
 				$role_list = '';
 				foreach ($dead_guy_roles as $role) {
-					if ($role != 'cursed' || $role != 'gunner') {
+					if ($role != 'cursed' && $role != 'gunner') {
 						$role_list = $role_list . $role . ', ';
 					}
 				}
