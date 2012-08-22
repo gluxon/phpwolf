@@ -292,36 +292,33 @@ class wolf extends irc {
 	 * @param mixed $nick Nick of player to not add
 	 * @return mixed List of players
 	 */
-	public function listPlayers($wolf = false, $reset = false, $nick = null) {
+	public function listPlayers($wolf = false, $nick = null) {
 		global $lang;
 
 		$list = "";
-		if ($wolf) {
-			foreach($this->players as $key => &$value) {
-				if ($nick == null || $key != $nick) {
-					$list = $list . $key;
-					if ( in_array($key, $this->wolf) ) {
+		foreach(array_keys($this->players) as $player) {
+			if ($player != $nick) {
+				$list = $list . $player;
+
+				// Display wolves as their role
+				if ($wolf) {
+					if ( in_array($player, $this->wolf) ) {
 						$list = $list . ' (' . $lang["wolf"] . ')';
-					} else if ( in_array($key, $this->traitor) ) {
+					} else if ( in_array($player, $this->traitor) ) {
 						$list = $list . ' (' . $lang["traitor"] . ')';
 					}
-					if ($reset) {
-						$value = time();
-					}
-					$list = $list . ', ';
 				}
-			}
-		} else {
-			foreach($this->players as $key => &$value) {
-				if ($nick == null || $key != $nick) {
-					$list = $list . $key . ', ';
-					if ($reset) {
-						$value = time();
-					}
-				}
+
+				$list = $list . ', ';
 			}
 		}
 		return substr($list, 0, -2);
+	}
+
+	public function resetPlayerTimeouts() {
+		foreach($this->players as &$value) {
+			$value = time();
+		}
 	}
 
 	/**
@@ -581,7 +578,10 @@ class wolf extends irc {
 			// Sucess!
 			else {
 				// Loop through players to generate list
-				$answer = $this->listPlayers(false, true);
+				$answer = $this->listPlayers(false);
+
+				// Reset Player timeouts at beginning of game
+				$this->resetPlayerTimeouts();
 
 				$game_welcome = $this->decode($lang["game_welcome"], NO_NICK, $answer);
 				$this->say($recipient, $game_welcome);
@@ -1368,7 +1368,7 @@ class wolf extends irc {
 				$this->say($nick, $seer_assign);
 
 				// List players
-				$answer=$this->listPlayers(false, false, $nick);
+				$answer=$this->listPlayers(false, $nick);
 				$players_list = $this->decode($lang["players_list"], NO_NICK, $answer);
 				$this->say($nick, $players_list);
 			break;
@@ -1385,7 +1385,7 @@ class wolf extends irc {
 				}
 
 				// List players
-				$answer=$this->listPlayers(true, false, $nick);
+				$answer=$this->listPlayers(true, $nick);
 				$players_list = $this->decode($lang["players_list"], NO_NICK, $answer);
 				$this->say($nick, $players_list);
 			break;
@@ -1406,7 +1406,7 @@ class wolf extends irc {
 				$this->say($nick, $harlot_assign);
 
 				// List players
-				$answer=$this->listPlayers(false, false, $nick);
+				$answer=$this->listPlayers(false, $nick);
 				$players_list = $this->decode($lang["players_list"], NO_NICK, $answer);
 				$this->say($nick, $players_list);
 			break;
@@ -1423,7 +1423,7 @@ class wolf extends irc {
 				}
 
 				// List players
-				$answer=$this->listPlayers(true, false, $nick);
+				$answer=$this->listPlayers(true, $nick);
 				$players_list = $this->decode($lang["players_list"], NO_NICK, $answer);
 				$this->say($nick, $players_list);
 			break;
@@ -1444,7 +1444,7 @@ class wolf extends irc {
 				$this->say($nick, $angel_assign);
 
 				// List players
-				$answer=$this->listPlayers(false, false, $nick);
+				$answer=$this->listPlayers(false, $nick);
 				$players_list = $this->decode($lang["players_list"], NO_NICK, $answer);
 				$this->say($nick, $players_list);
 			break;
