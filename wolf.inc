@@ -108,7 +108,6 @@ class wolf extends irc {
 			$return = str_replace("%nick%", $nick, $return);
 		}
 		if (isset($answer)) {
-			echo 'hi';
 			$return = str_replace("%answer%", $answer, $return);
 		}
 		if (isset($answer2)) {
@@ -510,7 +509,7 @@ class wolf extends irc {
 					$stats_roles = $this->decode($lang["stats_roles"], $nick, $reply);
 					$this->say($recipient, $stats_roles);
 				}
-			
+
 			}
 
 		}
@@ -543,8 +542,14 @@ class wolf extends irc {
 				$this->notice($nick, $ratelimit);
 			} else {
 				$this->last_ping = time();
-				
-				$list = implode(' ', $this->people);
+
+				$list = "";
+				foreach($this->people as $person) {
+					if ( !in_array($person, $this->away) && !isset($this->players[$person]) ) {
+						$list = $list . $person . ' ';
+					}
+				}
+				$list = substr($list, 0, -1);
 				// This returns PING %answer% if $list is empty
 				$ping = $this->decode($lang["ping"], NO_NICK, $list);
 				$this->say($recipient, $ping);
@@ -726,7 +731,7 @@ class wolf extends irc {
 					// players available to vote is subtracted from unexistant idle mechanism
 					$votes_required = $this->decode($lang["votes_required"], $nick, $amount, $amount / 2 + 1);
 					$this->say($recipient, $votes_required);
-					
+
 				} else {
 					// no votes yet
 				}
@@ -976,7 +981,7 @@ class wolf extends irc {
 				// Send join message
 				$join = $this->decode($lang["join"], $message);
 				$this->say($recipient, $join);
-			
+
 				// 1 player for player already added
 				if ( count($this->players) == 1 ) {
 					$this->channel = $recipient;
@@ -1017,9 +1022,7 @@ class wolf extends irc {
 						}
 					}
 				}
-		
 				$this->removePlayer($recipient, $message);
-		
 				$quit = $this->decode($lang["quit"], $message, $answer);
 				$this->say($recipient, $quit);
 			}
@@ -1029,8 +1032,10 @@ class wolf extends irc {
 		else if ( $this->isCommand($command, 'fping') && $this->isAdmin($host) ) {
 			if ($recipient == $nick) {
 				$this->say($nick, "This feature is not available in a pm.");
-			}
-			else if ($this->ongoing == false) {
+			} else if ($this->ongoing) {
+				$start_ongoing = $this->decode($lang["start_ongoing"]);
+				$this->notice($nick, $start_ongoing);
+			} else {
 				$this->last_ping = time();
 
 				$list = "";
@@ -1043,11 +1048,8 @@ class wolf extends irc {
 				// This returns PING %answer% if $list is empty
 				$ping = $this->decode($lang["ping"], NO_NICK, $list);
 				$this->say($recipient, $ping);
-			} else {
-				$start_ongoing = $this->decode($lang["start_ongoing"]);
-				$this->notice($nick, $start_ongoing);
 			}
-		
+
 		}
 
 		// !frestart
@@ -1900,8 +1902,8 @@ class wolf extends irc {
 					$this->commands($recipient, $message, $nick, $host);
 				break;
 				case 'KICK':
-				case 'QUIT': // Alias PART
 					$nick = $data["3"];
+				case 'QUIT': // Alias PART
 				case 'PART':
 					// Remove from peoples list
 					$key = array_search($nick, $this->people);
