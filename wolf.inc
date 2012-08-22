@@ -103,16 +103,17 @@ class wolf extends irc {
 		$return = str_replace("<bold>", chr(2), $string);
 		$return = str_replace("</bold>", chr(2), $return);
 
-		if ($nick != null) {
+		if (isset($nick)) {
 			$return = str_replace("%nick%", $nick, $return);
 		}
-		if ($answer != null) {
+		if (isset($answer)) {
+			echo 'hi';
 			$return = str_replace("%answer%", $answer, $return);
 		}
-		if ($answer2 != null) {
+		if (isset($answer2)) {
 			$return = str_replace("%answer2%", $answer2, $return);
 		}
-		if ($answer3 != null) {
+		if (isset($answer3)) {
 			$return = str_replace("%answer3%", $answer3, $return);
 		}
 
@@ -390,10 +391,7 @@ class wolf extends irc {
 
 		// !help
 		if ( $this->isCommand($command, 'help') ) {
-			$help = str_replace("<bold>", chr(2), $lang["help"]);
-			$help = str_replace("</bold>", chr(2), $help);
-
-			// PM this message
+			$help = $this->decode($lang["help"]);
 			$this->say($nick, $help);
 		}
 
@@ -424,8 +422,8 @@ class wolf extends irc {
 		// !quit and !leave
 		else if ( ( $this->isCommand($command, 'quit') || $this->isCommand($command, 'leave') ) ) {
 			if (!$this->isPlaying($nick)) {
-				$not_playing=$this->decode($lang["not_playing"], null, $person);
-				$this->notice($nick, $not_playing);
+				$not_playing_self=$this->decode($lang["not_playing_self"]);
+				$this->notice($nick, $not_playing_self);
 			} else {
 				// Send quit message
 				$roles = $this->getRoles($nick);
@@ -964,8 +962,9 @@ class wolf extends irc {
 			} else if ( isset($this->players[$message]) ) {
 				$join_already_playing = $this->decode($lang["join_already_playing"]);
 				$this->notice($nick, $join_already_playing);
-			} else if ( empty($message) ) {
-				// ignore
+			} else if ($message == "") {
+				$parameters=$this->decode($lang["parameters"], null, $message);
+				$this->notice($nick, $parameters);
 			} else {
 				$this->addPlayer($recipient, $message);
 
@@ -995,6 +994,9 @@ class wolf extends irc {
 			if (!$this->isPlaying($message)) {
 				$not_playing=$this->decode($lang["not_playing"], null, $message);
 				$this->notice($nick, $not_playing);
+			} else if ($message == "") {
+				$parameters=$this->decode($lang["parameters"], null, $message);
+				$this->notice($nick, $parameters);
 			} else {
 				$roles = $this->getRoles($message);
 				if ($roles === false) {
@@ -1215,19 +1217,16 @@ class wolf extends irc {
 				$not_playing=$this->decode($lang["not_playing"], null, $person);
 				$this->notice($nick, $not_playing);
 			} else {
-				$roles = $this->getRoles($nick);
-				if ($roles === false) {
-					$this->say($nick, "Ur a wullager.");
-				} else if ( in_array("cursed", $roles) ) {
-					// Don't tell the cursed that he's cursed; it defeats the purpose.
-					$cursed_roles = $roles;
-					$pos = array_search("cursed", $cursed_roles);
-					unset($cursed_roles[$pos]);
-					$this->say($nick, "You currently hold the role(s): " . implode(", ", $cursed_roles));
-				} else {
-					//Tell the player what roles they hold.
-					$this->say($nick, "You currently hold the role(s): " . implode(", ", $cursed_roles));
+				$role_list = "";
+				foreach($this->getRoles($nick) as $role) {
+					if ($role == false || $role == "cursed") {
+						$string .= "villager, ";
+					} else {
+						$string .= $role . ", ";
+					}
 				}
+				$role_list = substr($role_list, 0, -2)
+				$this->say($nick, "You currently hold the role(s): " . $role_list);
 			}
 		}
 
