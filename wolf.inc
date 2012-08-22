@@ -1,4 +1,7 @@
 <?php
+define('NO_OPERATOR', true);
+define('NO_NICK', null);
+
 class wolf extends irc {
 
 	// Start random module
@@ -8,52 +11,48 @@ class wolf extends irc {
 	private $players, $players_original;
 	private $lynch, $away;
 
-	// Game stores
+	// In-game stores
 	private $people, $channel, $ongoing;
 
-	// Counters
-	private $game_wait, $wait_extended, $last_ping;
-
-	// Role variables
-	public $role_names;
-	private $roles_set;
-	private $seer, $wolf, $cursed, $drunk, $harlot, $traitor, $gunner, $crow, $angel, $detective;
-
-	// Seen, visited, killed variables (per night)
-	private $seer_seen, $wolf_killed, $harlot_visited, $gunner_shot, $angel_guarded, $detective_ided;
-
-	// Pre-generated end roles message
-	private $roles_message;
+	// Counters and timeouts
+	private $game_wait, $wait_extended, $last_stats, $last_ping;
 
 	// Day and night
 	private $isDay, $isNight;
 	private $day_time, $night_time;
 	private $current_day_start, $current_night_start;
-	private $fday, $fnight;
 
 	// Goat
 	private $goat_switch;
 
+	// Pre-generated and store end roles message
+	private $roles_message;
+
+	// Role variables
+	public $role_names = array("wolf", "seer", "cursed", "drunk", "harlot", "traitor", "gunner", "crow", "angel", "detective"); // should be const, but constants can't be arrays
+	private $seer, $wolf, $cursed, $drunk, $harlot, $traitor, $gunner, $crow, $angel, $detective;
+	private $roles_set; // roles available corresponding to amount of players
+
+	// Seen, visited, killed variables (per night/day)
+	private $seer_seen, $wolf_killed, $harlot_visited, $gunner_shot, $angel_guarded, $detective_ided;
+
+	/**
+	 * Constructor for werewolf, initialize variables with default values
+	 */
 	public function __construct() {
 		$this->random = new random();
+
 		$this->players = array();
-		$this->people = array();
-		$this->lynch = array();
-		$this->away = array();
+		$this->lynch = array(); $this->away = array();
 
-		$this->ongoing = false;
-		$this->wait_extended = 0;
-		$this->last_ping = 0;
-		$this->last_stats = 0;
+		$this->people = array(); $this->ongoing = false;
 
-		$this->isDay = null;
-		$this->isNight = null;
-		$this->day_time = 0;
-		$this->night_time = 0;
+		$this->wait_extended = 0; $this->last_stats = 0; $this->last_ping = 0;
+
+		$this->isDay = null; $this->isNight = null;
+		$this->day_time = 0; $this->night_time = 0;
+
 		$this->goat_switch = true;
-
-		$this->fday = false;
-		$this->fnight = false;
 
 		$this->roles_message = '';
 
@@ -67,7 +66,6 @@ class wolf extends irc {
 		$this->crow = array(); 
 		$this->angel = array();
 		$this->detective = array();
-		$this->role_names = array("wolf", "seer", "cursed", "drunk", "harlot", "traitor", "gunner", "crow", "angel", "detective");
 
 		$this->seer_seen = array();
 		$this->wolf_killed = array();
@@ -78,14 +76,14 @@ class wolf extends irc {
 	}
 
 	/**
-	* Check if the string is a command
+	* Check if the string is a valid corresponding command
 	*
-	* @param mixed $string string to check
-	* @param mixed $command the command the string should be
-	* @return boolean yes or no answer
+	* @param mixed $string String to check
+	* @param mixed $command The command the string should be
+	* @param boolean $no_operator Set to true to remove operator requirement
+	* @return boolean True or False answer
 	*/
 	public function isCommand ($string, $command, $no_operator=false) {
-		//if ( strtolower($string) == '.' . $command || strtolower($string) == '!' . $command ) {
 		if ( strtolower($string) == '!' . $command || ($no_operator && strtolower($string) == $command) ) {
 			return true;
 		}
@@ -98,6 +96,9 @@ class wolf extends irc {
 	 * @param mixed $string Locale string
 	 * @param mixed $nick Nickname to replace %nick%
 	 * @param mixed $answer Answer to replace %answer%
+	 * @param mixed $answer Answer to replace %answer2%
+	 * @param mixed $answer Answer to replace %answer3%
+	 * @return string String with bolded words and correct answer values
 	 */
 	public function decode($string, $nick=null, $answer=null, $answer2=null, $answer3=null) {
 		$return = str_replace("<bold>", chr(2), $string);
@@ -122,6 +123,9 @@ class wolf extends irc {
 
 	/**
 	 * Return a string with formated seconds
+	 * 
+	 * @param int Seconds
+	 * @param string Formatted seconds ex: 05:32
 	 */
 	public function formatSeconds($seconds) {
 		$minutes = 0;
@@ -145,7 +149,7 @@ class wolf extends irc {
 	* @param mixed $nick Nickname of player
 	* @param mixed $host Hostname of player
 	* @param mixed $command Command
-	* @return bollean True or false
+	* @return boolean True or False answer
 	*/
 	public function isAdmin($host) {
 		global $user, $admins;
@@ -159,6 +163,9 @@ class wolf extends irc {
 
 	/**
 	 * Nickname auto-complete
+	 * 
+	 * @param mixed $nick First part of desired nickname
+	 * @return string Full nickname of player
 	 */
 	public function nickAutocomplete($nick) {
 		foreach(array_keys($this->players) as $player) {
@@ -179,6 +186,9 @@ class wolf extends irc {
 
 	/**
 	 * Check if the player is playing
+	 * 
+	 * @param mixed $nick Nickname of potential player
+	 * @return boolean True or False answer
 	 */
 	public function isPlaying($nick) {
 		foreach(array_keys($this->players) as $player) {
@@ -189,6 +199,12 @@ class wolf extends irc {
 		return false;
 	}
 
+	/**
+	 * Get all the roles a player has
+	 * 
+	 * @param mixed $nick Nickname of player
+	 * @return array Array containing roles of specified player
+	 */
 	public function getRoles($nick) {
 		foreach($this->role_names as $role) {
 			foreach($this->$role as $person) {
@@ -208,95 +224,69 @@ class wolf extends irc {
 		}
 	}
 
+	/**
+	 * Get the name of a role by id
+	 * 
+	 * @param int $id ID of role
+	 * @return string Name of role
+	 */
 	public function getRoleByID($id) {
 		switch($id) {
-			case 0: // Seer
+			case 0:
 				return 'seer';
-			break;
-		
-			case 1: // Wolf
+			case 1:
 				return 'wolf';
-			break;
-		
-			case 2: // Cursed
+			case 2:
 				return 'cursed';
-			break;
-
-			case 3: // Drunk
+			case 3:
 				return 'drunk';
-			break;
-		
-			case 4: // Harlot
+			case 4:
 				return 'harlot';
-			break;
-		
-			case 5: // Traitor
+			case 5:
 				return 'traitor';
-			break;
-		
-			case 6: // Gunner
+			case 6:
 				return 'gunner';
-			break;
-		
-			case 7: // Crow
+			case 7:
 				return 'crow';
-			break;
-		
-			case 8: // Angel
+			case 8:
 				return 'angel';
-			break;
-		
-			case 9: // Detective
+			case 9:
 				return 'detective';
-			break;
-
 			default:
 				return false;
 		}
 	}
 
+	/**
+	 * Get the ID of a role
+	 * 
+	 * This function is like an ENUM, but PHP does not support enum blocks
+	 * 
+	 * @param mixed $role Role name
+	 * @return int ID of role
+	 */
 	public function getRoleID($role) {
 		switch($role) {
-			case 'seer': // Seer
+			case 'seer':
 				return 0;
-				break;
-
-			case 'wolf': // Wolf
+			case 'wolf':
 				return 1;
-				break;
-	
-			case 'cursed': // Cursed
+			case 'cursed':
 				return 2;
-				break;
-	
-			case 'drunk': // Drunk
+			case 'drunk':
 				return 3;
-				break;
-	
-			case 'harlot': // Harlot
+			case 'harlot':
 				return 4;
-				break;
-	
-			case 'traitor': // Traitor
+			case 'traitor':
 				return 5;
-				break;
-	
-			case 'gunner': // Gunner
+			case 'gunner':
 				return 6;
-				break;
-	
-			case 'crow': // Crow
+			case 'crow':
 				return 7;
-				break;
-	
-			case 'angel': // Angel
+			case 'angel':
 				return 8;
-				break;
-	
-			case 'detective': // Detective
+			case 'detective':
 				return 9;
-				break;
-	
 			default:
 				return false;
 		}
@@ -367,7 +357,7 @@ class wolf extends irc {
 	 * @param mixed $host Host of sender
 	 */
 	public function commands($recipient, $message, $nick, $host) {
-		global $user, $lang, $setting, $limit, $irc;
+		global $user, $lang, $setting, $limit, $length, $irc;
 
 		// Remove double, extraneous whitespaces
 		$message = preg_replace("/\s+/", " ", $message);
@@ -549,7 +539,7 @@ class wolf extends irc {
 				
 				$list = implode(' ', $this->people);
 				// This returns PING %answer% if $list is empty
-				$ping = $this->decode($lang["ping"], null, $list);
+				$ping = $this->decode($lang["ping"], NO_NICK, $list);
 				$this->say($recipient, $ping);
 			}
 
@@ -568,7 +558,7 @@ class wolf extends irc {
 
 			// Time limit has not passed
 			else if ( $time < $setting["game_wait"] ) {
-				$game_wait = $this->decode($lang["game_wait"], null, $setting["game_wait"] - $time);
+				$game_wait = $this->decode($lang["game_wait"], NO_NICK, $setting["game_wait"] - $time);
 				$this->say($recipient, $game_wait);
 			}
 
@@ -589,7 +579,7 @@ class wolf extends irc {
 				// Loop through players to generate list
 				$answer = $this->listPlayers(false, true);
 
-				$game_welcome = $this->decode($lang["game_welcome"], null, $answer);
+				$game_welcome = $this->decode($lang["game_welcome"], NO_NICK, $answer);
 				$this->say($recipient, $game_welcome);
 
 				$this->ongoing = true;
@@ -631,10 +621,10 @@ class wolf extends irc {
 						}
 
 						if ($numItems > 1) {
-							$this->roles_message = $this->roles_message . $this->decode($lang["end_roles_plural"], null, $lang[$role . '_plural'], $role_list) . ' ';
+							$this->roles_message = $this->roles_message . $this->decode($lang["end_roles_plural"], NO_NICK, $lang[$role . '_plural'], $role_list) . ' ';
 						} else {
 							// This is a hackish workaround, $person is still the looped array since $numItems is 1
-							$this->roles_message = $this->roles_message . $this->decode($lang["end_roles"], null, $lang[$role], $person) . ' ';
+							$this->roles_message = $this->roles_message . $this->decode($lang["end_roles"], NO_NICK, $lang[$role], $person) . ' ';
 						}
 					}
 				}
@@ -674,7 +664,7 @@ class wolf extends irc {
 				$game_none = $this->decode($lang["game_none"]);
 				$this->say($recipient, $game_none);
 			} else if (!$this->isPlaying($nick)) {
-				$not_playing = $this->decode($lang["not_playing"], $this->nickAutocomplete($message));
+				$not_playing = $this->decode($lang["not_playing"], NO_NICK, $this->nickAutocomplete($message));
 				$this->say($recipient, $not_playing);
 			} else if ($this->isNight) {
 				$this->say($nick, "Error, it is not day time");
@@ -751,10 +741,10 @@ class wolf extends irc {
 				if (!$this->isPlaying($nick)) {
 					// This person is not playing, let's just ignore them (and hope they go away)
 				} else if (!$this->isPlaying($victim)) {
-					$not_playing = $this->decode($lang["not_playing"], null, $victim);
+					$not_playing = $this->decode($lang["not_playing"], NO_NICK, $victim);
 					$this->notice($nick, $not_playing);
 				} else if ($this->isNight) {
-					$lynch_night = $this->decode($lang["lynch_night"], null, $victim);
+					$lynch_night = $this->decode($lang["lynch_night"], NO_NICK, $victim);
 					$this->notice($nick, $lynch_night);
 				} else {
 					$this->lynch[$nick] = $victim;
@@ -774,10 +764,10 @@ class wolf extends irc {
 
 				$int = $this->random->getRandInt(1, 2);
 				if ($int == 1) {
-					$coin_land = $this->decode($lang["coin_land"], null, "heads");
+					$coin_land = $this->decode($lang["coin_land"], NO_NICK, "heads");
 					$this->say($recipient, $coin_land);
 				} else if ($int == 2) {
-					$coin_land = $this->decode($lang["coin_land"], null, "tails");
+					$coin_land = $this->decode($lang["coin_land"], NO_NICK, "tails");
 					$this->say($recipient, $coin_land);
 				} else {
 					$this->say($recipient, "There as an error retrieving random.org results.");
@@ -938,14 +928,22 @@ class wolf extends irc {
 		// !fday
 		else if ( $this->isCommand($command, 'fday') && $this->isAdmin($host) ) {
 			if ($this->isNight && $this->ongoing) {
-				$this->fday = true;
+				$length_night_original = $length["night"];
+
+				$length["night"] = 0;
+				$this->runMaintenance();
+				$length["night"] = $length_night_original;
 			}
 		}
 
 		// !fnight
 		else if ( $this->isCommand($command, 'fnight') && $this->isAdmin($host) ) {
 			if ($this->isDay && $this->ongoing) {
-				$this->fnight = true;
+				$length_day_original = $length["day"];
+
+				$length["day"] = 0;
+				$this->runMaintenance();
+				$length["day"] = $length_day_original;
 			}
 		}
 
@@ -963,7 +961,7 @@ class wolf extends irc {
 				$join_already_playing = $this->decode($lang["join_already_playing"]);
 				$this->notice($nick, $join_already_playing);
 			} else if ($message == "") {
-				$parameters=$this->decode($lang["parameters"], null, $message);
+				$parameters=$this->decode($lang["parameters"], NO_NICK, $message);
 				$this->notice($nick, $parameters);
 			} else {
 				$this->addPlayer($recipient, $message);
@@ -992,10 +990,10 @@ class wolf extends irc {
 
 			// Send quit message
 			if (!$this->isPlaying($message)) {
-				$not_playing=$this->decode($lang["not_playing"], null, $message);
+				$not_playing=$this->decode($lang["not_playing"], NO_NICK, $message);
 				$this->notice($nick, $not_playing);
 			} else if ($message == "") {
-				$parameters=$this->decode($lang["parameters"], null, $message);
+				$parameters=$this->decode($lang["parameters"], NO_NICK, $message);
 				$this->notice($nick, $parameters);
 			} else {
 				$roles = $this->getRoles($message);
@@ -1036,7 +1034,7 @@ class wolf extends irc {
 				}
 				$list = substr($list, 0, -1);
 				// This returns PING %answer% if $list is empty
-				$ping = $this->decode($lang["ping"], null, $list);
+				$ping = $this->decode($lang["ping"], NO_NICK, $list);
 				$this->say($recipient, $ping);
 			} else {
 				$start_ongoing = $this->decode($lang["start_ongoing"]);
@@ -1053,7 +1051,7 @@ class wolf extends irc {
 		}
 
 		/***** Private Role Commands *****/
-		else if ( $this->isCommand($command, 'see', true) ) {
+		else if ( $this->isCommand($command, 'see', NO_OPERATOR) ) {
 			if ($recipient == $this->channel || $this->isDay) {
 				// ignore this, people are probably telling the seer to 'see' someone.
 			} else if ( !in_array($nick, $this->seer) ) {
@@ -1066,7 +1064,7 @@ class wolf extends irc {
 				$person = $this->nickAutocomplete($message);
 
 				if (!$this->isPlaying($person)) {
-					$not_playing=$this->decode($lang["not_playing"], null, $person);
+					$not_playing=$this->decode($lang["not_playing"], NO_NICK, $person);
 					$this->notice($nick, $not_playing);
 				} else {
 					// parse this person
@@ -1086,7 +1084,7 @@ class wolf extends irc {
 					}
 
 					// Tell the seer who this guy is
-					$seer_see = $this->decode($lang["seer_see"], null, $person, $lang[$role]);
+					$seer_see = $this->decode($lang["seer_see"], NO_NICK, $person, $lang[$role]);
 					$this->say($nick, $seer_see);
 
 					// Add to list of seers that have seen tonight
@@ -1095,7 +1093,7 @@ class wolf extends irc {
 			}
 		}
 
-		else if ( $this->isCommand($command, 'kill', true) ) {
+		else if ( $this->isCommand($command, 'kill', NO_OPERATOR) ) {
 			if ($recipient == $this->channel || $this->isDay ) {
 				// ignore this
 			} else if ( !in_array($nick, $this->wolf) ) {
@@ -1104,7 +1102,7 @@ class wolf extends irc {
 				$person = $this->nickAutocomplete($message);
 
 				if (!$this->isPlaying($person)) {
-					$not_playing=$this->decode($lang["not_playing"], null, $person);
+					$not_playing=$this->decode($lang["not_playing"], NO_NICK, $person);
 					$this->notice($nick, $not_playing);
 				} else {
 					// Check if the victim is a wolf
@@ -1116,14 +1114,14 @@ class wolf extends irc {
 						$this->wolf_killed[$nick] = $person;
 
 						// Send Message
-						$wolf_kill = $this->decode($lang["wolf_kill"], null, $person);
+						$wolf_kill = $this->decode($lang["wolf_kill"], NO_NICK, $person);
 						$this->say($nick, $wolf_kill);
 					}
 				}
 			}
 		}
 
-		else if ( $this->isCommand($command, 'visit', true) ) {
+		else if ( $this->isCommand($command, 'visit', NO_OPERATOR) ) {
 			if ($recipient == $this->channel) {
 				// ignore this
 			} else if ($this->isDay) {
@@ -1132,17 +1130,17 @@ class wolf extends irc {
 				$this->notice($nick, $harlot_day);
 			} else if ( !in_array($nick, $this->harlot) ) {
 				// This person isn't the harlot
-				$harlot_visit_not=$this->decode($lang["harlot_visit_not"], null, $person);
+				$harlot_visit_not=$this->decode($lang["harlot_visit_not"], NO_NICK, $person);
 				$this->notice($nick, $harlot_visit_not);
 			} else if ( isset($this->harlot_visited[$nick])) {
 				// You've already visited
-				$harlot_visited=$this->decode($lang["harlot_visited"], null, $this->harlot_visited[$nick]);
+				$harlot_visited=$this->decode($lang["harlot_visited"], NO_NICK, $this->harlot_visited[$nick]);
 				$this->notice($nick, $harlot_visited);
 			} else {
 				$person = $this->nickAutocomplete($message);
 
 				if ( !$this->isPlaying($person) ) {
-					$not_playing=$this->decode($lang["not_playing"], $person);
+					$not_playing=$this->decode($lang["not_playing"], NO_NICK, $person);
 					$this->notice($nick, $not_playing);
 				} else {
 					// This person has been selected for death.
@@ -1154,11 +1152,11 @@ class wolf extends irc {
 						$this->notice($nick, $harlot_visit_self);
 					} else {
 						// Send Message
-						$harlot_visit = $this->decode($lang["harlot_visit"], null, $person);
+						$harlot_visit = $this->decode($lang["harlot_visit"], NO_NICK, $person);
 						$this->say($nick, $harlot_visit);
 
 						// Send Message to hostess
-						$harlot_visit = $this->decode($lang["harlot_visit"], null, $nick);
+						$harlot_visit = $this->decode($lang["harlot_visit"], NO_NICK, $nick);
 						$this->say($person, $harlot_visit);
 					}
 
@@ -1166,7 +1164,7 @@ class wolf extends irc {
 			}
 		}
 
-		else if ( $this->isCommand($command, 'guard', true) ) {
+		else if ( $this->isCommand($command, 'guard', NO_OPERATOR) ) {
 			if ($recipient == $this->channel) {
 				// ignore this
 			} else if ($this->isDay) {
@@ -1179,14 +1177,14 @@ class wolf extends irc {
 				$this->notice($nick, $angel_guard_not);
 			} else if ( isset($this->angel_guarded[$nick]) ) {
 				// You've already guarded
-				$angel_guarded=$this->decode($lang["angel_guarded"], null, $this->angel_guarded[$nick]);
+				$angel_guarded=$this->decode($lang["angel_guarded"], NO_NICK, $this->angel_guarded[$nick]);
 				$this->say($nick, $angel_guarded);
 			} else {
 				$person = $this->nickAutocomplete($message);
 
 				if ( !$this->isPlaying($person) ) {
 					// The visited guarding person isn't playing
-					$not_playing=$this->decode($lang["not_playing"], $person);
+					$not_playing=$this->decode($lang["not_playing"], NO_NICK, $person);
 					$this->notice($nick, $not_playing);
 				} else if ($nick == $person) {
 					// Guarding self isn't allowed
@@ -1197,11 +1195,11 @@ class wolf extends irc {
 					$this->angel_guarded[$nick] = $person;
 
 					// Send Message
-					$angel_guard = $this->decode($lang["angel_guard"], null, $person);
+					$angel_guard = $this->decode($lang["angel_guard"], NO_NICK, $person);
 					$this->say($nick, $angel_guard);
 
 					// Send Message to protected villager
-					$angel_guard_notify = $this->decode($lang["angel_guard_notify"], null, $nick);
+					$angel_guard_notify = $this->decode($lang["angel_guard_notify"], NO_NICK, $nick);
 					$this->say($person, $angel_guard_notify);
 
 				}
@@ -1209,12 +1207,12 @@ class wolf extends irc {
 		}
 
 		// whoami (needs official locale)
-		else if ( $this->isCommand($command, 'whoami', true) ) {
+		else if ( $this->isCommand($command, 'whoami', NO_OPERATOR) ) {
 			if (!$this->ongoing) {
 				//No game is currently running.
 				$this->say($nick, $this->decode($lang["game_none"]));
 			} else if ( !$this->isPlaying($nick) ) {
-				$not_playing=$this->decode($lang["not_playing"], null, $person);
+				$not_playing=$this->decode($lang["not_playing"], NO_NICK, $person);
 				$this->notice($nick, $not_playing);
 			} else {
 				$role_list = "";
@@ -1225,7 +1223,7 @@ class wolf extends irc {
 						$string .= $role . ", ";
 					}
 				}
-				$role_list = substr($role_list, 0, -2)
+				$role_list = substr($role_list, 0, -2);
 				$this->say($nick, "You currently hold the role(s): " . $role_list);
 			}
 		}
@@ -1365,7 +1363,7 @@ class wolf extends irc {
 
 				// List players
 				$answer=$this->listPlayers(false, false, $nick);
-				$players_list = $this->decode($lang["players_list"], null, $answer);
+				$players_list = $this->decode($lang["players_list"], NO_NICK, $answer);
 				$this->say($nick, $players_list);
 			break;
 
@@ -1382,7 +1380,7 @@ class wolf extends irc {
 
 				// List players
 				$answer=$this->listPlayers(true, false, $nick);
-				$players_list = $this->decode($lang["players_list"], null, $answer);
+				$players_list = $this->decode($lang["players_list"], NO_NICK, $answer);
 				$this->say($nick, $players_list);
 			break;
 
@@ -1403,7 +1401,7 @@ class wolf extends irc {
 
 				// List players
 				$answer=$this->listPlayers(false, false, $nick);
-				$players_list = $this->decode($lang["players_list"], null, $answer);
+				$players_list = $this->decode($lang["players_list"], NO_NICK, $answer);
 				$this->say($nick, $players_list);
 			break;
 
@@ -1420,7 +1418,7 @@ class wolf extends irc {
 
 				// List players
 				$answer=$this->listPlayers(true, false, $nick);
-				$players_list = $this->decode($lang["players_list"], null, $answer);
+				$players_list = $this->decode($lang["players_list"], NO_NICK, $answer);
 				$this->say($nick, $players_list);
 			break;
 
@@ -1441,7 +1439,7 @@ class wolf extends irc {
 
 				// List players
 				$answer=$this->listPlayers(false, false, $nick);
-				$players_list = $this->decode($lang["players_list"], null, $answer);
+				$players_list = $this->decode($lang["players_list"], NO_NICK, $answer);
 				$this->say($nick, $players_list);
 			break;
 
@@ -1463,7 +1461,7 @@ class wolf extends irc {
 		global $lang;
 
 		$this->night_time = $this->night_time + $lasted_time;
-		$day_turn = $this->decode($lang["day_turn"], null, $this->formatSeconds($lasted_time));
+		$day_turn = $this->decode($lang["day_turn"], NO_NICK, $this->formatSeconds($lasted_time));
 		$this->say($this->channel, $day_turn);
 
 		if ($victim == null) {
@@ -1477,7 +1475,7 @@ class wolf extends irc {
 
 		// Victim was protected by GA
 		} else if ( in_array($victim, $this->angel_guarded) ) {
-			$day_angel = $this->decode($lang["day_angel"], null, $victim);
+			$day_angel = $this->decode($lang["day_angel"], NO_NICK, $victim);
 			$this->say($this->channel, $day_angel);
 
 		} else {
@@ -1494,7 +1492,7 @@ class wolf extends irc {
 				$role_list = substr($role_list, 0, -2);
 			}
 
-			$day_victim = $this->decode($lang["day_victim"], null, $victim, $role_list);
+			$day_victim = $this->decode($lang["day_victim"], NO_NICK, $victim, $role_list);
 			$this->say($this->channel, $day_victim);
 			$this->removePlayer($this->channel, $victim);
 		}
@@ -1502,7 +1500,7 @@ class wolf extends irc {
 		// If the harlot visits a wolf!
 		foreach($this->harlot as $harlot) {
 			if ( isset($this->harlot_visited[$harlot]) && in_array($this->harlot_visited[$harlot], $this->wolf) ) {
-				$day_harlot_dead = $this->decode($lang["day_harlot_dead"], null, $harlot);
+				$day_harlot_dead = $this->decode($lang["day_harlot_dead"], NO_NICK, $harlot);
 				$this->say($this->channel, $day_harlot_dead);
 				$this->removePlayer($this->channel, $harlot);
 			}
@@ -1513,7 +1511,7 @@ class wolf extends irc {
 			// 50% chance of death
 			if ($this->random->getRandInt(1, 2) == '1') {
 				if ( isset($this->angel_guarded[$angel]) && in_array($this->angel_guarded[$angel], $this->wolf) ) {
-					$day_angel_dead = $this->decode($lang["day_angel_dead"], null, $angel);
+					$day_angel_dead = $this->decode($lang["day_angel_dead"], NO_NICK, $angel);
 					$this->say($this->channel, $day_angel_dead);
 					$this->removePlayer($this->channel, $angel);
 				}
@@ -1540,7 +1538,7 @@ class wolf extends irc {
 				$amount--;
 			}
 			// Lynch message, and how many required to kill a victim.
-			$day_vote = $this->decode($lang["day_vote"], null, $amount / 2 + 1);
+			$day_vote = $this->decode($lang["day_vote"], NO_NICK, $amount / 2 + 1);
 			$this->say($this->channel, $day_vote);
 
 			// Set booleans for.... THE SUN
@@ -1589,7 +1587,7 @@ class wolf extends irc {
 				$role_list = substr($role_list, 0, -2);
 			}
 
-			$night_victim = $this->decode($lang["night_victim"], null, $victim, $role_list);
+			$night_victim = $this->decode($lang["night_victim"], NO_NICK, $victim, $role_list);
 			$this->say($this->channel, $night_victim);
 			$this->removePlayer($this->channel, $victim);
 		}
@@ -1616,7 +1614,7 @@ class wolf extends irc {
 			}
 
 			$this->day_time = $this->day_time + $lasted_time;
-			$night_turn = $this->decode($lang["night_turn"], null, $this->formatSeconds($lasted_time));
+			$night_turn = $this->decode($lang["night_turn"], NO_NICK, $this->formatSeconds($lasted_time));
 			$this->say($this->channel, $night_turn);
 
 			// Set booleans for.... THE SUN
@@ -1673,7 +1671,7 @@ class wolf extends irc {
 
 		// Time and portions
 		$total = $this->day_time + $this->night_time;
-		$end_times = $this->decode($lang["end_times"], null, $this->formatSeconds($total), $this->formatSeconds($this->day_time), $this->formatSeconds($this->night_time));
+		$end_times = $this->decode($lang["end_times"], NO_NICK, $this->formatSeconds($total), $this->formatSeconds($this->day_time), $this->formatSeconds($this->night_time));
 		$this->say($channel, $end_times);
 
 		// Send previously generated roles message
@@ -1765,17 +1763,13 @@ class wolf extends irc {
 			if ($this->isNight) {
 				// Has the time limit run out yet?
 				$lasted_time = time() - $this->current_night_start;
-				// If the time limit has run out, or someone ran fday
-				if ($lasted_time >= $length["night"] || $this->fday) {
+				// If the time limit has run out
+				if ($lasted_time >= $length["night"]) {
 					$first_kill = reset($this->wolf_killed);
 					if ( !empty($first_kill) ) {
 						$this->turnDay($lasted_time, $first_kill);
 					} else {
 						$this->turnDay($lasted_time);
-					}
-
-					if ($this->fday == true) {
-						$this->fday = false;
 					}
 				} else {
 
@@ -1814,13 +1808,9 @@ class wolf extends irc {
 			} else if ($this->isDay) {
 				// Has the time limit run out yet?
 				$lasted_time = time() - $this->current_day_start;
-				// If the time limit has run out, or someone ran fday
-				if ($lasted_time >= $length["day"] || $this->fnight) {
+				// If the time limit has run out
+				if ($lasted_time >= $length["day"]) {
 					$this->turnNight($lasted_time);
-
-					if ($this->fnight) {
-						$this->fnight = false;
-					}
 				} else {
 
 					foreach($this->lynch as $lyncher => $lynchee) {
