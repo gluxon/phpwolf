@@ -329,6 +329,7 @@ class wolf extends irc {
 	 */
 	public function relayToWolves($sender, $message) {
 		global $lang;
+
 		foreach($this->wolf as $wolf) {
 			if ($wolf != $sender) {
 				$wolf_relay = $this->decode($lang["wolf_relay"], $sender, $message);
@@ -360,6 +361,7 @@ class wolf extends irc {
 			$message = substr($message, 0, -1);
 		}
 
+		// Split into a command, and its parameters ($message)
 		if ( strpbrk(" ", $message) ) {
 			$ex_message = explode(" ", $message, 2);
 			$command=$ex_message["0"];
@@ -441,7 +443,6 @@ class wolf extends irc {
 				$ratelimit = $this->decode($lang["ratelimit"]);
 				$this->notice($nick, $ratelimit);
 			} else {
-
 
 				// Get amount of players
 				$answer = count($this->players);
