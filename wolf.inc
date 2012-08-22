@@ -104,18 +104,14 @@ class wolf extends irc {
 		$return = str_replace("<bold>", chr(2), $string);
 		$return = str_replace("</bold>", chr(2), $return);
 
-		if (isset($nick)) {
+		if (isset($nick))
 			$return = str_replace("%nick%", $nick, $return);
-		}
-		if (isset($answer)) {
+		if (isset($answer))
 			$return = str_replace("%answer%", $answer, $return);
-		}
-		if (isset($answer2)) {
+		if (isset($answer2))
 			$return = str_replace("%answer2%", $answer2, $return);
-		}
-		if (isset($answer3)) {
+		if (isset($answer3))
 			$return = str_replace("%answer3%", $answer3, $return);
-		}
 
 		return $return;
 	}
@@ -155,9 +151,8 @@ class wolf extends irc {
 
 		if (in_array($host, $admins)) {
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	/**
@@ -168,6 +163,7 @@ class wolf extends irc {
 	 */
 	public function nickAutocomplete($nick) {
 		foreach(array_keys($this->players) as $player) {
+			// if $nick is at beginning (case-insensitive
 			if ( stripos($player, $nick) === 0 ) {
 				if (isset($return)) {
 					// There are more than 1 person with that name, return original nick
@@ -178,7 +174,7 @@ class wolf extends irc {
 			}
 		}
 		if (!isset($return)) {
-			$return = $nick;
+			return $nick;
 		}
 		return $return;
 	}
@@ -190,10 +186,8 @@ class wolf extends irc {
 	 * @return boolean True or False answer
 	 */
 	public function isPlaying($nick) {
-		foreach(array_keys($this->players) as $player) {
-			if ($player == $nick) {
-				return true;
-			}
+		if (!empty($this->players[$nick])) {
+			return true;
 		}
 		return false;
 	}
@@ -206,13 +200,11 @@ class wolf extends irc {
 	 */
 	public function getRoles($nick) {
 		foreach($this->role_names as $role) {
-			foreach($this->$role as $person) {
-				if ($nick == $person) {
-					if (!isset($return)) {
-						$return = array($role);
-					} else {
-						array_push($return, $role);
-					}
+			if (in_array($nick, $this->$role)) {
+				if (!isset($return)) {
+					$return = array($role);
+				} else {
+					array_push($return, $role);
 				}
 			}
 		}
@@ -1221,18 +1213,23 @@ class wolf extends irc {
 				//No game is currently running.
 				$this->say($nick, $this->decode($lang["game_none"]));
 			} else if ( !$this->isPlaying($nick) ) {
-				$not_playing=$this->decode($lang["not_playing"], NO_NICK, $person);
+				$not_playing = $this->decode($lang["not_playing"], NO_NICK, $person);
 				$this->notice($nick, $not_playing);
 			} else {
 				$role_list = "";
-				foreach($this->getRoles($nick) as $role) {
-					if ($role == false || $role == "cursed") {
-						$string .= "villager, ";
-					} else {
-						$string .= $role . ", ";
+				$roles = $this->getRoles($nick);
+				if ($roles === false) {
+					$role_list = "villager";
+				} else {
+					foreach($roles as $role) {
+						if ($role == "cursed") {
+							$role_list .= "villager, ";
+						} else {
+							$role_list .= $role . ", ";
+						}
 					}
+					$role_list = substr($role_list, 0, -2);
 				}
-				$role_list = substr($role_list, 0, -2);
 				$this->say($nick, "You currently hold the role(s): " . $role_list);
 			}
 		}
@@ -1307,7 +1304,7 @@ class wolf extends irc {
 			for($i=1; $i <= $amount; $i++) {
 
 				// Loop until role is given to proper candidate
-				// NOTE: This will result in an infinite loop if settings are manipulated wrong
+				// NOTE: This will result in an infinite loop if settings are manipulated wrong (ex: more roles than players)
 				while(true) {
 					echo "Finding $role_name";
 					// Player index to receive role
