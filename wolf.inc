@@ -1216,18 +1216,19 @@ class wolf extends irc {
 				$this->notice($nick, $not_playing);
 			} else {
 				$roles = $this->getRoles($nick);
-				if ($roles === false) {
-					$this->say($nick, "Ur a wullager.");
-				} else if ( in_array("cursed", $roles) ) {
-					// Don't tell the cursed that he's cursed; it defeats the purpose.
-					$cursed_roles = $roles;
-					$pos = array_search("cursed", $cursed_roles);
-					unset($cursed_roles[$pos]);
-					$this->say($nick, "You currently hold the role(s): " . implode(", ", $cursed_roles));
-				} else {
-					//Tell the player what roles they hold.
-					$this->say($nick, "You currently hold the role(s): " . implode(", ", $cursed_roles));
+				$string = ""
+				foreach($roles as $role) {
+					if ($role == "cursed") {
+						continue;
+					}
+					if ($role == false) {
+						$string .= "<bold>Villager</bold>";
+					} else {
+						$string .= "<bold>" . $role . "</bold>, ";
+					}
 				}
+				$string = strrpos(", ", ".");
+				$this->say($nick, "You currently hold the role(s): " + $this->decode($string));
 			}
 		}
 
