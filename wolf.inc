@@ -964,6 +964,8 @@ class wolf extends irc {
 			} else if ( isset($this->players[$message]) ) {
 				$join_already_playing = $this->decode($lang["join_already_playing"]);
 				$this->notice($nick, $join_already_playing);
+			} else if ( empty($message) ) {
+				$this->say($recipient, "Please specify a nick to join the game.");
 			} else {
 				$this->addPlayer($recipient, $message);
 
