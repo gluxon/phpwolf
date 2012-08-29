@@ -1052,6 +1052,26 @@ class wolf extends irc {
 			//die(exec('php ' . str_replace(' ', '\ ', getcwd()) . '/' . implode(' ', $GLOBALS['argv']) . ' > /dev/null &'));
 		}
 
+		// !access
+		else if ( $this->isCommand($command, 'access') && $this->isAdmin($host) ) {
+			$args = explode(" ", $message);
+			if (count($args) < 2) {
+				$this->say($recipient, "$nick, There are \002two\002 arguments required for this command, " . count($args) . "given.");
+			} else {
+				switch($args[0]) {
+					case '+admin':
+						array_push($admins, $args[1]);
+						$this->say($recipient, $nick . ", Operation executed successfully.");
+						break;
+					case '-admin':
+						$pos = array_search($args[1], $admins);
+						unset($pos);
+						$this->say($recipient, $nick . ", Operation executed successfully.");
+						break;
+				}
+			}
+		}
+
 		/***** Private Role Commands *****/
 		else if ( $this->isCommand($command, 'see', NO_OPERATOR) ) {
 			if ($recipient == $this->channel || $this->isDay) {
