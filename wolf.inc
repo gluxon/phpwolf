@@ -1053,10 +1053,12 @@ class wolf extends irc {
 		}
 
 		// !access
-		else if ( $this->isCommand($command, 'access') && $this->isAdmin($host) ) {
+		else if ( $this->isCommand($command, 'access') ) {
 			$args = explode(" ", $message);
 			if (count($args) < 2) {
-				$this->say($recipient, "$nick, There are \002two\002 arguments required for this command, " . count($args) . "given.");
+				$this->say($recipient, "$nick, There are \002two\002 arguments required for this command, " . count($args) . " given.");
+			} else if (!$this->isAdmin($host) ) {
+				$this->say($recipient, $nick . ", You are not a bot admin.");
 			} else {
 				switch($args[0]) {
 					case '+admin':
