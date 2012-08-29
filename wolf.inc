@@ -1054,6 +1054,7 @@ class wolf extends irc {
 
 		// !access
 		else if ( $this->isCommand($command, 'access') ) {
+			global $admins;
 			$args = explode(" ", $message);
 			if (count($args) < 2) {
 				$this->say($recipient, "$nick, There are \002two\002 arguments required for this command, " . count($args) . " given.");
