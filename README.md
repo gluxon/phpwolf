@@ -16,3 +16,4 @@ phpwolf is a rewritten wolfbot designed to benefit from the features offered by 
 Status
 ------------
 As of now, phpwolf is playable with 9 players max. Gunner, crow, angel, and detective are left to code. The web implementation is still under consideration with a HTML5 IRC WebSockets client or AJAX as options.
+
