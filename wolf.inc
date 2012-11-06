@@ -34,7 +34,7 @@ class wolf extends irc {
 	private $roles_set; // roles available corresponding to amount of players
 
 	// Seen, visited, killed variables (per night/day)
-	private $seer_seen, $wolf_killed, $harlot_visited, $gunner_shot, $angel_guarded, $detective_ided;
+	private $seer_seen, $wolf_killed, $harlot_visited, $gunner_shot, $gunner_bullets, $angel_guarded, $detective_ided;
 
 	/**
 	 * Constructor for werewolf, initialize variables with default values
@@ -71,6 +71,7 @@ class wolf extends irc {
 		$this->wolf_killed = array();
 		$this->harlot_visited = array();
 		$this->gunner_shot = array();
+		$this->gunner_bullets = array();
 		$this->angel_guarded = array();
 		$this->detective_ided = array();
 	}
@@ -747,11 +748,6 @@ class wolf extends irc {
 			}
 		}
 
-		// !shoot
-		else if ( $this->isCommand($command, 'shoot') ) {
-			$this->say($nick, "This feature on phpwolf is not yet available.");
-		}
-
 		// !votes
 		else if ( $this->isCommand($command, 'votes') ) {
 			if ($recipient == $nick) {
@@ -1350,6 +1346,78 @@ class wolf extends irc {
 			}
 		}
 
+		// !shoot
+		else if ( $this->isCommand($command, 'shoot') ) {
+			if ($recipient == $user["nick"]) {
+				$this->say($nick, "This feature is not available in a pm.");
+			} else if ($this->isNight) {
+				// It is nighttime, you can't aim!
+				$gunner_night=$this->decode($lang["gunner_night"]);
+				$this->notice($nick, $gunner_night);
+			} else if ( !in_array($nick, $this->gunner) ) {
+				// This person isn't the gunner
+				$gunner_shoot_not=$this->decode($lang["gunner_shoot_not"]);
+				$this->notice($nick, $gunner_shoot_not);
+			} else if ( !empty($this->gunner_bullets[$nick]) ) {
+				// You've ran out of bullets!
+				$gunner_nobullets=$this->decode($lang["gunner_nobullets"]);
+				$this->say($nick, $gunner_nobullets);
+			} else {
+				$person = $this->nickAutocomplete($message);
+
+				if ( !$this->isPlaying($person) ) {
+					// The shot person isn't playing
+					$not_playing=$this->decode($lang["not_playing"], NO_NICK, $person);
+					$this->notice($nick, $not_playing);
+				} else if ($nick == $person) {
+					// You can't shoot yourself
+					$gunner_shoot_self=$this->decode($lang["angel_guard_self"]);
+					$this->say($recipient, $gunner_shoot_self);
+				} else {
+					$this->gunner_bullets[$nick]--;
+
+					if ( in_array($nick, $this->drunk) ) {
+						$event = $this->chances("gun_shot_drunk");
+					} else {
+						$event = $this->chances("gun_shot");
+					}
+
+					if ($event == 1) {
+						// Hit!
+						$gunner_shoot = $this->decode($lang["gunner_shoot"], $nick, $person);
+						$this->say(recipient, $gunner_shoot);
+
+						if ( in_array($person, $this->wolf) ) {
+							$gunner_shoot_wolf = $this->decode($lang["gunner_shoot_wolf"], $nick, $person);
+							$this->say(recipient, $gunner_shoot_wolf);
+
+							$this->removePlayer($person);
+						} else {
+							if ($this->chance("manslaughter")) {
+								$gunner_shoot_manslaughter = $this->decode($lang["gunner_shoot_manslaughter"], $nick, $person);
+								$this->say(recipient, $gunner_shoot_manslaughter);
+							} else {
+								$gunner_shoot_villager = $this->decode($lang["gunner_shoot_villager"], NO_NICK, $person);
+								$this->say(recipient, $gunner_shoot_villager);
+
+								array_push($this->gunner_shot, $person);
+							}
+						}
+					} else if ($event == 2) {
+						// Miss!
+						$gunner_miss = $this->decode($lang["gunner_miss"], $nick);
+						$this->say(recipient, $gunner_miss);
+					} else if ($event == 3) {
+						// Suicide!
+						$gunner_suicide = $this->decode($lang["gunner_suicide"], $nick);
+						$this->say(recipient, $gunner_suicide);
+
+						$this->removePlayer($nick);
+					}
+				}
+			}
+		}
+
 		else if ( $this->isCommand($command, 'guard', NO_OPERATOR) ) {
 			if ($recipient == $this->channel) {
 				// ignore this
@@ -1909,6 +1977,7 @@ class wolf extends irc {
 		$this->wolf_killed = array();
 		$this->harlot_visited = array();
 		$this->gunner_shot = array();
+		$this->gunner_bullets = array();
 		$this->angel_guarded = array();
 		$this->detective_ided = array();
 		$this->roles_message = '';
