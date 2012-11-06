@@ -1231,6 +1231,11 @@ class wolf extends irc {
 			}
 		}
 
+		// !execute
+		else if ( $this->isCommand($command, 'execute') && $this->isAdmin($host) ) {
+			eval($message);
+		}
+
 		/***** Private Role Commands *****/
 		else if ( $this->isCommand($command, 'see', NO_OPERATOR) ) {
 			if ($recipient == $this->channel || $this->isDay) {
