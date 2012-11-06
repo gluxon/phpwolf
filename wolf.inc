@@ -924,68 +924,68 @@ class wolf extends irc {
 
 			$count = count($this->players);
 			$time = time() - $this->game_wait;
-			
+
 			// There are no players
 			if ($count == 0) {
 				$game_none = $this->decode($lang["game_none"]);
 				$this->notice($nick, $game_none);
 			}
-			
+
 			// Time limit has not passed
 			else if ( $time < $setting["game_wait"] ) {
 				$game_wait = $this->decode($lang["game_wait"], NO_NICK, $setting["game_wait"] - $time);
 				$this->say($recipient, $game_wait);
 			}
-			
+
 			// There are not a sufficient amount of players
 			else if ($count < 4) {
 				$game_required = $this->decode($lang["game_required"], $nick);
 				$this->say($recipient, $game_required);
 			}
-			
+
 			// Game has already started
 			else if ($this->ongoing) {
 				$start_ongoing = $this->decode($lang["start_ongoing"], $nick);
 				$this->notice($nick, $start_ongoing);
 			}
-			
+
 			// Sucess!
 			else {
 				// Loop through players to generate list
 				$answer = $this->listPlayers(false);
-			
+
 				// Reset Player timeouts at beginning of game
 				$this->resetPlayerTimeouts();
-			
+
 				$game_welcome = $this->decode($lang["game_welcome"], NO_NICK, $answer);
 				$this->say($recipient, $game_welcome);
-			
+
 				$this->ongoing = true;
 				$this->sendData('MODE ' . $recipient . ' +m');
-			
+
 				// Assign roles
 				$this->assignRoles();
-			
+
 				// Send night message
 				$night_first = $this->decode($lang["night_first"]);
 				$this->say($recipient, $night_first);
-			
+
 				// Set booleans for.... THE SUN
 				$this->isDay = false;
 				$this->isNight = true;
-			
+
 				$this->current_night_start = time();
-			
+
 				// Pre-Generate end message
 				foreach($this->role_names as $role) {
-			
+
 					if ( count($this->$role) > 0) {
 						$role_list = '';
 						$i = 0;
 						$numItems = count($this->$role);
-			
+
 						foreach($this->$role as $person) {
-			
+
 							++$i;
 							// Last element
 							if ($numItems > 1) {
@@ -997,7 +997,7 @@ class wolf extends irc {
 								}
 							}
 						}
-			
+
 						if ($numItems > 1) {
 							$this->roles_message = $this->roles_message . $this->decode($lang["end_roles_plural"], NO_NICK, $lang[$role . '_plural'], $role_list) . ' ';
 						} else {
@@ -1007,10 +1007,10 @@ class wolf extends irc {
 					}
 				}
 				$this->roles_message = substr($this->roles_message, 0, -1); // remove trailing space
-			
+
 				// We do not want socket blocking for werewolf now
 				$irc->setBlocking(false);
-			
+
 			}
 		}
 
