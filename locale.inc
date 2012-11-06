@@ -130,7 +130,7 @@ $en_US["gunner_shoot"]="<bold>%nick%</bold> shoots <bold>%answer%</bold> with a 
 $en_US["gunner_shoot_wolf"]="<bold>%answer%</bold> is a wolf, and is dying from the silver bullet.";
 $en_US["gunner_shoot_villager"]="<bold>%answer%</bold> is a villager and is injured but will have a full recovery. S/He will be resting for the day.";
 $en_US["gunner_shoot_not"]="You don't have a gun.";
-$en_US["gunner_shoot_nobullets"]="You don't have any more bullets.";
+$en_US["gunner_nobullets"]="You don't have any more bullets.";
 $en_US["gunner_shoot_manslaughter"]="<bold>%answer%</bold> is a not a wolf but was accidentally fatally injured.";
 $en_US["gunner_reveal"]="Appears (s)he was a <bold>%answer%</bold>";
 $en_US["gunner_miss"]="<bold>%nick%</bold> is a lousy shooter. S/He missed!";
@@ -142,7 +142,7 @@ $en_US["angel_guard"]="You are protecting <bold>%answer%</bold> tonight. Farewel
 $en_US["angel_guard_notify"]="You can sleep well tonight, for a guardian angel is protecting you.";
 $en_US["angel_guard_not"]="Only a guardian angel may use this command.";
 $en_US["angel_guard_self"]="You may not guard yourself.";
-$en_US["angel_guarded"]="You are already protecting %answer%.";
+$en_US["angel_guarded"]="You are already protecting <bold>%answer%.</bold>";
 $en_US["angel_day"]="You may only protect people at night.";
 
 $en_US["players_list"]="Players: %answer%";
