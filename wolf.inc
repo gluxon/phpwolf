@@ -1068,7 +1068,7 @@ class wolf extends irc {
 						break;
 					case '-admin':
 						$pos = array_search($args[1], $admins);
-						unset($pos);
+						unset($admins[$pos]);
 						$this->say($recipient, $nick . ", Operation executed successfully.");
 						break;
 				}
