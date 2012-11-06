@@ -1516,7 +1516,7 @@ class wolf extends irc {
 				$role_list = '';
 				foreach ($dead_guy_roles as $role) {
 					if ($role != 'cursed' && $role != 'gunner') {
-						$role_list = $role_list . $role . ', ';
+						$role_list = $role_list . $this->decode($lang[$role]) . ', ';
 					}
 				}
 				$role_list = substr($role_list, 0, -2);
@@ -1611,7 +1611,7 @@ class wolf extends irc {
 				$role_list = '';
 				foreach ($dead_guy_roles as $role) {
 					if ($role != 'cursed' || $role != 'gunner') {
-						$role_list = $role_list . $role . ', ';
+						$role_list = $role_list . $this->decode($lang[$role]) . ', ';
 					}
 				}
 				$role_list = substr($role_list, 0, -2);
