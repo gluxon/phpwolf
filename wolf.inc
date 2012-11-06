@@ -284,6 +284,71 @@ class wolf extends irc {
 	}
 
 	/**
+	 * Returns the reaction to a scenario
+	 * 
+	 * @param mixed $action The action that is performed
+	 * @param mixed $reaction The reaction to the action
+	 */
+	public function chance($action) {
+		global $gun_shot, $gun_shot_drunk_drunk, $manslaughter;
+		global $guardian_angel_dies, $detective_revealed;
+
+		switch ($action) {
+			case 'gun_shot':
+				$spin = $this->random->getRandInt(1, $gun_shot[0][1]);
+				if ($spin <= $gun_shot[0][0]) {
+					return 1;
+				} else if ($spin <= $gun_shot[0][0] + $gun_shot[1][0]) {
+					return 2;
+				} else if ($spin <= $gun_shot[0][0] + $gun_shot[1][0] + $gun_shot[2][0]) {
+					return 3;
+				}
+			break;
+
+			case 'gun_shot_drunk':
+				$spin = $this->random->getRandInt(1, $gun_shot_drunk[0][1]);
+				if ($spin <= $gun_shot_drunk[0][0]) {
+					return 1;
+				} else if ($spin <= $gun_shot_drunk[0][0] + $gun_shot_drunk[1][0]) {
+					return 2;
+				} else if ($spin <= $gun_shot_drunk[0][0] + $gun_shot_drunk[1][0] + $gun_shot_drunk[2][0]) {
+					return 3;
+				}
+			break;
+
+			case 'manslaughter':
+				$spin = $this->random->getRandInt(1, $manslaughter[1]);
+				if ($spin <= $manslaughter[0]) {
+					return true;
+				} else {
+					return false;
+				}
+			break;
+
+			case 'guardian_angel_dies':
+				$spin = $this->random->getRandInt(1, $guardian_angel_dies[1]);
+				if ($spin <= $guardian_angel_dies[0]) {
+					return true;
+				} else {
+					return false;
+				}
+			break;
+
+			case 'detective_revealed':
+				$spin = $this->random->getRandInt(1, $detective_revealed[1]);
+				if ($spin <= $detective_revealed[0]) {
+					return true;
+				} else {
+					return false;
+				}
+			break;
+
+			default:
+				return null;
+		}
+	}
+
+	/**
 	 * Return a list of all the players
 	 * 
 	 * 
