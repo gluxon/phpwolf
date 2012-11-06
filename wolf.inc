@@ -1695,7 +1695,7 @@ class wolf extends irc {
 		// If the GA guards a wolf!
 		foreach($this->angel as $angel) {
 			// 50% chance of death
-			if ($this->random->getRandInt(1, 2) == '1') {
+			if ( $this->chance('guardian_angel_dies') ) {
 				if ( isset($this->angel_guarded[$angel]) && in_array($this->angel_guarded[$angel], $this->wolf) ) {
 					$day_angel_dead = $this->decode($lang["day_angel_dead"], NO_NICK, $angel);
 					$this->say($this->channel, $day_angel_dead);
