@@ -126,6 +126,16 @@ $en_US["traitor_notify"]="HOOOOOOOOOWL. You have become... a wolf!";
 $en_US["traitor_avenge"]="It is up to you to avenge your fallen leaders!";
 
 $en_US["gunner_assign"]="You are a <bold>gunner</bold>. You hold a gun that shoots special silver bullets. You may only use it during the day. If you shoot a wolf, (s)he will die instantly, but if you shoot a villager, that villager will likely survive. There is also the possibility of the gun blowing up, and killing you with it, so take caution. You get 2 bullets.";
+$en_US["gunner_shoot"]="<bold>%nick%</bold> shoots <bold>%answer%</bold> with a silver bullet!";
+$en_US["gunner_shoot_wolf"]="<bold>%answer%</bold> is a wolf, and is dying from the silver bullet.";
+$en_US["gunner_shoot_villager"]="<bold>%answer%</bold> is a villager and is injured but will have a full recovery. S/He will be resting for the day.";
+$en_US["gunner_shoot_not"]="You don't have a gun.";
+$en_US["gunner_shoot_nobullets"]="You don't have any more bullets.";
+$en_US["gunner_shoot_manslaughter"]="<bold>%answer%</bold> is a not a wolf but was accidentally fatally injured.";
+$en_US["gunner_reveal"]="Appears (s)he was a <bold>%answer%</bold>";
+$en_US["gunner_miss"]="<bold>%nick%</bold> is a lousy shooter. S/He missed!";
+$en_US["gunner_suicide"]="<bold>%nick%</bold> should clean his/her weapons more often. The gun exploded and killed him/her!";
+$en_US["gunner_night"]="Shooting is only allowed during the day. Please wait patiently for morning.";
 
 $en_US["angel_assign"]="You are a <bold>guardian angel</bold>. It is your job to protect the villagers. If you guard a wolf, there is a 50/50 chance of you dying, if you guard a victim, they will live. Use !guard to guard a player.";
 $en_US["angel_guard"]="You are protecting <bold>%answer%</bold> tonight. Farewell!";
