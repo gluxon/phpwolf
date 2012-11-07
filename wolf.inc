@@ -1523,7 +1523,7 @@ class wolf extends irc {
 	 * Assign player roles
 	 */
 	public function assignRoles() {
-		global $roles;
+		global $roles, $shots_multiplier;
 
 		// Get the array of # of roles according to player amount
 		$player_amount = count($this->players);
@@ -1593,7 +1593,7 @@ class wolf extends irc {
 					array_push($this->$role_name, $players_sorted[$player_index]);
 
 					if ($role_name == "gunner") {
-						$this->gunner_bullets[$nick] = ceil($shots_multiplier * count($players) );
+						$this->gunner_bullets[$players_sorted[$player_index]] = ceil($shots_multiplier * count($this->players) );
 					}
 
 					break;
@@ -1688,7 +1688,7 @@ class wolf extends irc {
 
 			case 'gunner': // Gunner
 				// Role Assign
-				$gunner_assign = $this->decode($lang["gunner_assign"]);
+				$gunner_assign = $this->decode($lang["gunner_assign"], NO_NICK, $this->gunner_bullets[$nick]);
 				$this->say($nick, $gunner_assign);
 			break;
 
