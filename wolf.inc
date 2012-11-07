@@ -1591,6 +1591,11 @@ class wolf extends irc {
 
 					// Conditions satisfied, give another role!
 					array_push($this->$role_name, $players_sorted[$player_index]);
+
+					if ($role_name == "gunner") {
+						$this->gunner_bullets[$nick] = ceil($shots_multiplier * count($players) );
+					}
+
 					break;
 				}
 			}
