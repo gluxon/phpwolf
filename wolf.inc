@@ -1406,11 +1406,11 @@ class wolf extends irc {
 					} else if ($event == 2) {
 						// Miss!
 						$gunner_miss = $this->decode($lang["gunner_miss"], $nick);
-						$this->say(recipient, $gunner_miss);
+						$this->say($recipient, $gunner_miss);
 					} else if ($event == 3) {
 						// Suicide!
 						$gunner_suicide = $this->decode($lang["gunner_suicide"], $nick);
-						$this->say(recipient, $gunner_suicide);
+						$this->say($recipient, $gunner_suicide);
 
 						$this->removePlayer($nick);
 					}
