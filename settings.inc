@@ -44,4 +44,16 @@ $roles = array(
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 );
 
+$shots_multiplier = .12; // ceil($shots_multiplier * count($players) )
+
+// Syntax: 1/7 = array(1,7)
+
+//                               HIT         MISS        SUICIDE
+$gun_shot =         array( array(5,7) , array(1,7) , array(1,7) );
+$gun_shot_drunk =   array( array(2,7) , array(4,7) , array(1,7) );
+$manslaughter =     array(1,5); // ACCIDENTAL HEADSHOT (FATAL)
+
+// Not sure what this is -> GUNNER_KILLS_WOLF_AT_NIGHT_CHANCE = 0
+$guardian_angel_dies = array(1,2);
+$detective_revealed =  array(2,5);
 ?>
