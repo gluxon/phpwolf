@@ -38,7 +38,7 @@ $wolf = new wolf();
 while (true) {
 
 	// Read new line
-	$data=$irc->getData(128);
+	$data=$irc->getData(512);
 
 	if (!empty($data)) {
 		echo $data; 
