@@ -1288,7 +1288,7 @@ class wolf extends irc {
 					$this->notice($nick, $not_playing);
 				} else {
 					// Check if the victim is a wolf
-					if ($person_roles != false && in_array('wolf', $this->wolf)) {
+					if (in_array('wolf', $this->wolf)) {
 						$this->say($nick, "You can't kill a wolf!");
 					} else {
 						// This person has been selected for death.
@@ -1384,20 +1384,22 @@ class wolf extends irc {
 					if ($event == 1) {
 						// Hit!
 						$gunner_shoot = $this->decode($lang["gunner_shoot"], $nick, $person);
-						$this->say(recipient, $gunner_shoot);
+						$this->say($recipient, $gunner_shoot);
 
 						if ( in_array($person, $this->wolf) ) {
 							$gunner_shoot_wolf = $this->decode($lang["gunner_shoot_wolf"], $nick, $person);
-							$this->say(recipient, $gunner_shoot_wolf);
+							$this->say($recipient, $gunner_shoot_wolf);
 
 							$this->removePlayer($person);
 						} else {
 							if ($this->chance("manslaughter")) {
 								$gunner_shoot_manslaughter = $this->decode($lang["gunner_shoot_manslaughter"], $nick, $person);
-								$this->say(recipient, $gunner_shoot_manslaughter);
+								$this->say($recipient, $gunner_shoot_manslaughter);
+
+								$this->removePlayer($person);
 							} else {
 								$gunner_shoot_villager = $this->decode($lang["gunner_shoot_villager"], NO_NICK, $person);
-								$this->say(recipient, $gunner_shoot_villager);
+								$this->say($recipient, $gunner_shoot_villager);
 
 								array_push($this->gunner_shot, $person);
 							}
