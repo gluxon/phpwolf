@@ -1377,9 +1377,9 @@ class wolf extends irc {
 					$this->gunner_bullets[$nick]--;
 
 					if ( in_array($nick, $this->drunk) ) {
-						$event = $this->chances("gun_shot_drunk");
+						$event = $this->chance("gun_shot_drunk");
 					} else {
-						$event = $this->chances("gun_shot");
+						$event = $this->chance("gun_shot");
 					}
 
 					if ($event == 1) {
