@@ -1350,14 +1350,14 @@ class wolf extends irc {
 		else if ( $this->isCommand($command, 'shoot') ) {
 			if ($recipient == $user["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
-			} else if ($this->isNight) {
-				// It is nighttime, you can't aim!
-				$gunner_night=$this->decode($lang["gunner_night"]);
-				$this->notice($nick, $gunner_night);
 			} else if ( !in_array($nick, $this->gunner) ) {
 				// This person isn't the gunner
 				$gunner_shoot_not=$this->decode($lang["gunner_shoot_not"]);
 				$this->notice($nick, $gunner_shoot_not);
+			} else if ($this->isNight) {
+				// It is nighttime, you can't aim!
+				$gunner_night=$this->decode($lang["gunner_night"]);
+				$this->notice($nick, $gunner_night);
 			} else if ( !empty($this->gunner_bullets[$nick]) ) {
 				// You've ran out of bullets!
 				$gunner_nobullets=$this->decode($lang["gunner_nobullets"]);
@@ -1421,14 +1421,14 @@ class wolf extends irc {
 		else if ( $this->isCommand($command, 'guard', NO_OPERATOR) ) {
 			if ($recipient == $this->channel) {
 				// ignore this
-			} else if ($this->isDay) {
-				// It's daytime
-				$angel_day=$this->decode($lang["angel_day"]);
-				$this->notice($nick, $angel_day);
 			} else if ( !in_array($nick, $this->angel) ) {
 				// This person isn't the angel
 				$angel_guard_not=$this->decode($lang["angel_guard_not"]);
 				$this->notice($nick, $angel_guard_not);
+			} else if ($this->isDay) {
+				// It's daytime
+				$angel_day=$this->decode($lang["angel_day"]);
+				$this->notice($nick, $angel_day);
 			} else if ( isset($this->angel_guarded[$nick]) ) {
 				// You've already guarded
 				$angel_guarded=$this->decode($lang["angel_guarded"], NO_NICK, $this->angel_guarded[$nick]);
