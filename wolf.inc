@@ -1358,7 +1358,7 @@ class wolf extends irc {
 				// It is nighttime, you can't aim!
 				$gunner_night=$this->decode($lang["gunner_night"]);
 				$this->notice($nick, $gunner_night);
-			} else if ( $this->gunner_bullets[$nick] <= 0) {
+			} else if ( empty($this->gunner_bullets[$nick]) )  {
 				// You've ran out of bullets!
 				$gunner_nobullets=$this->decode($lang["gunner_nobullets"]);
 				$this->say($nick, $gunner_nobullets);
