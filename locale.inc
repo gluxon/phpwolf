@@ -125,7 +125,7 @@ $en_US["traitor_transform"]="<bold>The villagers, during their celebrations, are
 $en_US["traitor_notify"]="HOOOOOOOOOWL. You have become... a wolf!";
 $en_US["traitor_avenge"]="It is up to you to avenge your fallen leaders!";
 
-$en_US["gunner_assign"]="You are a <bold>gunner</bold>. You hold a gun that shoots special silver bullets. You may only use it during the day. If you shoot a wolf, (s)he will die instantly, but if you shoot a villager, that villager will likely survive. There is also the possibility of the gun blowing up, and killing you with it, so take caution. You get %answer% bullets.";
+$en_US["gunner_assign"]="You are a <bold>gunner</bold>. You hold a gun that shoots special silver bullets. You may only use it during the day. If you shoot a wolf, (s)he will die instantly, but if you shoot a villager, that villager will likely survive. There is also the possibility of the gun blowing up, and killing you with it, so take caution. You get <bold>%answer%</bold> bullets.";
 $en_US["gunner_shoot"]="<bold>%nick%</bold> shoots <bold>%answer%</bold> with a silver bullet!";
 $en_US["gunner_shoot_wolf"]="<bold>%answer%</bold> is a wolf, and is dying from the silver bullet.";
 $en_US["gunner_shoot_villager"]="<bold>%answer%</bold> is a villager and is injured but will have a full recovery. S/He will be resting for the day.";
