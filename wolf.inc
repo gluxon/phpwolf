@@ -1390,13 +1390,13 @@ class wolf extends irc {
 							$gunner_shoot_wolf = $this->decode($lang["gunner_shoot_wolf"], $nick, $person);
 							$this->say($recipient, $gunner_shoot_wolf);
 
-							$this->removePlayer($person);
+							$this->removePlayer($this->channel, $person);
 						} else {
 							if ($this->chance("manslaughter")) {
 								$gunner_shoot_manslaughter = $this->decode($lang["gunner_shoot_manslaughter"], $nick, $person);
 								$this->say($recipient, $gunner_shoot_manslaughter);
 
-								$this->removePlayer($person);
+								$this->removePlayer($this->channel, $person);
 							} else {
 								$gunner_shoot_villager = $this->decode($lang["gunner_shoot_villager"], NO_NICK, $person);
 								$this->say($recipient, $gunner_shoot_villager);
@@ -1413,7 +1413,7 @@ class wolf extends irc {
 						$gunner_suicide = $this->decode($lang["gunner_suicide"], $nick);
 						$this->say($recipient, $gunner_suicide);
 
-						$this->removePlayer($nick);
+						$this->removePlayer($this->channel, $nick);
 					}
 				}
 			}
