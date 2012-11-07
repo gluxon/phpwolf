@@ -812,6 +812,9 @@ class wolf extends irc {
 				} else if ($this->isNight) {
 					$lynch_night = $this->decode($lang["lynch_night"], NO_NICK, $victim);
 					$this->notice($nick, $lynch_night);
+				} else if ( in_array($nick, $this->gunner_shot) ) {
+					$lynch_resting = $this->decode($lang["lynch_resting"], $nick);
+					$this->say($recipient, $lynch_resting);
 				} else {
 					$this->lynch[$nick] = $victim;
 					$lynch = $this->decode($lang["lynch"], $nick, $victim);
@@ -1370,7 +1373,7 @@ class wolf extends irc {
 					$this->notice($nick, $not_playing);
 				} else if ($nick == $person) {
 					// You can't shoot yourself
-					$gunner_shoot_self=$this->decode($lang["angel_guard_self"]);
+					$gunner_shoot_self=$this->decode($lang["gunner_shoot_self"]);
 					$this->say($recipient, $gunner_shoot_self);
 				} else {
 					$this->gunner_bullets[$nick]--;
