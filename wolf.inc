@@ -1288,8 +1288,7 @@ class wolf extends irc {
 					$this->notice($nick, $not_playing);
 				} else {
 					// Check if the victim is a wolf
-					$person_roles = $this->getRoles($person);
-					if ($person_roles != false && in_array('wolf', $person_roles)) {
+					if ($person_roles != false && in_array('wolf', $this->wolf)) {
 						$this->say($nick, "You can't kill a wolf!");
 					} else {
 						// This person has been selected for death.
