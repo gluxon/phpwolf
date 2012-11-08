@@ -76,7 +76,9 @@ $en_US["join"]="<bold>%nick%</bold> has joined the game.";
 $en_US["quit"]="<bold>%nick%</bold> died of an unknown disease. S/He was a <bold>%answer%</bold>.";
 $en_US["lynch"]="<bold>%nick%</bold> votes for <bold>%answer%</bold>.";
 $en_US["lynch_night"]="Lynching is only allowed during the day. Please wait patiently for morning.";
-/* NOT OFFICIAL */$en_US["retract"]="<bold>%nick%</bold> has retracted their vote.";
+$en_US["lynch_resting"]="%nick%: You are wounded and resting, thus you are unable to vote for the day.";
+$en_US["retract"]="<bold>%nick%</bold> retracted his/her vote.";
+$en_US["retract_not"]="You haven't voted yet.";
 
 // Notices
 $en_US["game_none"]="No game is currently running.";
@@ -125,7 +127,7 @@ $en_US["traitor_transform"]="<bold>The villagers, during their celebrations, are
 $en_US["traitor_notify"]="HOOOOOOOOOWL. You have become... a wolf!";
 $en_US["traitor_avenge"]="It is up to you to avenge your fallen leaders!";
 
-$en_US["gunner_assign"]="You are a <bold>gunner</bold>. You hold a gun that shoots special silver bullets. You may only use it during the day. If you shoot a wolf, (s)he will die instantly, but if you shoot a villager, that villager will likely survive. There is also the possibility of the gun blowing up, and killing you with it, so take caution. You get <bold>%answer%</bold> bullets.";
+$en_US["gunner_assign"]="You hold a gun that shoots special silver bullets. You may only use it during the day. If you shoot a wolf, (s)he will die instantly, but if you shoot a villager, that villager will likely survive. There is also the possibility of the gun blowing up, and killing you with it, so take caution. You get <bold>%answer%</bold> bullets.";
 $en_US["gunner_shoot"]="<bold>%nick%</bold> shoots <bold>%answer%</bold> with a silver bullet!";
 $en_US["gunner_shoot_wolf"]="<bold>%answer%</bold> is a wolf, and is dying from the silver bullet.";
 $en_US["gunner_shoot_villager"]="<bold>%answer%</bold> is a villager and is injured but will have a full recovery. S/He will be resting for the day.";
@@ -145,6 +147,15 @@ $en_US["angel_guard_not"]="Only a guardian angel may use this command.";
 $en_US["angel_guard_self"]="You may not guard yourself.";
 $en_US["angel_guarded"]="You are already protecting <bold>%answer%.</bold>";
 $en_US["angel_day"]="You may only protect people at night.";
+
+$en_US["detective_assign"]="You are a <bold>detective</bold>.";
+$en_US["detective_assign2"]="It is your job to determine all the wolves and traitors. Your job is during the day, and you can see the true identity of all users, even traitors.";
+$en_US["detective_assign3"]="But, each time you use your ability, you risk a 2/5 chance of having your identity revealed to the wolves. So be careful. Use \"!id\" to identify any player during the day.";
+$en_US["detective_id"]="The results of your investigation have returned. <bold>%answer%</bold> is a... <bold>%answer2%</bold>!";
+$en_US["detective_id_not"]="Only a detective may use this command.";
+$en_US["detective_ided"]="You may only investigate one person per round.";
+$en_US["detective_night"]="You may only investigate people during the day.";
+$en_US["detective_revealed"]="<bold>%nick%</bold> accidentally drops a paper. The paper reveals that (s)he is the detective!";
 
 $en_US["players_list"]="Players: %answer%";
 ?>
