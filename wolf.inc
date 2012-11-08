@@ -1749,12 +1749,14 @@ class wolf extends irc {
 		} else {
 			$dead_guy_roles = $this->getRoles($victim);
 			if ($dead_guy_roles == false) {
-				$role_list = 'villager';
+				$role_list = $this->decode($lang["villager"]);
 			} else {
 				$role_list = '';
 				foreach ($dead_guy_roles as $role) {
 					if ($role != 'cursed' && $role != 'gunner') {
 						$role_list = $role_list . $this->decode($lang[$role]) . ', ';
+					} else {
+						$role_list = $role_list . $this->decode($lang["villager"]) . ', ';
 					}
 				}
 				$role_list = substr($role_list, 0, -2);
@@ -1844,12 +1846,14 @@ class wolf extends irc {
 		} else {
 			$dead_guy_roles = $this->getRoles($victim);
 			if ($dead_guy_roles == false) {
-				$role_list = 'villager';
+				$role_list = $this->decode($lang["villager"]);
 			} else {
 				$role_list = '';
 				foreach ($dead_guy_roles as $role) {
 					if ($role != 'cursed' || $role != 'gunner') {
 						$role_list = $role_list . $this->decode($lang[$role]) . ', ';
+					} else {
+						$role_list = $role_list . $this->decode($lang["villager"]) . ', ';
 					}
 				}
 				$role_list = substr($role_list, 0, -2);
