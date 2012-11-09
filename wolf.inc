@@ -217,6 +217,57 @@ class wolf extends irc {
 	}
 
 	/**
+	 * Get all the roles a player has and return it as a nice string
+	 *
+	 * @param mixed $nick Nickname of player
+	 * @param boolean $show_cursed Show the cursed and gunner
+	 * @param boolean $bold_roles Bold roles if true
+	 * @return string A string containing a list of roles in sensible English.
+	 */
+	public function getRolesNice($nick, $bold_roles, $show_cursed, $show_gunner) {
+		$roles = $this->getRoles($nick);
+
+		if ($roles === false) {
+			$role_list = chr(2) . "villager" . chr(2);
+		} else {
+			$role_list = "";
+			foreach($roles as $key => $role) {
+				if ( $key + 1 == count($roles) && count($roles) > 1 ) {
+					if (count($roles) == 2) {
+						$role_list = substr($role_list, 0, -2) . " ";
+					}
+					$role_list .= 'and ';
+				}
+
+				if ($role == "cursed" && !$show_cursed) {
+					if ( count($roles) > 1 ) {
+						$role_list .= chr(2) . "villager" . chr(2);
+					}
+				} else if ($role == "gunner" && !$show_gunner) {
+					if ( count($roles) > 1 ) {
+						$role_list .= chr(2) . "villager" . chr(2);
+					}
+				} else {
+					$role_list .= chr(2) . $role . chr(2);
+				}
+
+				if ( $key + 1 < count($roles) ) {
+					$role_list .= ', ';
+				}
+
+			}
+
+		}
+
+		if ($bold_roles) {
+			return $role_list;
+		} else {
+			return str_replace(chr(2), '', $role_list);
+		}
+
+	}
+
+	/**
 	 * Get the name of a role by id
 	 * 
 	 * @param int $id ID of role
@@ -291,7 +342,7 @@ class wolf extends irc {
 	 * @param mixed $reaction The reaction to the action
 	 */
 	public function chance($action) {
-		global $gun_shot, $gun_shot_drunk_drunk, $manslaughter;
+		global $gun_shot, $gun_shot_drunk, $manslaughter;
 		global $guardian_angel_dies, $detective_revealed;
 
 		switch ($action) {
@@ -1464,6 +1515,56 @@ class wolf extends irc {
 			}
 		}
 
+		// !id
+		else if ( $this->isCommand($command, 'id') ) {
+			if ($recipient != $user["nick"]) {
+				$this->say($nick, "This feature is not available in a pm.");
+			} else if ( !in_array($nick, $this->detective) ) {
+				// This person isn't the detective
+				$detective_id_not=$this->decode($lang["detective_id_not"]);
+				$this->say($nick, $detective_id_not);
+			} else if ($this->isNight) {
+				// It is nighttime, you can't see anything!
+				$detective_night=$this->decode($lang["detective_night"]);
+				$this->say($nick, $detective_night);
+			} else if ( in_array($nick, $this->detective_ided) )  {
+				// You've already seen!
+				$detective_ided=$this->decode($lang["detective_ided"]);
+				$this->say($nick, $detective_ided);
+			} else {
+				$person = $this->nickAutocomplete($message);
+
+				if ( !$this->isPlaying($person) ) {
+					// The shot person isn't playing
+					$not_playing=$this->decode($lang["not_playing"], NO_NICK, $person);
+					$this->notice($nick, $not_playing);
+				} else if ($nick == $person) {
+					// You can't id yourself
+					$detective_id_self=$this->decode($lang["detective_id_self"]);
+					$this->say($recipient, $detective_id_self);
+				} else {
+					array_push($this->detective_ided, $nick);
+
+					$roles = $this->getRolesNice($person, true, true, true);
+
+					$detective_id=$this->decode($lang["detective_id"], NO_NICK, $person, $roles);
+					$this->say($nick, $detective_id);
+
+					if ( $this->chance("detective_revealed") ) {
+						$detective_revealed=$this->decode($lang["detective_revealed"], $nick);
+						foreach($this->wolf as $wolf) {
+							$this->say($wolf, $detective_revealed);
+						}
+						foreach($this->traitor as $traitor) {
+							$this->say($traitor, $detective_revealed);
+						}
+						echo "NO!";
+					}
+
+				}
+			}
+		}
+
 		// whoami (needs official locale)
 		else if ( $this->isCommand($command, 'whoami', NO_OPERATOR) ) {
 			if (!$this->ongoing) {
@@ -1473,21 +1574,7 @@ class wolf extends irc {
 				$not_playing = $this->decode($lang["not_playing"], NO_NICK, $person);
 				$this->notice($nick, $not_playing);
 			} else {
-				$role_list = "";
-				$roles = $this->getRoles($nick);
-				if ($roles === false) {
-					$role_list = "villager";
-				} else {
-					foreach($roles as $role) {
-						if ($role == "cursed") {
-							$role_list .= "villager, ";
-						} else {
-							$role_list .= $role . ", ";
-						}
-					}
-					$role_list = substr($role_list, 0, -2);
-				}
-				$this->say($nick, "You currently hold the role(s): " . $role_list);
+				$this->say($nick, "You currently hold the role(s): " . $this->getRolesNice($nick, true, false, true) );
 			}
 		}
 
@@ -1519,6 +1606,18 @@ class wolf extends irc {
 				if ($nick == $person) {
 					unset($this->{$role}[$key]);
 				}
+			}
+		}
+
+		// Remove player's lynch
+		if (isset($this->lynch[$nick])) {
+			unset($this->lynch[$nick]);
+		}
+
+		// Remove lynches on player
+		foreach($this->lynch as $lyncher => $lynchee) {
+			if ($lynchee == $nick) {
+				unset($this->lynch[$lyncher]);
 			}
 		}
 	}
@@ -1715,6 +1814,12 @@ class wolf extends irc {
 				// Role Assign
 				$detective_assign = $this->decode($lang["detective_assign"]);
 				$this->say($nick, $detective_assign);
+
+				$detective_assign2 = $this->decode($lang["detective_assign2"]);
+				$this->say($nick, $detective_assign2);
+
+				$detective_assign3 = $this->decode($lang["detective_assign3"]);
+				$this->say($nick, $detective_assign3);
 			break;
 		}
 	}
@@ -2178,10 +2283,6 @@ class wolf extends irc {
 					// Quit update for game
 					if (isset($this->players[$nick])) {
 						$this->commands($recipient, "!quit", $nick, $host);
-					}
-					// Quit update for lynch
-					if (isset($this->lynch[$nick])) {
-						unset($this->lynch[$nick]);
 					}
 				break;
 				case 'JOIN':
