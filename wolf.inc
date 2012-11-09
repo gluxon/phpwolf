@@ -1558,7 +1558,6 @@ class wolf extends irc {
 						foreach($this->traitor as $traitor) {
 							$this->say($traitor, $detective_revealed);
 						}
-						echo "NO!";
 					}
 
 				}
