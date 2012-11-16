@@ -15,7 +15,7 @@ $user["password"]="password";
 $channel["name"]="##phpwolf";
 
 // Admins array
-$admins = array("~gluxon@unaffiliated/gluxon", "~Snuupy@unaffiliated/snuupy", '~jcao219@wikibooks/Jcao219', '~ceradon@wikimedia/Ceradon');
+$admins = array("~gluxon@unaffiliated/gluxon", "~Snuupy@unaffiliated/snuupy", '~jcao219@wikibooks/Jcao219', '~ceradon@wikimedia/Ceradon', '~jsec@affiliated/pdpc.active.jsec');
 
 // Language
 $lang=$en_US;
