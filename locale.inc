@@ -67,6 +67,7 @@ $en_US["rules_part1"]="##phpwolf channel rules: 1) Be nice to others. 2) Do not 
 $en_US["rules_part2"]="5) Do not quit unless you need to leave. 6) No swearing and keep it family-friendly. 7) Do not paste PM's from the bot during the game. 8) Use common sense. 9) Waiting for timeouts is discouraged.";
 //$en_US["votes"]="%nick%: njstein: 1 (gluxon), gluxon: 2 (Nascar1996 rwg), FoolsTP: 1 (Mithadon)";
 $en_US["votes"]="%nick%: %answer%";
+$en_US["votes_none"]="%nick%: No votes yet.";
 $en_US["votes_required"]="%nick%: <bold>%answer%</bold> players, <bold>%answer2%</bold> votes required to lynch, <bold>%answer%</bold> players available to vote.";
 $en_US["votes_night"]="Voting is only during the day.";
 $en_US["goat"]="<bold>%nick%</bold>'s goat walks by and kicks <bold>%answer%</bold>";
@@ -127,7 +128,7 @@ $en_US["traitor_transform"]="<bold>The villagers, during their celebrations, are
 $en_US["traitor_notify"]="HOOOOOOOOOWL. You have become... a wolf!";
 $en_US["traitor_avenge"]="It is up to you to avenge your fallen leaders!";
 
-$en_US["gunner_assign"]="You hold a gun that shoots special silver bullets. You may only use it during the day. If you shoot a wolf, (s)he will die instantly, but if you shoot a villager, that villager will likely survive. There is also the possibility of the gun blowing up, and killing you with it, so take caution. You get <bold>%answer%</bold> bullets.";
+$en_US["gunner_assign"]="You hold a gun that shoots special silver bullets. You may only use it during the day. If you shoot a wolf, (s)he will die instantly, but if you shoot a villager, that villager will likely survive. There is also the possibility of the gun blowing up, and killing you with it, so take caution. You get %answer% bullets.";
 $en_US["gunner_shoot"]="<bold>%nick%</bold> shoots <bold>%answer%</bold> with a silver bullet!";
 $en_US["gunner_shoot_wolf"]="<bold>%answer%</bold> is a wolf, and is dying from the silver bullet.";
 $en_US["gunner_shoot_villager"]="<bold>%answer%</bold> is a villager and is injured but will have a full recovery. S/He will be resting for the day.";
