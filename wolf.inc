@@ -1202,6 +1202,9 @@ class wolf extends irc {
 				if (!$this->isPlaying($person)) {
 					$not_playing=$this->decode($lang["not_playing"], NO_NICK, $person);
 					$this->notice($nick, $not_playing);
+				} else if ( $nick == $person ) {
+					$seer_see_self=$this->decode($lang["seer_see_self"], NO_NICK, $person);
+					$this->say($nick, $seer_see_self);
 				} else {
 					// parse this person
 					$person_roles = $this->getRoles($person);
