@@ -13,7 +13,28 @@ Why phpwolf?
 ------------
 phpwolf is a rewritten wolfbot designed to benefit from the features offered by the PHP language. The project is going extremely well, and there are future goals beyond IRC are in the making. git, clone, and have fun!
 
+License
+-------
+This is licensed [GPLv3](http://www.gnu.org/licenses/gpl.html).
+
+> phpwolf is an IRC bot allowing users to play Werewolf, a variation of Mafia.
+> Copyright (C) 2012 Brandon Cheng (gluxon)
+> Copyright (C) 2012 ceradon
+
+> This program is free software: you can redistribute it and/or modify
+> it under the terms of the GNU General Public License as published by
+> the Free Software Foundation, either version 3 of the License, or
+> (at your option) any later version.
+
+> This program is distributed in the hope that it will be useful,
+> but WITHOUT ANY WARRANTY; without even the implied warranty of
+> MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> GNU General Public License for more details.
+
+> You should have received a copy of the GNU General Public License
+> along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 Status
 ------------
-As of now, phpwolf is playable with 9 players max. Gunner, crow, angel, and detective are left to code. The web implementation is still under consideration with a HTML5 IRC WebSockets client or AJAX as options.
+As of Saturday, November 11th 2012, the only requirement left to completion is IDLE check. The web implementation is still under consideration with a HTML5 IRC WebSockets client or AJAX as options.
 
