@@ -896,16 +896,17 @@ class wolf extends irc {
 		else if ( $this->isCommand($command, 'wait') ) {
 			if ($recipient == $nick) {
 				$this->say($nick, "This feature is not available in a pm.");
-			}
-			else if ($this->ongoing == false) {
+			} else if ($this->ongoing == false) {
 				if ($this->wait_extended < $setting["game_add_wait_limit"]) {
+
 					$this->wait_extended += 1;
 					$this->game_wait += $setting["game_add_wait"];
+
 					$wait = $this->decode($lang["wait"], $nick, $setting["game_add_wait"]);
 					$this->say($recipient, $wait);
 				} else {
-					$wait_limit = $this->decode($lang["wait_limit"]);
-					$this->say($recipient, $wait_limit);
+					$wait_reached = $this->decode($lang["wait_reached"]);
+					$this->say($recipient, $wait_reached);
 				}
 			} else {
 				$start_ongoing = $this->decode($lang["start_ongoing"]);
@@ -1954,7 +1955,7 @@ class wolf extends irc {
 		$this->players = array();
 		$this->lynch = array();
 
-		$wait_extended = 0;
+		$this->wait_extended = 0;
 
 		// Clear all player roles
 		$this->seer = array();
