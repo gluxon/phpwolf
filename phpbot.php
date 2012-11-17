@@ -2,23 +2,14 @@
 // Stop PHP from killing itself
 set_time_limit(0);
 
-// Custom Functions
-require("functions.inc");
+require("functions.inc"); // Custom functions
+require("TokenBucket.inc"); // Token Bucket Algorithm
+require("irc.inc"); // IRC Class
+require("random.inc"); // Random Functions
+require("wolf.inc"); // Werewolf Game
 
-// Import locales
-require("locale.inc");
-
-// Import settings
-require("settings.inc");
-
-// Import IRC class
-require("irc.inc");
-
-// Import random module
-require("random.inc");
-
-// Import wolf module
-require("wolf.inc");
+require("locale.inc"); // Language Translations
+require("settings.inc"); // Settings
 
 // Start IRC class
 $irc = new irc();

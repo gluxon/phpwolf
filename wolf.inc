@@ -40,6 +40,10 @@ class wolf extends irc {
 	 * Constructor for werewolf, initialize variables with default values
 	 */
 	public function __construct() {
+		// Inherited IRC Class doesn't run through constructor since we overrided it here
+		// TokenBucket
+		$this->TokenBucket = new TokenBucket(23, 1.73);
+
 		$this->random = new random();
 
 		$this->players = array();

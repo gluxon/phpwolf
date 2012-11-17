@@ -2,6 +2,11 @@
 class irc {
 
 	protected $socket;
+	protected $TokenBucket;
+
+	public function __construct() {
+		$this->TokenBucket = new TokenBucket(23, 1.73);
+	}
 
 	/**
 	 * Get the socket variable (access function)
@@ -46,6 +51,9 @@ class irc {
 	 * @param mixed $data Data to send
 	 */
 	public function sendData($data) {
+		while ( !$this->TokenBucket->consume(1) ) {
+			sleep(0.3);
+		}
 		fwrite($this->socket, $data . "\n");
 	}
 
