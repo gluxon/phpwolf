@@ -1976,7 +1976,6 @@ class wolf extends irc {
 		$this->gunner_bullets = array();
 		$this->angel_guarded = array();
 		$this->detective_ided = array();
-		$this->roles_message = '';
 
 		$this->roles_message = '';
 
@@ -2192,6 +2191,14 @@ class wolf extends irc {
 					if (isset($this->away[$nick])) {
 						$this->away[$new_nick] = $this->away[$nick];
 						unset($this->away[$nick]);
+					}
+
+					foreach($this->role_names as $role) {
+						foreach($this->$role as $key => &$person) {
+							if ($nick == $person) {
+								$this->{$role}[$key] = $new_nick;
+							}
+						}
 					}
 				break;
 				case '353': // RPL_NAMREPLY (list of people in channel)
