@@ -551,7 +551,7 @@ class wolf extends irc {
 
 		// !stats
 		else if ( $this->isCommand($command, 'stats') ) {
-			if ($recipient == $nick) {
+			if ($recipient == $user["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if (time() - $this->last_stats < $limit["stats"]) {
 				$ratelimit = $this->decode($lang["ratelimit"]);
@@ -637,7 +637,7 @@ class wolf extends irc {
 
 		// !ping
 		else if ( $this->isCommand($command, 'ping') ) {
-			if ($recipient == $nick) {
+			if ($recipient == $user["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if ($this->ongoing) {
 				$start_ongoing = $this->decode($lang["start_ongoing"]);
@@ -759,8 +759,7 @@ class wolf extends irc {
 
 		// !retract
 		else if ( $this->isCommand($command, 'retract') ) {
-
-			if ($recipient == $nick) {
+			if ($recipient == $user["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if ($this->ongoing == false) {
 				$start_ongoing = $this->decode($lang["start_ongoing"]);
@@ -778,9 +777,7 @@ class wolf extends irc {
 
 		// !goat
 		else if ( $this->isCommand($command, 'goat') ) {
-			if ($recipient == $nick) {
-				$this->say($nick, "This feature is not available in a pm.");
-			} else if ($this->ongoing == false){
+			if ($this->ongoing == false){
 				$game_none = $this->decode($lang["game_none"]);
 				$this->say($recipient, $game_none);
 			} else if (!$this->isPlaying($nick)) {
@@ -799,7 +796,7 @@ class wolf extends irc {
 
 		// !votes
 		else if ( $this->isCommand($command, 'votes') ) {
-			if ($recipient == $nick) {
+			if ($recipient == $user["nick"]) {
 				// ignore
 			} else if (!$this->ongoing) {
 				$game_none = $this->decode($lang["game_none"]);
@@ -846,8 +843,7 @@ class wolf extends irc {
 
 		// !lynch
 		else if ( $this->isCommand($command, 'lynch') || $this->isCommand($command, 'vote') ) {
-
-			if ($recipient == $nick) {
+			if ($recipient == $user["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if (!$this->ongoing) {
 				$game_none = $this->decode($lang["game_none"]);
@@ -877,7 +873,7 @@ class wolf extends irc {
 
 		// !coin
 		else if ( $this->isCommand($command, 'coin') ) {
-			if ($recipient == $nick) {
+			if ($recipient == $user["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else {
 				$coin_toss = $this->decode($lang["coin_toss"], $nick);
@@ -898,7 +894,7 @@ class wolf extends irc {
 
 		// !wait
 		else if ( $this->isCommand($command, 'wait') ) {
-			if ($recipient == $nick) {
+			if ($recipient == $user["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if ($this->ongoing == false) {
 				if ($this->wait_extended < $setting["game_add_wait_limit"]) {
@@ -920,7 +916,7 @@ class wolf extends irc {
 
 		// !join
 		else if ( $this->isCommand($command, 'join') ) {
-			if ($recipient == $nick) {
+			if ($recipient == $user["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if ( isset($this->players[$nick]) ) {
 				$join_already_playing = $this->decode($lang["join_already_playing"]);
@@ -1382,7 +1378,7 @@ class wolf extends irc {
 		}
 
 		else if ( $this->isCommand($command, 'guard', NO_OPERATOR) ) {
-			if ($recipient == $this->channel) {
+			if ($recipient != $user["nick"]) {
 				// ignore this
 			} else if ( !in_array($nick, $this->angel) ) {
 				// This person isn't the angel
