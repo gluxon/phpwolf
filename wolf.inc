@@ -918,6 +918,9 @@ class wolf extends irc {
 		else if ( $this->isCommand($command, 'join') ) {
 			if ($recipient == $user["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
+			} else if ($this->ongoing) {
+				$start_ongoing = $this->decode($lang["start_ongoing"], $nick);
+				$this->notice($nick, $start_ongoing);
 			} else if ( isset($this->players[$nick]) ) {
 				$join_already_playing = $this->decode($lang["join_already_playing"]);
 				$this->notice($nick, $join_already_playing);
@@ -1077,6 +1080,9 @@ class wolf extends irc {
 
 			if ($recipient == $nick) {
 				$this->say($nick, "This feature is not available in a pm.");
+			} else if ($this->ongoing) {
+				$start_ongoing = $this->decode($lang["start_ongoing"], $nick);
+				$this->notice($nick, $start_ongoing);
 			} else if ( isset($this->players[$message]) ) {
 				$join_already_playing = $this->decode($lang["join_already_playing"]);
 				$this->notice($nick, $join_already_playing);
