@@ -511,11 +511,6 @@ class wolf extends irc {
 			$this->say($nick, $help);
 		}
 
-		// !nick
-		else if ( $this->isCommand($command, 'nick') ) {
-			$this->say($recipient, $this->nickAutocomplete($message));
-		}
-
 		// !simple
 		else if ( $this->isCommand($command, 'simple') ) {
 			$this->say($nick, "This feature on phpwolf is not yet available.");
@@ -665,7 +660,6 @@ class wolf extends irc {
 				$ping = $this->decode($lang["ping"], NO_NICK, $list);
 				$this->say($recipient, $ping);
 			}
-
 		}
 
 		// !start
@@ -1043,7 +1037,6 @@ class wolf extends irc {
 		// !fstart
 		else if ( $this->isCommand($command, 'fstart') && $this->isAdmin($host) ) {
 			$this->game_wait = 0;
-
 			$this->commands($recipient, "!start", $nick, $host);
 		}
 
@@ -1079,86 +1072,27 @@ class wolf extends irc {
 		// !fjoin
 		else if ( $this->isCommand($command, 'fjoin') && $this->isAdmin($host) ) {
 			// Trim off everything after a space
-			$space = strpos($message, " ");
-			if ($space !== false) {
+			if ( strpos($message, " ") !== false ) {
 				$message = substr($message, 0, $space);
 			}
 
-			if ($recipient == $nick) {
-				$this->say($nick, "This feature is not available in a pm.");
-			} else if ( isset($this->players[$message]) ) {
-				$join_already_playing = $this->decode($lang["join_already_playing"]);
-				$this->notice($nick, $join_already_playing);
-			} else if ($message == "") {
-				$parameters=$this->decode($lang["parameters"], NO_NICK, $message);
-				$this->notice($nick, $parameters);
-			} else {
-				$this->addPlayer($recipient, $message);
-
-				// Send join message
-				$join = $this->decode($lang["join"], $message);
-				$this->say($recipient, $join);
-
-				// 1 player for player already added
-				if ( count($this->players) == 1 ) {
-					$this->channel = $recipient;
-					$game_start = $this->decode($lang["game_start"], $message);
-					$this->say($recipient, $game_start);
-					$this->game_wait = time();
-				}
-			}
+			$this->commands($recipient, "!join", $message, $host);
 		}
 
 		// !fquit and !fleave
 		else if ( ( $this->isCommand($command, 'fquit') || $this->isCommand($command, 'fleave') ) && $this->isAdmin($host) ) {
 			// Trim off everything after a space
-			$space = strpos($message, " ");
-			if ($space !== false) {
+			if ( strpos($message, " ") !== false ) {
 				$message = substr($message, 0, $space);
 			}
 
-			// Send quit message
-			if (!$this->isPlaying($message)) {
-				$not_playing=$this->decode($lang["not_playing"], NO_NICK, $message);
-				$this->notice($nick, $not_playing);
-			} else if ($message == "") {
-				$parameters=$this->decode($lang["parameters"], NO_NICK, $message);
-				$this->notice($nick, $parameters);
-			} else {
-				if ($this->ongoing) {
-					$answer = $this->getRolesNice($message, false, false, false);
-				} else {
-					$answer = "person";
-				}
-
-				$this->removePlayer($recipient, $message);
-				$quit = $this->decode($lang["quit"], $message, $answer);
-				$this->say($recipient, $quit);
-			}
+			$this->commands($recipient, "!quit", $message, $host);
 		}
 
 		// !fping
 		else if ( $this->isCommand($command, 'fping') && $this->isAdmin($host) ) {
-			if ($recipient == $nick) {
-				$this->say($nick, "This feature is not available in a pm.");
-			} else if ($this->ongoing) {
-				$start_ongoing = $this->decode($lang["start_ongoing"]);
-				$this->notice($nick, $start_ongoing);
-			} else {
-				$this->last_ping = time();
-
-				$list = "";
-				foreach($this->people as $person) {
-					if ( !in_array($person, $this->away) && !isset($this->players[$person]) ) {
-						$list = $list . $person . ' ';
-					}
-				}
-				$list = substr($list, 0, -1);
-				// This returns PING %answer% if $list is empty
-				$ping = $this->decode($lang["ping"], NO_NICK, $list);
-				$this->say($recipient, $ping);
-			}
-
+			$this->last_ping = time() - $limit["ping"] - 1;
+			$this->commands($recipient, "!ping", $nick, $host);
 		}
 
 		// !frestart
@@ -1197,6 +1131,7 @@ class wolf extends irc {
 		}
 
 		/***** Private Role Commands *****/
+		// !see
 		else if ( $this->isCommand($command, 'see', NO_OPERATOR) ) {
 			if ($recipient == $this->channel || $this->isDay) {
 				// ignore this, people are probably telling the seer to 'see' someone.
@@ -1217,20 +1152,7 @@ class wolf extends irc {
 					$this->say($nick, $seer_see_self);
 				} else {
 					// parse this person
-					$person_roles = $this->getRoles($person);
-					if ($person_roles == false) {
-						$role = 'villager';
-					} else {
-						foreach($person_roles as $value) {
-							if ($value == 'cursed') {
-								$role = 'wolf';
-							} else if ($value == 'traitor') {
-								$role = 'villager';
-							} else {
-								$role = $value;
-							}
-						}
-					}
+					$person_roles = $this->getRolesNice($person, false, true, true);
 
 					// Tell the seer who this guy is
 					$seer_see = $this->decode($lang["seer_see"], NO_NICK, $person, $lang[$role]);
@@ -1242,6 +1164,7 @@ class wolf extends irc {
 			}
 		}
 
+		// !kill
 		else if ( $this->isCommand($command, 'kill', NO_OPERATOR) ) {
 			if ($recipient == $this->channel || $this->isDay ) {
 				// ignore this
@@ -1269,6 +1192,7 @@ class wolf extends irc {
 			}
 		}
 
+		// !visit
 		else if ( $this->isCommand($command, 'visit', NO_OPERATOR) ) {
 			if ($recipient == $this->channel) {
 				// ignore this
@@ -1386,6 +1310,7 @@ class wolf extends irc {
 			}
 		}
 
+		// !guard
 		else if ( $this->isCommand($command, 'guard', NO_OPERATOR) ) {
 			if ($recipient != $user["nick"]) {
 				// ignore this
