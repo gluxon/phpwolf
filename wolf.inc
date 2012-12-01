@@ -228,7 +228,7 @@ class wolf extends irc {
 	 * @param boolean $bold_roles Bold roles if true
 	 * @return string A string containing a list of roles in sensible English.
 	 */
-	public function getRolesNice($nick, $bold_roles, $show_cursed, $show_gunner) {
+	public function getRolesNice($nick, $bold_roles, $show_cursed=false, $show_gunner=false) {
 		global $lang;
 
 		$roles = $this->getRoles($nick);
@@ -236,28 +236,34 @@ class wolf extends irc {
 		if ($roles === false) {
 			$role_list = chr(2) .  $this->decode($lang["villager"]) . chr(2);
 		} else {
+
+			$role_amount = count($roles);
+			if (in_array('cursed', $roles) && !$show_cursed)
+				$role_amount--;
+			if (in_array('gunner', $roles) && !$show_gunner)
+				$role_amount--;
+
 			$role_list = "";
 			foreach($roles as $key => $role) {
-				if ( $key + 1 == count($roles) && count($roles) > 1 ) {
-					if (count($roles) == 2) {
+
+				// Append "and" before the end of the list
+				if ( $key + 1 == $role_amount && $role_amount > 1 ) {
+					// Remove a space and comma if there is only two items
+					if ($role_amount == 2) {
 						$role_list = substr($role_list, 0, -2) . " ";
 					}
 					$role_list .= 'and ';
 				}
 
-				if ($role == "cursed" && !$show_cursed) {
-					if ( count($roles) == 1 ) {
-						$role_list .= chr(2) . $this->decode($lang["villager"]) . chr(2);
-					}
-				} else if ($role == "gunner" && !$show_gunner) {
-					if ( count($roles) == 1 ) {
+				if ( ($role=='cursed' && !$show_cursed) || ($role=='gunner' && !$show_gunner) ) {
+					if ( $role_amount <= 0 && empty($role_list) ) {
 						$role_list .= chr(2) . $this->decode($lang["villager"]) . chr(2);
 					}
 				} else {
 					$role_list .= chr(2) . $this->decode($lang[$role]) . chr(2);
 				}
 
-				if ( $key + 1 < count($roles) ) {
+				if ( $key + 1 < $role_amount ) {
 					$role_list .= ', ';
 				}
 
