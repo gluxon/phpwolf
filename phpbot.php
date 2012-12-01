@@ -2,6 +2,11 @@
 // Stop PHP from killing itself
 set_time_limit(0);
 
+// Log error messages
+ini_set('display_errors', 'On');
+ini_set('log_errors', 'true');
+ini_set('error_log', 'error_log');
+
 require("functions.inc"); // Custom functions
 require("TokenBucket.inc"); // Token Bucket Algorithm
 require("irc.inc"); // IRC Class
