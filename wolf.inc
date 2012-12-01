@@ -825,15 +825,12 @@ class wolf extends irc {
 					$votes = $this->decode($lang["votes"], $nick, $votes_list);
 					$this->say($recipient, $votes);
 
-					$amount = count($this->players);
-					// If the number is odd, subtract 1
-					if ($amount % 2 != 0) {
-						$amount--;
-					}
-
 					// players available to vote is subtracted from unexistant idle mechanism
-					$votes_required = $this->decode($lang["votes_required"], $nick, $amount, $amount / 2 + 1);
-					$this->say($recipient, $votes_required);
+					$votes_required = floor(count($this->players) / 2) + 1 - count($this->gunner_shot);
+					$votes_available = count($this->players);
+
+					$votes_status = $this->decode($lang["votes_status"], $nick, count($this->players), $votes_required, $votes_available);
+					$this->say($recipient, $votes_status);
 
 				} else {
 					// no votes yet
@@ -1072,21 +1069,36 @@ class wolf extends irc {
 		// !fjoin
 		else if ( $this->isCommand($command, 'fjoin') && $this->isAdmin($host) ) {
 			// Trim off everything after a space
-			if ( strpos($message, " ") !== false ) {
+			$space = strpos($message, " ");
+			if ($space !== false) {
 				$message = substr($message, 0, $space);
 			}
 
-			$this->commands($recipient, "!join", $message, $host);
+			if ($message == "") {
+				$parameters=$this->decode($lang["parameters"], NO_NICK, $message);
+				$this->notice($nick, $parameters);
+			} else {
+				$ongoing = $this->ongoing;
+				$this->ongoing = false;
+				$this->commands($recipient, "!join", $message, $host);
+				$this->ongoing = $ongoing;
+			}
 		}
 
 		// !fquit and !fleave
 		else if ( ( $this->isCommand($command, 'fquit') || $this->isCommand($command, 'fleave') ) && $this->isAdmin($host) ) {
 			// Trim off everything after a space
-			if ( strpos($message, " ") !== false ) {
+			$space = strpos($message, " ");
+			if ( $space !== false ) {
 				$message = substr($message, 0, $space);
 			}
 
-			$this->commands($recipient, "!quit", $message, $host);
+			if ($message == "") {
+				$parameters=$this->decode($lang["parameters"], NO_NICK, $message);
+				$this->notice($nick, $parameters);
+			} else {
+				$this->commands($recipient, "!quit", $message, $host);
+			}
 		}
 
 		// !fping
@@ -2010,13 +2022,8 @@ class wolf extends irc {
 						}
 					}
 
-					$amount = count($this->players);
-					// If the number is odd, subtract 1
-					if ($amount % 2 != 0) {
-						$amount--;
-					}
 					// Lynch message, and how many required to kill a victim.
-					$amount = $amount / 2 + 1;
+					$amount = floor(count($this->players) / 2) + 1 - count($this->gunner_shot);
 					foreach(array_keys($this->players) as $player) {
 						if ( isset($$player) && $$player >= $amount) {
 							$lasted_time = time() - $this->current_day_start;
