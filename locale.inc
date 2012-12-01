@@ -62,13 +62,13 @@ $en_US["stats"]="%nick%: <bold>%answer%</bold> players: %answer2%";
 $en_US["stats_none"]="%nick%: There are no players.";
 $en_US["stats_roles"]="%nick%: There is %answer%";
 $en_US["wait"]="<bold>%nick%</bold> increased the wait time by %answer% seconds.";
-$en_US["wait_limit"]="Limit has already been reached for extending the wait time.";
+$en_US["wait_reached"]="Limit has already been reached for extending the wait time.";
 $en_US["rules_part1"]="##phpwolf channel rules: 1) Be nice to others. 2) Do not share information after death. 3) No bots allowed. 4) Do not play with clones.";
 $en_US["rules_part2"]="5) Do not quit unless you need to leave. 6) No swearing and keep it family-friendly. 7) Do not paste PM's from the bot during the game. 8) Use common sense. 9) Waiting for timeouts is discouraged.";
 //$en_US["votes"]="%nick%: njstein: 1 (gluxon), gluxon: 2 (Nascar1996 rwg), FoolsTP: 1 (Mithadon)";
 $en_US["votes"]="%nick%: %answer%";
 $en_US["votes_none"]="%nick%: No votes yet.";
-$en_US["votes_required"]="%nick%: <bold>%answer%</bold> players, <bold>%answer2%</bold> votes required to lynch, <bold>%answer%</bold> players available to vote.";
+$en_US["votes_status"]="%nick%: <bold>%answer%</bold> players, <bold>%answer2%</bold> votes required to lynch, <bold>%answer3%</bold> players available to vote.";
 $en_US["votes_night"]="Voting is only during the day.";
 $en_US["goat"]="<bold>%nick%</bold>'s goat walks by and kicks <bold>%answer%</bold>";
 
@@ -107,6 +107,7 @@ $en_US["seer_assign"]="You are a <bold>seer</bold>. It is your job to detect the
 $en_US["seer_see"]="You have a vision; in this vision, you see that <bold>%answer%</bold> is a <bold>%answer2%</bold>!";
 $en_US["seer_see_not"]="Only a seer may use this command";
 $en_US["seer_seen"]="You may only have one vision per round.";
+$en_US["seer_see_self"]="You can't see yourself without a mirror. You don't have a mirror.";
 $en_US["seer_see_day"]="You may only have visions at night.";
 
 $en_US["wolf_assign"]="You are a <bold>wolf</bold>. It is your job to kill all the villagers. Use \"kill <nick>\" to kill a villager.";
