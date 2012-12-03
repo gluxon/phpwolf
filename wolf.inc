@@ -2,6 +2,8 @@
 define('NO_OPERATOR', true);
 define('NO_NICK', null);
 
+define('AWAY_LIST', 'away_list');
+
 class wolf extends irc {
 
 	// Start random module
@@ -78,6 +80,10 @@ class wolf extends irc {
 		$this->gunner_bullets = array();
 		$this->angel_guarded = array();
 		$this->detective_ided = array();
+
+		if (file_exists(AWAY_LIST)) {
+			$this->away = explode(',', file_get_contents(AWAY_LIST) );
+		}
 	}
 
 	/**
@@ -524,6 +530,8 @@ class wolf extends irc {
 
 				$back = $this->decode($lang["back"]);
 				$this->notice($nick, $back);
+
+				file_put_contents(AWAY_LIST, implode(',', $this->away) );
 			} else {
 				$not_away = $this->decode($lang["not_away"]);
 				$this->notice($nick, $not_away);
@@ -634,6 +642,8 @@ class wolf extends irc {
 				$away = $this->decode($lang["away"]);
 				$this->notice($nick, $away);
 			}
+
+			file_put_contents(AWAY_LIST, implode(',', $this->away) );
 		}
 
 		// !ping
