@@ -1174,7 +1174,7 @@ class wolf extends irc {
 					$this->say($nick, $seer_see_self);
 				} else {
 					// parse this person
-					$person_roles = $this->getRolesNice($person, false, true, true);
+					$person_roles = $this->getRolesNice($person, false, false, false);
 
 					// Tell the seer who this guy is
 					$seer_see = $this->decode($lang["seer_see"], NO_NICK, $person, $person_roles);
