@@ -19,8 +19,7 @@ $admins = array('~gluxon@unaffiliated/gluxon',
                 '~Snuupy@unaffiliated/snuupy',
                 '~ceradon@wikimedia/Ceradon',
                 '~mithadon@unaffiliated/mithadon',
-                'ishanyx@junethack/teamsplat/ishanyx',
-                '~jsec@affiliated/pdpc.active.jsec');
+                'ishanyx@junethack/teamsplat/ishanyx');
 
 // Language
 $lang=$en_US;
