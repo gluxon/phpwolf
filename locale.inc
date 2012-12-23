@@ -123,6 +123,7 @@ $en_US["harlot_visit_not"]="Only a harlot may use this command.";
 $en_US["harlot_visit_self"]="You have chosen to stay home for the night.";
 $en_US["harlot_visited"]="You are already spending the night with <bold>%answer%</bold>.";
 $en_US["harlot_day"]="You may only visit someone at night.";
+$en_US["harlot_dead"]="<bold>%answer%<bold>, a <bold>harlot<bold>, made the unfortunate mistake of visiting the victim's house last night and is now dead.";
 
 $en_US["traitor_assign"]="You are a <bold>traitor</bold>. You are exactly like a villager and not even a seer can see your true identity. Only detectives can.";
 $en_US["traitor_transform"]="<bold>The villagers, during their celebrations, are frightened as they hear a loud howl. The wolves are not gone!</bold>";
