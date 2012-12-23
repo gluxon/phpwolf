@@ -1117,6 +1117,14 @@ class wolf extends irc {
 			$this->commands($recipient, "!ping", $nick, $host);
 		}
 
+		// !fwait
+		else if ( $this->isCommand($command, 'fwait') && $this->isAdmin($host) ) {
+			if ($this->wait_extended >= $setting["game_add_wait_limit"]) {
+				$this->wait_extended--;
+			}
+			$this->commands($recipient, "!wait", $nick, $host);
+		}
+
 		// !frestart
 		else if ( $this->isCommand($command, 'frestart') && $this->isAdmin($host) ) {
 			// Hack from -> http://debuggable.com/posts/restarting-a-php-command-line-script:4988968d-b9d0-4fe8-af30-05544834cda3
@@ -1715,7 +1723,17 @@ class wolf extends irc {
 
 			$day_victim = $this->decode($lang["day_victim"], NO_NICK, $victim, $dead_guy_roles);
 			$this->say($this->channel, $day_victim);
+
 			$this->removePlayer($this->channel, $victim);
+
+			// Check if harlot visited victim
+			foreach($this->harlot as $harlot) {
+				if ( isset($this->harlot_visited[$harlot]) && $this->harlot_visited[$harlot] == $victim ) {
+					$harlot_dead = $this->decode($lang["harlot_dead"], NO_NICK, $harlot);
+					$this->say($this->channel, $harlot_dead);
+					$this->removePlayer($this->channel, $harlot);
+				}
+			}
 		}
 
 		// If the harlot visits a wolf!
