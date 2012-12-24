@@ -22,7 +22,7 @@ $admins = array('~gluxon@unaffiliated/gluxon',
                 'ishanyx@junethack/teamsplat/ishanyx');
 
 // Language
-$lang=$en_US;
+$lang='en_US';
 
 // Times (in seconds)
 $setting["game_wait"]=60;
