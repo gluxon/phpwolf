@@ -4,6 +4,9 @@ define('AWAY_LIST', 'away_list');
 
 class wolf extends irc {
 
+	// Settings store
+	private $setting;
+
 	// Start random module
 	private $random;
 
@@ -82,6 +85,10 @@ class wolf extends irc {
 		$this->angel_guarded = array();
 		$this->detective_ided = array();
 
+		// Import werewolf settings
+		include(SETTINGS_PATH . '/werewolf.inc');
+		$this->setting = $wolf;
+
 		if (file_exists(AWAY_LIST)) {
 			$this->away = explode(',', file_get_contents(AWAY_LIST) );
 		}
@@ -97,7 +104,7 @@ class wolf extends irc {
 	 * @param mixed $sub4 Answer 4
 	 * @return string String with bolded words and correct answer values
 	 */
-	public function string($string, $sub1, $sub2=null, $sub3=null, $sub4=null) {
+	public function string($string, $sub1=null, $sub2=null, $sub3=null, $sub4=null) {
 		return $this->locale->getSubbedString($string, $sub1, $sub2, $sub3, $sub4);
 	}
 
@@ -224,7 +231,6 @@ class wolf extends irc {
 	 * @return string A string containing a list of roles in sensible English.
 	 */
 	public function getRolesNice($nick, $bold_roles, $show_cursed=false, $show_gunner=false) {
-		global $lang;
 
 		$roles = $this->getRoles($nick);
 
@@ -349,8 +355,12 @@ class wolf extends irc {
 	 * @param mixed $reaction The reaction to the action
 	 */
 	public function chance($action) {
-		global $gun_shot, $gun_shot_drunk, $manslaughter;
-		global $guardian_angel_dies, $detective_revealed;
+		$gun_shot = $this->setting["gun_shot"];
+		$gun_shot_drunk = $this->setting["gun_shot_drunk"];
+		$manslaughter = $this->setting["manslaughter"];
+
+		$guardian_angel_dies = $this->setting["guardian_angel_dies"];
+		$detective_revealed = $this->setting["detective_revealed"];
 
 		switch ($action) {
 			case 'gun_shot':
@@ -416,7 +426,6 @@ class wolf extends irc {
 	 * @return mixed List of players
 	 */
 	public function listPlayers($wolf = false, $nick = null) {
-		global $lang;
 
 		$list = "";
 		foreach(array_keys($this->players) as $player) {
@@ -426,9 +435,9 @@ class wolf extends irc {
 				// Display wolves as their role
 				if ($wolf) {
 					if ( in_array($player, $this->wolf) ) {
-						$list = $list . ' (' . $this->locale->getString('wolf') . ')';
+						$list = $list . ' (' . $this->string('wolf') . ')';
 					} else if ( in_array($player, $this->traitor) ) {
-						$list = $list . ' (' . $this->locale->getString('traitor') . ')';
+						$list = $list . ' (' . $this->string('traitor') . ')';
 					}
 				}
 
@@ -451,8 +460,6 @@ class wolf extends irc {
 	 * @param mixed $message Message being sent
 	 */
 	public function relayToWolves($sender, $message) {
-		global $lang;
-
 		foreach($this->wolf as $wolf) {
 			if ($wolf != $sender) {
 				$wolf_relay = $this->string('wolf_relay', $sender, $message);
@@ -476,7 +483,7 @@ class wolf extends irc {
 	 * @param mixed $host Host of sender
 	 */
 	public function commands($recipient, $message, $nick, $host) {
-		global $user, $lang, $setting, $limit, $length, $irc;
+		global $user;
 
 		// Remove double, extraneous whitespaces
 		$message = preg_replace("/\s+/", " ", $message);
@@ -550,7 +557,7 @@ class wolf extends irc {
 		else if ( $this->isCommand($command, 'stats') ) {
 			if ($recipient == $user["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
-			} else if (time() - $this->last_stats < $limit["stats"]) {
+			} else if (time() - $this->last_stats < $this->setting["wait_stats"]) {
 				$ratelimit = $this->string('ratelimit');
 				$this->notice($nick, $ratelimit);
 			} else {
@@ -588,11 +595,11 @@ class wolf extends irc {
 							$specials_total = $specials_total + $amount; // Add to total
 
 							if ($amount == 0) {
-								$reply = $reply . 'no ' . $lang[$role_name . '_plural'] . ', ';
+								$reply = $reply . 'no ' . $this->string($role_name . '_plural') . ', ';
 							} else if ($amount == 1) {
-								$reply = $reply . chr(2).$amount.chr(2) . ' ' . $lang[$role_name] . ', ';
+								$reply = $reply . chr(2).$amount.chr(2) . ' ' . $this->string($role_name) . ', ';
 							} else {
-								$reply = $reply . chr(2).$amount.chr(2) . ' ' . $lang[$role_name . '_plural'] . ', ';
+								$reply = $reply . chr(2).$amount.chr(2) . ' ' . $this->string($role_name . '_plural') . ', ';
 							}
 						}
 					}
@@ -641,7 +648,7 @@ class wolf extends irc {
 			} else if ($this->ongoing) {
 				$start_ongoing = $this->string('start_ongoing');
 				$this->notice($nick, $start_ongoing);
-			} else if (time() - $this->last_ping < $limit["ping"]) {
+			} else if (time() - $this->last_ping < $this->setting["wait_ping"]) {
 				$ratelimit = $this->string('ratelimit');
 				$this->notice($nick, $ratelimit);
 			} else {
@@ -672,8 +679,8 @@ class wolf extends irc {
 			} 
 
 			// Time limit has not passed
-			else if ( $time < $setting["game_wait"] ) {
-				$game_wait = $this->string('game_wait', $setting["game_wait"] - $time);
+			else if ( $time < $this->setting["game_wait"] ) {
+				$game_wait = $this->string('game_wait', $this->setting["game_wait"] - $time);
 				$this->say($recipient, $game_wait);
 			}
 
@@ -739,16 +746,17 @@ class wolf extends irc {
 						}
 
 						if ($numItems > 1) {
-							$this->roles_message = $this->roles_message . $this->string('end_roles_plural', $lang[$role . '_plural'], $role_list) . ' ';
+							$this->roles_message = $this->roles_message . $this->string('end_roles_plural', $this->string($role . '_plural'), $role_list) . ' ';
 						} else {
 							// This is a hackish workaround, $person is still the looped array since $numItems is 1
-							$this->roles_message = $this->roles_message . $this->string('end_roles', $lang[$role], $person) . ' ';
+							$this->roles_message = $this->roles_message . $this->string('end_roles', $this->string($role), $person) . ' ';
 						}
 					}
 				}
 				$this->roles_message = substr($this->roles_message, 0, -1); // remove trailing space
 
 				// We do not want socket blocking for werewolf now
+				global $irc;
 				$irc->setBlocking(false);
 
 			}
@@ -892,12 +900,12 @@ class wolf extends irc {
 			if ($recipient == $user["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if ($this->ongoing == false) {
-				if ($this->wait_extended < $setting["game_add_wait_limit"]) {
+				if ($this->wait_extended < $this->setting["game_add_wait_limit"]) {
 
 					$this->wait_extended += 1;
-					$this->game_wait += $setting["game_add_wait"];
+					$this->game_wait += $this->setting["game_add_wait"];
 
-					$wait = $this->string('wait', $nick, $setting["game_add_wait"]);
+					$wait = $this->string('wait', $nick, $this->setting["game_add_wait"]);
 					$this->say($recipient, $wait);
 				} else {
 					$wait_reached = $this->string('wait_reached');
@@ -1045,22 +1053,22 @@ class wolf extends irc {
 		// !fday
 		else if ( $this->isCommand($command, 'fday') && $this->isAdmin($host) ) {
 			if ($this->isNight && $this->ongoing) {
-				$length_night_original = $length["night"];
+				$length_night_original = $this->setting["length_night"];
 
-				$length["night"] = 0;
+				$this->setting["length_night"] = 0;
 				$this->runMaintenance();
-				$length["night"] = $length_night_original;
+				$this->setting["length_night"] = $length_night_original;
 			}
 		}
 
 		// !fnight
 		else if ( $this->isCommand($command, 'fnight') && $this->isAdmin($host) ) {
 			if ($this->isDay && $this->ongoing) {
-				$length_day_original = $length["day"];
+				$length_day_original = $this->setting["length_day"];
 
-				$length["day"] = 0;
+				$this->setting["length_day"] = 0;
 				$this->runMaintenance();
-				$length["day"] = $length_day_original;
+				$this->setting["length_day"] = $length_day_original;
 			}
 		}
 
@@ -1101,13 +1109,13 @@ class wolf extends irc {
 
 		// !fping
 		else if ( $this->isCommand($command, 'fping') && $this->isAdmin($host) ) {
-			$this->last_ping = time() - $limit["ping"] - 1;
+			$this->last_ping = time() - $this->setting["ping"] - 1;
 			$this->commands($recipient, "!ping", $nick, $host);
 		}
 
 		// !fwait
 		else if ( $this->isCommand($command, 'fwait') && $this->isAdmin($host) ) {
-			if ($this->wait_extended >= $setting["game_add_wait_limit"]) {
+			if ($this->wait_extended >= $this->setting["game_add_wait_limit"]) {
 				$this->wait_extended--;
 			}
 			$this->commands($recipient, "!wait", $nick, $host);
@@ -1481,7 +1489,7 @@ class wolf extends irc {
 	 * Assign player roles
 	 */
 	public function assignRoles() {
-		global $roles, $shots_multiplier;
+		$roles = $this->setting["roles"];
 
 		// Get the array of # of roles according to player amount
 		$player_amount = count($this->players);
@@ -1551,7 +1559,7 @@ class wolf extends irc {
 					array_push($this->$role_name, $players_sorted[$player_index]);
 
 					if ($role_name == "gunner") {
-						$this->gunner_bullets[$players_sorted[$player_index]] = ceil($shots_multiplier * count($this->players) );
+						$this->gunner_bullets[$players_sorted[$player_index]] = ceil($this->setting["shots_multiplier"] * count($this->players) );
 					}
 
 					break;
@@ -1575,7 +1583,6 @@ class wolf extends irc {
 	 * @param mixed $role Role player has been assigned
 	 */
 	public function sendDirections($nick, $role) {
-		global $lang;
 
 		switch($role) {
 			case 'seer': // Seer
@@ -1686,7 +1693,6 @@ class wolf extends irc {
 	 * @param mixed $lasted_time Time night lasted for
 	 */
 	public function turnDay($lasted_time, $victim = null) {
-		global $lang;
 
 		$this->night_time = $this->night_time + $lasted_time;
 		$day_turn = $this->string('day_turn', $this->formatSeconds($lasted_time));
@@ -1785,7 +1791,6 @@ class wolf extends irc {
 	 * @param mixed $lasted_time Time day lasted for
 	 */
 	public function turnNight($lasted_time, $victim = null) {
-		global $lang;
 
 		// Day has ended, we can reset these actions
 		// NOTE: Do not reset gunner shots
@@ -1858,7 +1863,7 @@ class wolf extends irc {
 	 * @param mixed $win 0 no win, 1 for villagers, 2 for wolves, 3 for all wolves dead
 	 */
 	public function endGame($channel, $win=0) {
-		global $lang, $irc;
+		global $irc;
 
 		// Game stopped, we can start blocking the socket again
 		$irc->setBlocking(true);
@@ -1953,7 +1958,6 @@ class wolf extends irc {
 	 * Run functions not invoked by messages
 	 */
 	public function runMaintenance() {
-		global $lang, $length;
 
 		if ($this->ongoing) {
 
@@ -1981,7 +1985,7 @@ class wolf extends irc {
 				// Has the time limit run out yet?
 				$lasted_time = time() - $this->current_night_start;
 				// If the time limit has run out
-				if ($lasted_time >= $length["night"]) {
+				if ($lasted_time >= $this->setting["length_night"]) {
 					$first_kill = reset($this->wolf_killed);
 					if ( !empty($first_kill) ) {
 						$this->turnDay($lasted_time, $first_kill);
@@ -2026,7 +2030,7 @@ class wolf extends irc {
 				// Has the time limit run out yet?
 				$lasted_time = time() - $this->current_day_start;
 				// If the time limit has run out
-				if ($lasted_time >= $length["day"]) {
+				if ($lasted_time >= $this->setting["length_day"]) {
 					$this->turnNight($lasted_time);
 				} else {
 
