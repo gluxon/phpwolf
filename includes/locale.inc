@@ -66,14 +66,17 @@ class locale {
 		$extension = $this->extension;
 
 		// Search for files in the directory to use as languages
-		foreach(scandir($directory) as $lang) {
+		foreach(scandir($directory) as $lang_file) {
 			// Include the file if the language is a file and ends in ".inc";
-			if ( is_file($directory . '/' . $lang) && preg_match("/^.*" . $extension . "$/i", $lang) == 1 ) {
+			if ( is_file($directory . '/' . $lang_file) && preg_match("/^.*" . $extension . "$/i", $lang_file) == 1 ) {
 
-				include($directory . '/' . $lang);
+				include($directory . '/' . $lang_file);
 
 				// Cut out the extension
-				$language = substr($lang, 0, strlen($lang) - strlen($extension));
+				$language = substr($lang_file, 0, strlen($lang_file) - strlen($extension));
+
+				// Add as a property to reference to later
+				$this->$language = $$language;
 
 				// Add it to stack of loaded languages
 				array_push($this->languages, $language);
@@ -125,7 +128,8 @@ class locale {
 	 * @param mixed $langauge The language of the string
 	 */
 	public function getString($string) {
-		return $this->$language[$string];
+		$current_language = $this->getLanguage();
+		return $this->{$current_language}[$string];
 	}
 
 	/**
