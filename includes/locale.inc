@@ -14,10 +14,10 @@ class locale {
 	 * @param mixed $extension File extension of locale files
 	 */
 	public function __construct($directory, $extension) {
-		$languages = array();
+		$this->languages = array();
 
 		$this->setDirectory($directory);
-		$this->setExtension($extension);
+		$this->setFileExtension($extension);
 
 		$this->cullLangs();
 	}
@@ -62,11 +62,13 @@ class locale {
 	 * Cull or compile the langs together
 	 */
 	public function cullLangs() {
+		$directory = $this->directory;
+		$extension = $this->extension;
 
 		// Search for files in the directory to use as languages
 		foreach(scandir($directory) as $lang) {
 			// Include the file if the language is a file and ends in ".inc";
-			if ( is_file($directory . '/' . $lang) && preg_match("/^.*" . $extension . "$/i", $module) == 1 ) {
+			if ( is_file($directory . '/' . $lang) && preg_match("/^.*" . $extension . "$/i", $lang) == 1 ) {
 
 				include($directory . '/' . $lang);
 
@@ -74,7 +76,7 @@ class locale {
 				$language = substr($lang, 0, strlen($lang) - strlen($extension));
 
 				// Add it to stack of loaded languages
-				array_push($languages, $language);
+				array_push($this->languages, $language);
 			}
 		}
 	}
