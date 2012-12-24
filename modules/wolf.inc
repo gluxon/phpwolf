@@ -1,7 +1,5 @@
 <?php
 define('NO_OPERATOR', true);
-define('NO_NICK', null);
-
 define('AWAY_LIST', 'away_list');
 
 class wolf extends irc {
@@ -243,7 +241,7 @@ class wolf extends irc {
 						$role_list .= chr(2) . $this->locale->getSubbedString('villager') . chr(2);
 					}
 				} else {
-					$role_list .= chr(2) . $this->locale->getSubbedString($lang[$role]) . chr(2);
+					$role_list .= chr(2) . $this->locale->getSubbedString($role) . chr(2);
 				}
 
 				if ( $key + 1 < $role_amount ) {
@@ -643,7 +641,7 @@ class wolf extends irc {
 				}
 				$list = substr($list, 0, -1);
 				// This returns PING %answer% if $list is empty
-				$ping = $this->locale->getSubbedString('ping', NO_NICK, $list);
+				$ping = $this->locale->getSubbedString('ping', $list);
 				$this->say($recipient, $ping);
 			}
 		}
@@ -661,7 +659,7 @@ class wolf extends irc {
 
 			// Time limit has not passed
 			else if ( $time < $setting["game_wait"] ) {
-				$game_wait = $this->locale->getSubbedString('game_wait', NO_NICK, $setting["game_wait"] - $time);
+				$game_wait = $this->locale->getSubbedString('game_wait', $setting["game_wait"] - $time);
 				$this->say($recipient, $game_wait);
 			}
 
@@ -685,7 +683,7 @@ class wolf extends irc {
 				// Reset Player timeouts at beginning of game
 				$this->resetPlayerTimeouts();
 
-				$game_welcome = $this->locale->getSubbedString('game_welcome', NO_NICK, $answer);
+				$game_welcome = $this->locale->getSubbedString('game_welcome', $answer);
 				$this->say($recipient, $game_welcome);
 
 				$this->ongoing = true;
@@ -727,10 +725,10 @@ class wolf extends irc {
 						}
 
 						if ($numItems > 1) {
-							$this->roles_message = $this->roles_message . $this->locale->getSubbedString('end_roles_plural', NO_NICK, $lang[$role . '_plural'], $role_list) . ' ';
+							$this->roles_message = $this->roles_message . $this->locale->getSubbedString('end_roles_plural', $lang[$role . '_plural'], $role_list) . ' ';
 						} else {
 							// This is a hackish workaround, $person is still the looped array since $numItems is 1
-							$this->roles_message = $this->roles_message . $this->locale->getSubbedString('end_roles', NO_NICK, $lang[$role], $person) . ' ';
+							$this->roles_message = $this->roles_message . $this->locale->getSubbedString('end_roles', $lang[$role], $person) . ' ';
 						}
 					}
 				}
@@ -767,7 +765,7 @@ class wolf extends irc {
 				$game_none = $this->locale->getSubbedString('game_none');
 				$this->say($recipient, $game_none);
 			} else if (!$this->isPlaying($nick)) {
-				$not_playing = $this->locale->getSubbedString('not_playing', NO_NICK, $this->nickAutocomplete($message));
+				$not_playing = $this->locale->getSubbedString('not_playing', $this->nickAutocomplete($message));
 				$this->say($recipient, $not_playing);
 			} else if ($this->isNight) {
 				$this->say($nick, "Error, it is not day time");
@@ -838,10 +836,10 @@ class wolf extends irc {
 				if (!$this->isPlaying($nick)) {
 					// This person is not playing, let's just ignore them (and hope they go away)
 				} else if (!$this->isPlaying($victim)) {
-					$not_playing = $this->locale->getSubbedString('not_playing', NO_NICK, $victim);
+					$not_playing = $this->locale->getSubbedString('not_playing', $victim);
 					$this->notice($nick, $not_playing);
 				} else if ($this->isNight) {
-					$lynch_night = $this->locale->getSubbedString('lynch_night', NO_NICK, $victim);
+					$lynch_night = $this->locale->getSubbedString('lynch_night', $victim);
 					$this->notice($nick, $lynch_night);
 				} else if ( in_array($nick, $this->gunner_shot) ) {
 					$lynch_resting = $this->locale->getSubbedString('lynch_resting', $nick);
@@ -864,10 +862,10 @@ class wolf extends irc {
 
 				$int = $this->random->getRandInt(1, 2);
 				if ($int == 1) {
-					$coin_land = $this->locale->getSubbedString('coin_land', NO_NICK, "heads");
+					$coin_land = $this->locale->getSubbedString('coin_land', "heads");
 					$this->say($recipient, $coin_land);
 				} else if ($int == 2) {
-					$coin_land = $this->locale->getSubbedString('coin_land', NO_NICK, "tails");
+					$coin_land = $this->locale->getSubbedString('coin_land', "tails");
 					$this->say($recipient, $coin_land);
 				} else {
 					$this->say($recipient, "There as an error retrieving random.org results.");
@@ -1061,7 +1059,7 @@ class wolf extends irc {
 			}
 
 			if ($message == "") {
-				$parameters=$this->locale->getSubbedString('parameters', NO_NICK, $message);
+				$parameters=$this->locale->getSubbedString('parameters', $message);
 				$this->notice($nick, $parameters);
 			} else {
 				$ongoing = $this->ongoing;
@@ -1080,7 +1078,7 @@ class wolf extends irc {
 			}
 
 			if ($message == "") {
-				$parameters=$this->locale->getSubbedString('parameters', NO_NICK, $message);
+				$parameters=$this->locale->getSubbedString('parameters', $message);
 				$this->notice($nick, $parameters);
 			} else {
 				$this->commands($recipient, "!quit", $message, $host);
@@ -1151,17 +1149,17 @@ class wolf extends irc {
 				$person = $this->nickAutocomplete($message);
 
 				if (!$this->isPlaying($person)) {
-					$not_playing=$this->locale->getSubbedString('not_playing', NO_NICK, $person);
+					$not_playing=$this->locale->getSubbedString('not_playing', $person);
 					$this->notice($nick, $not_playing);
 				} else if ( $nick == $person ) {
-					$seer_see_self=$this->locale->getSubbedString('seer_see_self', NO_NICK, $person);
+					$seer_see_self=$this->locale->getSubbedString('seer_see_self', $person);
 					$this->say($nick, $seer_see_self);
 				} else {
 					// parse this person
 					$person_roles = $this->getRolesNice($person, false, false, false);
 
 					// Tell the seer who this guy is
-					$seer_see = $this->locale->getSubbedString('seer_see', NO_NICK, $person, $person_roles);
+					$seer_see = $this->locale->getSubbedString('seer_see', $person, $person_roles);
 					$this->say($nick, $seer_see);
 
 					// Add to list of seers that have seen tonight
@@ -1180,7 +1178,7 @@ class wolf extends irc {
 				$person = $this->nickAutocomplete($message);
 
 				if (!$this->isPlaying($person)) {
-					$not_playing=$this->locale->getSubbedString('not_playing', NO_NICK, $person);
+					$not_playing=$this->locale->getSubbedString('not_playing', $person);
 					$this->notice($nick, $not_playing);
 				} else {
 					// Check if the victim is a wolf
@@ -1191,7 +1189,7 @@ class wolf extends irc {
 						$this->wolf_killed[$nick] = $person;
 
 						// Send Message
-						$wolf_kill = $this->locale->getSubbedString('wolf_kill', NO_NICK, $person);
+						$wolf_kill = $this->locale->getSubbedString('wolf_kill', $person);
 						$this->say($nick, $wolf_kill);
 					}
 				}
@@ -1208,17 +1206,17 @@ class wolf extends irc {
 				$this->notice($nick, $harlot_day);
 			} else if ( !in_array($nick, $this->harlot) ) {
 				// This person isn't the harlot
-				$harlot_visit_not=$this->locale->getSubbedString('harlot_visit_not', NO_NICK, $person);
+				$harlot_visit_not=$this->locale->getSubbedString('harlot_visit_not', $person);
 				$this->notice($nick, $harlot_visit_not);
 			} else if ( isset($this->harlot_visited[$nick])) {
 				// You've already visited
-				$harlot_visited=$this->locale->getSubbedString('harlot_visited', NO_NICK, $this->harlot_visited[$nick]);
+				$harlot_visited=$this->locale->getSubbedString('harlot_visited', $this->harlot_visited[$nick]);
 				$this->notice($nick, $harlot_visited);
 			} else {
 				$person = $this->nickAutocomplete($message);
 
 				if ( !$this->isPlaying($person) ) {
-					$not_playing=$this->locale->getSubbedString('not_playing', NO_NICK, $person);
+					$not_playing=$this->locale->getSubbedString('not_playing', $person);
 					$this->notice($nick, $not_playing);
 				} else {
 					// This person has been selected for death.
@@ -1230,11 +1228,11 @@ class wolf extends irc {
 						$this->notice($nick, $harlot_visit_self);
 					} else {
 						// Send Message
-						$harlot_visit = $this->locale->getSubbedString('harlot_visit', NO_NICK, $person);
+						$harlot_visit = $this->locale->getSubbedString('harlot_visit', $person);
 						$this->say($nick, $harlot_visit);
 
 						// Send Message to hostess
-						$harlot_visit = $this->locale->getSubbedString('harlot_visit', NO_NICK, $nick);
+						$harlot_visit = $this->locale->getSubbedString('harlot_visit', $nick);
 						$this->say($person, $harlot_visit);
 					}
 
@@ -1263,7 +1261,7 @@ class wolf extends irc {
 
 				if ( !$this->isPlaying($person) ) {
 					// The shot person isn't playing
-					$not_playing=$this->locale->getSubbedString('not_playing', NO_NICK, $person);
+					$not_playing=$this->locale->getSubbedString('not_playing', $person);
 					$this->notice($nick, $not_playing);
 				} else if ($nick == $person) {
 					// You can't shoot yourself
@@ -1295,7 +1293,7 @@ class wolf extends irc {
 
 								$this->removePlayer($this->channel, $person);
 							} else {
-								$gunner_shoot_villager = $this->locale->getSubbedString('gunner_shoot_villager', NO_NICK, $person);
+								$gunner_shoot_villager = $this->locale->getSubbedString('gunner_shoot_villager', $person);
 								$this->say($recipient, $gunner_shoot_villager);
 
 								array_push($this->gunner_shot, $person);
@@ -1330,14 +1328,14 @@ class wolf extends irc {
 				$this->notice($nick, $angel_day);
 			} else if ( isset($this->angel_guarded[$nick]) ) {
 				// You've already guarded
-				$angel_guarded=$this->locale->getSubbedString('angel_guarded', NO_NICK, $this->angel_guarded[$nick]);
+				$angel_guarded=$this->locale->getSubbedString('angel_guarded', $this->angel_guarded[$nick]);
 				$this->say($nick, $angel_guarded);
 			} else {
 				$person = $this->nickAutocomplete($message);
 
 				if ( !$this->isPlaying($person) ) {
 					// The visited guarding person isn't playing
-					$not_playing=$this->locale->getSubbedString('not_playing', NO_NICK, $person);
+					$not_playing=$this->locale->getSubbedString('not_playing', $person);
 					$this->notice($nick, $not_playing);
 				} else if ($nick == $person) {
 					// Guarding self isn't allowed
@@ -1348,11 +1346,11 @@ class wolf extends irc {
 					$this->angel_guarded[$nick] = $person;
 
 					// Send Message
-					$angel_guard = $this->locale->getSubbedString('angel_guard', NO_NICK, $person);
+					$angel_guard = $this->locale->getSubbedString('angel_guard', $person);
 					$this->say($nick, $angel_guard);
 
 					// Send Message to protected villager
-					$angel_guard_notify = $this->locale->getSubbedString('angel_guard_notify', NO_NICK, $nick);
+					$angel_guard_notify = $this->locale->getSubbedString('angel_guard_notify', $nick);
 					$this->say($person, $angel_guard_notify);
 
 				}
@@ -1380,7 +1378,7 @@ class wolf extends irc {
 
 				if ( !$this->isPlaying($person) ) {
 					// The shot person isn't playing
-					$not_playing=$this->locale->getSubbedString('not_playing', NO_NICK, $person);
+					$not_playing=$this->locale->getSubbedString('not_playing', $person);
 					$this->notice($nick, $not_playing);
 				} else if ($nick == $person) {
 					// You can't id yourself
@@ -1391,7 +1389,7 @@ class wolf extends irc {
 
 					$roles = $this->getRolesNice($person, true, true, true);
 
-					$detective_id=$this->locale->getSubbedString('detective_id', NO_NICK, $person, $roles);
+					$detective_id=$this->locale->getSubbedString('detective_id', $person, $roles);
 					$this->say($nick, $detective_id);
 
 					if ( $this->chance("detective_revealed") ) {
@@ -1414,7 +1412,7 @@ class wolf extends irc {
 				//No game is currently running.
 				$this->say($nick, $this->locale->getSubbedString('game_none'));
 			} else if ( !$this->isPlaying($nick) ) {
-				$not_playing = $this->locale->getSubbedString('not_playing', NO_NICK, $person);
+				$not_playing = $this->locale->getSubbedString('not_playing', $person);
 				$this->notice($nick, $not_playing);
 			} else {
 				$this->say($nick, "You currently hold the role(s): " . $this->getRolesNice($nick, true, false, true) );
@@ -1573,7 +1571,7 @@ class wolf extends irc {
 
 				// List players
 				$answer=$this->listPlayers(false, $nick);
-				$players_list = $this->locale->getSubbedString('players_list', NO_NICK, $answer);
+				$players_list = $this->locale->getSubbedString('players_list', $answer);
 				$this->say($nick, $players_list);
 			break;
 
@@ -1590,7 +1588,7 @@ class wolf extends irc {
 
 				// List players
 				$answer=$this->listPlayers(true, $nick);
-				$players_list = $this->locale->getSubbedString('players_list', NO_NICK, $answer);
+				$players_list = $this->locale->getSubbedString('players_list', $answer);
 				$this->say($nick, $players_list);
 			break;
 
@@ -1611,7 +1609,7 @@ class wolf extends irc {
 
 				// List players
 				$answer=$this->listPlayers(false, $nick);
-				$players_list = $this->locale->getSubbedString('players_list', NO_NICK, $answer);
+				$players_list = $this->locale->getSubbedString('players_list', $answer);
 				$this->say($nick, $players_list);
 			break;
 
@@ -1628,13 +1626,13 @@ class wolf extends irc {
 
 				// List players
 				$answer=$this->listPlayers(true, $nick);
-				$players_list = $this->locale->getSubbedString('players_list', NO_NICK, $answer);
+				$players_list = $this->locale->getSubbedString('players_list', $answer);
 				$this->say($nick, $players_list);
 			break;
 
 			case 'gunner': // Gunner
 				// Role Assign
-				$gunner_assign = $this->locale->getSubbedString('gunner_assign', NO_NICK, $this->gunner_bullets[$nick]);
+				$gunner_assign = $this->locale->getSubbedString('gunner_assign', $this->gunner_bullets[$nick]);
 				$this->say($nick, $gunner_assign);
 			break;
 
@@ -1649,7 +1647,7 @@ class wolf extends irc {
 
 				// List players
 				$answer=$this->listPlayers(false, $nick);
-				$players_list = $this->locale->getSubbedString('players_list', NO_NICK, $answer);
+				$players_list = $this->locale->getSubbedString('players_list', $answer);
 				$this->say($nick, $players_list);
 			break;
 
@@ -1677,7 +1675,7 @@ class wolf extends irc {
 		global $lang;
 
 		$this->night_time = $this->night_time + $lasted_time;
-		$day_turn = $this->locale->getSubbedString('day_turn', NO_NICK, $this->formatSeconds($lasted_time));
+		$day_turn = $this->locale->getSubbedString('day_turn', $this->formatSeconds($lasted_time));
 		$this->say($this->channel, $day_turn);
 
 		if ($victim == null) {
@@ -1691,13 +1689,13 @@ class wolf extends irc {
 
 		// Victim was protected by GA
 		} else if ( in_array($victim, $this->angel_guarded) ) {
-			$day_angel = $this->locale->getSubbedString('day_angel', NO_NICK, $victim);
+			$day_angel = $this->locale->getSubbedString('day_angel', $victim);
 			$this->say($this->channel, $day_angel);
 
 		} else {
 			$dead_guy_roles = $this->getRolesNice($victim, false, false, false);
 
-			$day_victim = $this->locale->getSubbedString('day_victim', NO_NICK, $victim, $dead_guy_roles);
+			$day_victim = $this->locale->getSubbedString('day_victim', $victim, $dead_guy_roles);
 			$this->say($this->channel, $day_victim);
 
 			$this->removePlayer($this->channel, $victim);
@@ -1705,7 +1703,7 @@ class wolf extends irc {
 			// Check if harlot visited victim
 			foreach($this->harlot as $harlot) {
 				if ( isset($this->harlot_visited[$harlot]) && $this->harlot_visited[$harlot] == $victim ) {
-					$harlot_dead = $this->locale->getSubbedString('harlot_dead', NO_NICK, $harlot);
+					$harlot_dead = $this->locale->getSubbedString('harlot_dead', $harlot);
 					$this->say($this->channel, $harlot_dead);
 					$this->removePlayer($this->channel, $harlot);
 				}
@@ -1715,7 +1713,7 @@ class wolf extends irc {
 		// If the harlot visits a wolf!
 		foreach($this->harlot as $harlot) {
 			if ( isset($this->harlot_visited[$harlot]) && in_array($this->harlot_visited[$harlot], $this->wolf) ) {
-				$day_harlot_dead = $this->locale->getSubbedString('day_harlot_dead', NO_NICK, $harlot);
+				$day_harlot_dead = $this->locale->getSubbedString('day_harlot_dead', $harlot);
 				$this->say($this->channel, $day_harlot_dead);
 				$this->removePlayer($this->channel, $harlot);
 			}
@@ -1726,7 +1724,7 @@ class wolf extends irc {
 			// 50% chance of death
 			if ( $this->chance('guardian_angel_dies') ) {
 				if ( isset($this->angel_guarded[$angel]) && in_array($this->angel_guarded[$angel], $this->wolf) ) {
-					$day_angel_dead = $this->locale->getSubbedString('day_angel_dead', NO_NICK, $angel);
+					$day_angel_dead = $this->locale->getSubbedString('day_angel_dead', $angel);
 					$this->say($this->channel, $day_angel_dead);
 					$this->removePlayer($this->channel, $angel);
 				}
@@ -1754,7 +1752,7 @@ class wolf extends irc {
 				$amount--;
 			}
 			// Lynch message, and how many required to kill a victim.
-			$day_vote = $this->locale->getSubbedString('day_vote', NO_NICK, $amount / 2 + 1);
+			$day_vote = $this->locale->getSubbedString('day_vote', $amount / 2 + 1);
 			$this->say($this->channel, $day_vote);
 
 			// Set booleans for.... THE SUN
@@ -1792,7 +1790,7 @@ class wolf extends irc {
 		} else {
 			$dead_guy_roles = $this->getRolesNice($victim, false, false, false);
 
-			$night_victim = $this->locale->getSubbedString('night_victim', NO_NICK, $victim, $dead_guy_roles);
+			$night_victim = $this->locale->getSubbedString('night_victim', $victim, $dead_guy_roles);
 			$this->say($this->channel, $night_victim);
 			$this->removePlayer($this->channel, $victim);
 		}
@@ -1819,7 +1817,7 @@ class wolf extends irc {
 			}
 
 			$this->day_time = $this->day_time + $lasted_time;
-			$night_turn = $this->locale->getSubbedString('night_turn', NO_NICK, $this->formatSeconds($lasted_time));
+			$night_turn = $this->locale->getSubbedString('night_turn', $this->formatSeconds($lasted_time));
 			$this->say($this->channel, $night_turn);
 
 			// Set booleans for.... THE SUN
@@ -1876,7 +1874,7 @@ class wolf extends irc {
 
 		// Time and portions
 		$total = $this->day_time + $this->night_time;
-		$end_times = $this->locale->getSubbedString('end_times', NO_NICK, $this->formatSeconds($total), $this->formatSeconds($this->day_time), $this->formatSeconds($this->night_time));
+		$end_times = $this->locale->getSubbedString('end_times', $this->formatSeconds($total), $this->formatSeconds($this->day_time), $this->formatSeconds($this->night_time));
 		$this->say($channel, $end_times);
 
 		// Send previously generated roles message
