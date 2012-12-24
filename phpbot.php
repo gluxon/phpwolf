@@ -7,14 +7,22 @@ ini_set('display_errors', 'On');
 ini_set('log_errors', 'true');
 ini_set('error_log', 'error_log');
 
-require("functions.inc"); // Custom functions
-require("TokenBucket.inc"); // Token Bucket Algorithm
-require("irc.inc"); // IRC Class
-require("random.inc"); // Random Functions
-require("wolf.inc"); // Werewolf Game
+// Where is everything?
+define('INCLUDES_PATH', 'includes');
+define('SETTINGS_PATH', 'settings');
+define('MODULES_PATH', 'modules');
+define('LOCALES_PATH', 'locales');
 
-require("locale.inc"); // Language Translations
-require("settings.inc"); // Settings
+require("irc.inc"); // IRC Class
+
+require(INCLUDES_PATH . "/functions.inc"); // Custom functions
+require(INCLUDES_PATH . "/TokenBucket.inc"); // Token Bucket Algorithm
+require(INCLUDES_PATH . "/random.inc"); // Random Functions
+require(INCLUDES_PATH . "/locale.inc"); // Language class
+
+require(MODULES_PATH . "/wolf.inc"); // Werewolf Game
+
+require(SETTINGS_PATH . "/bot.inc"); // Settings
 
 // Start IRC class
 $irc = new irc();
