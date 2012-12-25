@@ -7,15 +7,17 @@ class wolf extends irc {
 	// Settings store
 	private $setting;
 
-	// Start random module
-	private $random;
+	// Libraries for phpwolf
+	private $TokenBucket, $random, $locale;
 
 	// List of players
-	private $players, $players_original;
+	private $players;
 	private $lynch, $away;
 
 	// In-game stores
-	private $people, $channel, $ongoing;
+	private $people; // Full list of people in the channel
+	private $channel; // Current game wolf is playing in
+	private $ongoing; // Is the game still going?
 
 	// Counters and timeouts
 	private $game_wait, $wait_extended, $last_stats, $last_ping;
@@ -28,24 +30,27 @@ class wolf extends irc {
 	// Goat
 	private $goat_switch;
 
-	// Pre-generated and store end roles message
-	private $roles_message;
-
 	// Role variables
-	public $role_names = array("wolf", "seer", "cursed", "drunk", "harlot", "traitor", "gunner", "crow", "angel", "detective"); // should be const, but constants can't be arrays
-	private $seer, $wolf, $cursed, $drunk, $harlot, $traitor, $gunner, $crow, $angel, $detective;
-	private $roles_set; // roles available corresponding to amount of players
+	private $seer, $wolf, $cursed, $drunk, $harlot, $traitor, $gunner, $crow, $angel, $detective; // Store who has what role
 
 	// Seen, visited, killed variables (per night/day)
 	private $seer_seen, $wolf_killed, $harlot_visited, $gunner_shot, $gunner_bullets, $angel_guarded, $detective_ided;
+
+	private $roles_set; // roles available corresponding to amount of players
+	private $roles_message; // Pre-generated and store end roles message
+
+	// Convenience array for looping
+	public $role_names = array("wolf", "seer", "cursed", "drunk", "harlot", "traitor", "gunner", "crow", "angel", "detective");
 
 	/**
 	 * Constructor for werewolf, initialize variables with default values
 	 */
 	public function __construct() {
+
 		// The language handler.
+		global $lang;
 		$this->locale = new locale(LOCALES_PATH, '.inc');
-		$this->locale->setLanguage('en_US');
+		$this->locale->setLanguage($lang);
 
 		// TokenBucket - Inherited IRC Class doesn't run through constructor since we overrided it here
 		$this->TokenBucket = new TokenBucket(23, 1.73);
@@ -1514,9 +1519,6 @@ class wolf extends irc {
 			$i++;
 		}
 
-		// Backup players for original
-		$this->players_original = $players_sorted;
-
 		// Start looping through each role and assign them
 		foreach($game_roles as $role => $amount) {
 
@@ -1954,8 +1956,6 @@ class wolf extends irc {
 		$this->isNight = null;
 		$this->day_time = 0;
 		$this->night_time = 0;
-
-		unset($this->players_original);
 	}
 
 	/**
