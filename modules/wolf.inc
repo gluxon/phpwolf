@@ -1109,7 +1109,7 @@ class wolf extends irc {
 
 		// !fping
 		else if ( $this->isCommand($command, 'fping') && $this->isAdmin($host) ) {
-			$this->last_ping = time() - $this->setting["ping"] - 1;
+			$this->last_ping = time() - $this->setting["wait_ping"] - 1;
 			$this->commands($recipient, "!ping", $nick, $host);
 		}
 
