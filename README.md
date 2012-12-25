@@ -11,7 +11,7 @@ Werewolf is a variant of the party game [Mafia](http://en.wikipedia.org/wiki/Maf
 
 Why phpwolf?
 ------------
-phpwolf is a rewritten wolfbot designed to benefit from the features offered by the PHP language. The project is going extremely well, and there are future goals beyond IRC are in the making. git, clone, and have fun!
+phpwolf is a rewritten wolfbot designed to benefit from the features offered by the PHP language. The project is going extremely well, and there are future goals beyond IRC are in the making.
 
 License
 -------
@@ -36,5 +36,5 @@ This is licensed [GPLv3](http://www.gnu.org/licenses/gpl.html).
 
 Status
 ------------
-As of Saturday, November 11th 2012, the only requirement left to completion is IDLE check. The web implementation is still under consideration with a HTML5 IRC WebSockets client or AJAX as options.
+As of Christmas, the only requirement left to completion is IDLE check. The web implementation will be written with a Node.js server and ideally AJAX communication (WebSockets if not). Follow progress for the server at [WolfSpider](http://github.com/gluxon/WolfSpider).
 
