@@ -610,9 +610,9 @@ class wolf extends irc {
 					if ($villagers_total == 0) { 
 						$reply = substr($reply, 0, -2) . ' no ' . 'villager_plural';
 					} else if ($villagers_total == 1) {
-						$reply = substr($reply, 0, -2) . ' and ' . \x02.$villagers_total.\x02 . ' ' . $this->string('villager') . '.';
+						$reply = substr($reply, 0, -2) . ' and ' . chr(2).$villagers_total.chr(2) . ' ' . $this->string('villager') . '.';
 					} else {
-						$reply = substr($reply, 0, -2) . ' and ' . \x02.$villagers_total.\x02 . ' ' . $this->string('villager_plural') . '.';
+						$reply = substr($reply, 0, -2) . ' and ' . chr(2).$villagers_total.chr(2) . ' ' . $this->string('villager_plural') . '.';
 					}
 
 					$stats_roles = $this->string('stats_roles', $nick, $reply);
