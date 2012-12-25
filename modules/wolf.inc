@@ -8,7 +8,8 @@ class wolf extends irc {
 	private $setting;
 
 	// Libraries for phpwolf
-	private $TokenBucket, $random, $locale;
+	private $random, $locale;
+	protected $TokenBucket;
 
 	// List of players
 	private $players;
