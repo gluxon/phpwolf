@@ -35,7 +35,7 @@ $en_US["game_welcome"]="%answer1%: Welcome to Werewolf, the popular detective/so
 // Night time
 $en_US["night_first"]="It is now nighttime. All players check for PMs from me for instructions. If you did not receive one, simply sit back, relax, and wait patiently for morning.";
 $en_US["night_turn"]="Day lasted <bold>%answer1%</bold>. It is now nighttime. All players check for PMs from me for instructions. If you did not receive one, simply sit back, relax, and wait patiently for morning.";
-$en_US["night_victim"]="The mob drags a protesting <bold>%answer1%</bold> to the hanging tree. S/He succumbs to the will of the horde, and is hanged. It is discovered (s)he was a <bold>%answer3%</bold>.";
+$en_US["night_victim"]="The mob drags a protesting <bold>%answer1%</bold> to the hanging tree. S/He succumbs to the will of the horde, and is hanged. It is discovered (s)he was a <bold>%answer2%</bold>.";
 
 // Day time turn
 $en_US["day_turn"]="Night lasted <bold>%answer1%</bold>. It is now daytime. The villagers awake, thankful for surviving the night, and search the village... ";
