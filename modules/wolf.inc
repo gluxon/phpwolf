@@ -226,11 +226,13 @@ class wolf extends irc {
 	 * Get all the roles a player has and return it as a nice string
 	 *
 	 * @param mixed $nick Nickname of player
-	 * @param boolean $show_cursed Show the cursed and gunner
 	 * @param boolean $bold_roles Bold roles if true
+	 * @param boolean $show_cursed Show the cursed as a villager
+	 * @param boolean $show_gunner Show the gunner as a villager
+	 * @param boolean $cursed_as_wolf Show the cursed as a wolf
 	 * @return string A string containing a list of roles in sensible English.
 	 */
-	public function getRolesNice($nick, $bold_roles, $show_cursed=false, $show_gunner=false) {
+	public function getRolesNice($nick, $bold_roles, $show_cursed=false, $show_gunner=false, $cursed_as_wolf = false) {
 
 		$roles = $this->getRoles($nick);
 
@@ -257,7 +259,9 @@ class wolf extends irc {
 				}
 
 				if ( ($role=='cursed' && !$show_cursed) || ($role=='gunner' && !$show_gunner) ) {
-					if ( $role_amount <= 0 && empty($role_list) ) {
+					if ($role=='cursed' && $cursed_as_wolf) {
+						$role_list .= chr(2) . $this->string('wolf') . chr(2);
+					} else if ( $role_amount <= 0 && empty($role_list) ) {
 						$role_list .= chr(2) . $this->string('villager') . chr(2);
 					}
 				} else {
@@ -1178,7 +1182,7 @@ class wolf extends irc {
 					$this->say($nick, $seer_see_self);
 				} else {
 					// parse this person
-					$person_roles = $this->getRolesNice($person, false, false, false);
+					$person_roles = $this->getRolesNice($person, false, false, false, true);
 
 					// Tell the seer who this guy is
 					$seer_see = $this->string('seer_see', $person, $person_roles);
