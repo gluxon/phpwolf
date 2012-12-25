@@ -1,14 +1,14 @@
 <?php
 // Times (in seconds)
-$setting["game_wait"]=60;
-$setting["game_add_wait"]=20;
-$setting["game_add_wait_limit"]=2;
-$limit["ping"]=60 * 5;
-$limit["stats"]=60 * 1/2;
-$length["night"]=60 * 2;
-$length["day"]=60 * 15;
+$wolf['game_wait']=60;
+$wolf['game_add_wait']=20;
+$wolf['game_add_wait_limit']=2;
+$wolf['wait_ping']=60 * 5;
+$wolf['wait_stats']=60 * 1/2;
+$wolf['length_night']=60 * 2;
+$wolf['length_day']=60 * 15;
 
-$roles = array(
+$wolf['roles'] = array(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // PLAYERS:           SEER    WOLF   CURSED   DRUNK  HARLOT  TRAITOR  GUNNER   CROW   ANGEL DETECTIVE //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23,16 +23,16 @@ $roles = array(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 );
 
-$shots_multiplier = .12; // ceil($shots_multiplier * count($players) )
+$wolf['shots_multiplier'] = .12; // ceil($shots_multiplier * count($players) )
 
 // Syntax: 1/7 = array(1,7)
 
 //                               HIT         MISS        SUICIDE
-$gun_shot =         array( array(5,7) , array(1,7) , array(1,7) );
-$gun_shot_drunk =   array( array(2,7) , array(4,7) , array(1,7) );
-$manslaughter =     array(1,5); // ACCIDENTAL HEADSHOT (FATAL)
+$wolf['gun_shot'] =         array( array(5,7) , array(1,7) , array(1,7) );
+$wolf['gun_shot_drunk'] =   array( array(2,7) , array(4,7) , array(1,7) );
+$wolf['manslaughter'] =     array(1,5); // ACCIDENTAL HEADSHOT (FATAL)
 
 // Not sure what this is -> GUNNER_KILLS_WOLF_AT_NIGHT_CHANCE = 0
-$guardian_angel_dies = array(1,2);
-$detective_revealed =  array(2,5);
+$wolf['guardian_angel_dies'] = array(1,2);
+$wolf['detective_revealed'] =  array(2,5);
 ?>
