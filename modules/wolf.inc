@@ -160,11 +160,18 @@ class wolf extends irc {
 	* @return boolean True or False answer
 	*/
 	public function isAdmin($host) {
-		global $user, $admins;
+		global $admins;
 
-		if (in_array($host, $admins)) {
-			return true;
+		foreach($admins as $admin) {
+			$admin = str_replace('.', '\\.', $admin);
+			$admin = str_replace('/', '\/', $admin);
+			$admin = str_replace('*', '.*', $admin);
+
+			if (preg_match("/" . $admin . "$/i", $host) == 1) {
+				return true;
+			}
 		}
+
 		return false;
 	}
 
