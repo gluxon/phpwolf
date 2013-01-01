@@ -1321,13 +1321,13 @@ class wolf extends irc {
 						$this->say($recipient, $gunner_shoot);
 
 						if ( in_array($person, $this->wolf) ) {
-							$gunner_shoot_wolf = $this->string('gunner_shoot_wolf', $nick, $person);
+							$gunner_shoot_wolf = $this->string('gunner_shoot_wolf', $person);
 							$this->say($recipient, $gunner_shoot_wolf);
 
 							$this->removePlayer($this->channel, $person);
 						} else {
 							if ($this->chance("manslaughter")) {
-								$gunner_shoot_manslaughter = $this->string('gunner_shoot_manslaughter', $nick, $person);
+								$gunner_shoot_manslaughter = $this->string('gunner_shoot_manslaughter', $person);
 								$this->say($recipient, $gunner_shoot_manslaughter);
 
 								$this->removePlayer($this->channel, $person);
