@@ -1173,6 +1173,16 @@ class wolf extends irc {
 			eval($message);
 		}
 
+		// !language
+		else if ( $this->isCommand($command, 'language') && $this->isAdmin($host) ) {
+			// Trim off everything after the first space
+			if (strpos($message, " ")) {
+				$message = substr($message, 0, strpos($message, " "));
+			}
+
+			$this->locale->setLanguage($language);
+		}
+
 		/***** Private Role Commands *****/
 		// !see
 		else if ( $this->isCommand($command, 'see', NO_OPERATOR) ) {
