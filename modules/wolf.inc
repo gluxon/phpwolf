@@ -1177,7 +1177,9 @@ class wolf extends irc {
 		else if ( $this->isCommand($command, 'language') && $this->isAdmin($host) ) {
 			// Trim off everything after the first space
 			if (strpos($message, " ")) {
-				$message = substr($message, 0, strpos($message, " "));
+				$language = substr($message, 0, strpos($message, " "));
+			} else {
+				$language = $message;
 			}
 
 			$this->locale->setLanguage($language);
