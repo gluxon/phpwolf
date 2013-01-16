@@ -47,6 +47,9 @@ $en_US["day_angel"]="<bold>%answer1%</bold> was attacked by the wolves last nigh
 $en_US["day_angel_dead"]="<bold>%answer1%</bold>, a <bold>guardian angel</bold> made the unfortunate mistake of guarding a wolf last night, attempted to escape, but failed and is now dead.";
 $en_US["day_vote"]="The villagers must now vote for whom to lynch. Use \"!lynch <nick>\" to cast your vote. %answer1% votes are required to lynch.";
 
+// Game phase turning
+$en_US["day_almost"]="<bold>A few villagers awake early and notice it is still dark outside. The night is almost over and there are still whispers heard in the village.</bold>";
+
 // Maintenance
 $en_US["idle_warn"]="%answer1%: <bold>You have been idling for a while. Please say something soon or you might be declared dead.</bold>";
 $en_US["idle_die"]="<bold>auror</bold> didn't get out of bed for a very long time. S/He is declared dead. Appears (s)he was a <bold>seer</bold>.";
@@ -113,6 +116,7 @@ $en_US["seer_see_day"]="You may only have visions at night.";
 $en_US["wolf_assign"]="You are a <bold>wolf</bold>. It is your job to kill all the villagers. Use \"kill <nick>\" to kill a villager.";
 $en_US["wolf_multiple"]="Also, if you PM me, your message will be relayed to other wolves.";
 $en_US["wolf_kill"]="You have selected <bold>%answer1%</bold> to be killed.";
+$en_US["wolf_kill_self"]="Suicide is bad. Don't do it.";
 $en_US["wolf_relay"]="<bold>%answer1%</bold> says: %answer2%";
 
 $en_US["drunk_assign"]="You have been drinking too much! You are the <bold>village drunk</bold>.";

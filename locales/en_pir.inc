@@ -113,6 +113,7 @@ $en_pir["seer_see_day"]="You may only see pirates at night.";
 $en_pir["wolf_assign"]="You are a <bold>rebel</bold>. It is your job to kill all the pirates. Use \"kill <nick>\" to kill a pirate.";
 $en_pir["wolf_multiple"]="Also, if you PM me, your message will be relayed to other rebels.";
 $en_pir["wolf_kill"]="You have selected <bold>%answer1%</bold> to be killed.";
+$en_pir["wolf_kill_self"]="There is much more beer to live for, matey! Don't throw yerself off the plank!";
 $en_pir["wolf_relay"]="<bold>%answer1%</bold> says: %answer2%";
 
 $en_pir["drunk_assign"]="You have been drinking too much! For a pirate, anyway. You are the <bold>drunk pirate</bold>.";
@@ -171,4 +172,3 @@ $en_pir["werecrow_not"]="Only a rebel spy may use this command.";
 
 $en_pir["players_list"]="Pirates: %answer1%";
 ?>
-
