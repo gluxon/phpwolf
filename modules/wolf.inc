@@ -1233,7 +1233,7 @@ class wolf extends irc {
 					$this->notice($nick, $not_playing);
 				} else {
 					// Check if the victim is a wolf
-					if ($nick == $victim) {
+					if ($nick == $person) {
 						$wolf_kill_self = $this->string('wolf_kill_self');
 						$this->say($nick, $wolf_kill_self);
 					} else if (in_array($nick, $this->wolf)) {
