@@ -1236,7 +1236,7 @@ class wolf extends irc {
 					if ($nick == $person) {
 						$wolf_kill_self = $this->string('wolf_kill_self');
 						$this->say($nick, $wolf_kill_self);
-					} else if (in_array($nick, $this->wolf)) {
+					} else if (in_array($person, $this->wolf)) {
 						$this->say($nick, "You can't kill a wolf!");
 					} else {
 						// This person has been selected for death.
