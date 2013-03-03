@@ -536,7 +536,7 @@ class wolf extends irc {
 		foreach($this->traitor as $traitor) {
 			if ($traitor != $sender) {
 				$wolf_relay = $this->string('wolf_relay', $sender, $message);
-				$this->say($wolf, $wolf_relay);
+				$this->say($traitor, $wolf_relay);
 			}
 		}
 	}
@@ -2192,7 +2192,7 @@ class wolf extends irc {
 
 					// Wolf relay for game
 					// If the game ongoing, recipient is phpwolf,          user is wolf or traitor,                         and there is more than one wolf
-					if ($this->ongoing && $recipient == $this->bot["nick"] && ( in_array($nick, $this->wolf) || in_array($nick, $this->traitor) ) && count($this->wolf) > 1) {
+					if ($this->ongoing && $recipient == $this->bot["nick"] && ( in_array($nick, $this->wolf) || in_array($nick, $this->traitor) ) && count($this->wolf) + count($this->traitor) > 1) {
 						$this->relayToWolves($nick, $message);
 					}
 
