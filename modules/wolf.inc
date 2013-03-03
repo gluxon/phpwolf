@@ -1116,7 +1116,7 @@ class wolf extends irc {
 			if ($this->ongoing) {
 				$this->endGame($this->channel);
 			} else {
-				foreach($this->players as $player) {
+				foreach(array_keys($this->players) as $player) {
 					$this->removePlayer($this->channel, $player);
 				}
 			}
