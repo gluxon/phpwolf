@@ -35,11 +35,11 @@ $en_US["game_welcome"]="%answer1%: Welcome to Werewolf, the popular detective/so
 // Night time
 $en_US["night_first"]="It is now nighttime. All players check for PMs from me for instructions. If you did not receive one, simply sit back, relax, and wait patiently for morning.";
 $en_US["night_turn"]="Day lasted <bold>%answer1%</bold>. It is now nighttime. All players check for PMs from me for instructions. If you did not receive one, simply sit back, relax, and wait patiently for morning.";
-$en_US["night_victim"]="The mob drags a protesting <bold>%answer1%</bold> to the hanging tree. S/He succumbs to the will of the horde, and is hanged. It is discovered (s)he was a <bold>%answer2%</bold>.";
+$en_US["night_victim"]="The mob drags a protesting <bold>%answer1%</bold> to the hanging tree. S/He succumbs to the will of the horde, and is hanged. It is discovered (s)he was a %answer2%.";
 
 // Day time turn
 $en_US["day_turn"]="Night lasted <bold>%answer1%</bold>. It is now daytime. The villagers awake, thankful for surviving the night, and search the village... ";
-$en_US["day_victim"]="The dead body of <bold>%answer1%</bold>, a <bold>%answer2%</bold>, is found. Those remaining mourn his/her death.";
+$en_US["day_victim"]="The dead body of <bold>%answer1%</bold>, a %answer2%, is found. Those remaining mourn his/her death.";
 $en_US["day_nokill"]="The body of a young penguin pet is found. All villagers, however, have survived.";
 $en_US["day_harlot"]="The wolves' selected victim was a harlot, but she wasn't home.";
 $en_US["day_harlot_dead"]="<bold>%answer1%</bold>, a <bold>harlot</bold>, made the unfortunate mistake of visiting a wolf's house last night and is now dead.";
@@ -48,7 +48,7 @@ $en_US["day_angel_dead"]="<bold>%answer1%</bold>, a <bold>guardian angel</bold> 
 $en_US["day_vote"]="The villagers must now vote for whom to lynch. Use \"!lynch <nick>\" to cast your vote. %answer1% votes are required to lynch.";
 
 // Game phase turning
-$en_US["day_almost"]="<bold>A few villagers awake early and notice it is still dark outside. The night is almost over and there are still whispers heard in the village.</bold>";
+$en_US["day_warn"]="<bold>A few villagers awake early and notice it is still dark outside. The night is almost over and there are still whispers heard in the village.</bold>";
 
 // Maintenance
 $en_US["idle_warn"]="%answer1%: <bold>You have been idling for a while. Please say something soon or you might be declared dead.</bold>";
@@ -107,7 +107,7 @@ $en_US["end_roles_plural"]="The %answer1% were <bold>%answer2%</bold>.";
 
 // Directions
 $en_US["seer_assign"]="You are a <bold>seer</bold>. It is your job to detect the wolves, you may have a vision once per night. Use \"see <nick>\" to see the role of a player.";
-$en_US["seer_see"]="You have a vision; in this vision, you see that <bold>%answer1%</bold> is a <bold>%answer2%</bold>!";
+$en_US["seer_see"]="You have a vision; in this vision, you see that <bold>%answer1%</bold> is a %answer2%!";
 $en_US["seer_see_not"]="Only a seer may use this command";
 $en_US["seer_seen"]="You may only have one vision per round.";
 $en_US["seer_see_self"]="You can't see yourself without a mirror. You don't have a mirror.";
@@ -142,7 +142,7 @@ $en_US["gunner_shoot_not"]="You don't have a gun.";
 $en_US["gunner_shoot_self"]="You are holding it the wrong way.";
 $en_US["gunner_nobullets"]="You don't have any more bullets.";
 $en_US["gunner_shoot_manslaughter"]="<bold>%answer1%</bold> is a not a wolf but was accidentally fatally injured.";
-$en_US["gunner_reveal"]="Appears (s)he was a <bold>%answer1%</bold>";
+$en_US["gunner_reveal"]="Appears (s)he was a %answer1%.";
 $en_US["gunner_miss"]="<bold>%answer1%</bold> is a lousy shooter. S/He missed!";
 $en_US["gunner_suicide"]="<bold>%answer1%</bold> should clean his/her weapons more often. The gun exploded and killed him/her!";
 $en_US["gunner_night"]="Shooting is only allowed during the day. Please wait patiently for morning.";
