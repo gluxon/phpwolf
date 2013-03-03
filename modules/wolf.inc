@@ -1402,6 +1402,13 @@ class wolf extends irc {
 								$gunner_shoot_manslaughter = $this->string('gunner_shoot_manslaughter', $person);
 								$this->say($recipient, $gunner_shoot_manslaughter);
 
+								$roles = $this->getRolesNice(array(
+									'nick' => $person,
+									'show_traitor' => true
+								));
+								$gunner_reveal = $this->string('gunner_reveal', $person, $roles);
+								$this->say($recipient, $gunner_reveal);
+
 								$this->removePlayer($this->channel, $person);
 							} else {
 								$gunner_shoot_villager = $this->string('gunner_shoot_villager', $person);
@@ -2062,105 +2069,105 @@ class wolf extends irc {
 	 */
 	public function runMaintenance() {
 
-		if ($this->ongoing) {
-
-			// Check if game has finished
-			if (count($this->wolf) == 0 && count($this->traitor) == 0 ) {
-				// All evildoers are dead
-				$this->endGame($this->channel, 1);
-			} else if (count($this->wolf) == 0 && count($this->traitor) > 0) {
-				// No more wolves, traitor transforms
-				$traitor_transform = $this->string('traitor_transform');
-				$this->say($this->channel, $traitor_transform);
-
-				// Transform traitor and tell them
-				$lucky_traitor = reset($this->traitor);
-				array_push($this->wolf, $lucky_traitor);
-				$traitor_notify = $this->string('traitor_notify');
-				$this->say($lucky_traitor, $traitor_notify);
-				unset($this->traitor[key($this->traitor)]);
-			} else if (count($this->players) / 2 <= count($this->wolf) + count($this->traitor) ) {
-				// Wolves equal villagers
-				$this->endGame($this->channel, 2);
-			}
-
-			if ($this->isNight) {
-				// Has the time limit run out yet?
-				$lasted_time = time() - $this->current_night_start;
-				// If the time limit has run out
-				if ($lasted_time >= $this->setting["length_night"]) {
-					$first_kill = reset($this->wolf_killed);
-					if ( !empty($first_kill) ) {
-						$this->turnDay($lasted_time, $first_kill);
-					} else {
-						$this->turnDay($lasted_time);
-					}
-				} else {
-
-					$i_role = 0;
-					$i_condition = 0;
-					foreach($this->role_names as $role) {
-						if (count($this->$role) > 0) {
-							if ($role == 'seer') {
-								if (count($this->seer_seen) == count($this->seer)) {
-									$i_condition++;
-								}
-							} else if ($role == 'wolf') {
-								if (count($this->wolf_killed) == count($this->wolf)) {
-									$i_condition++;
-								}
-							} else if ($role == 'harlot') {
-								if (count($this->harlot_visited) == count($this->harlot)) {
-									$i_condition++;
-								}
-							} else if ($role == 'angel') {
-								if (count($this->angel_guarded) == count($this->angel)) {
-									$i_condition++;
-								}
-							}
-
-							if ($role != 'drunk' && $role != 'cursed' && $role != 'traitor' && $role != 'gunner' && $role != 'detective') {
-								$i_role++;
-							}
-						}
-					}
-					if ($i_role == $i_condition) {
-						$this->turnDay( $lasted_time, reset($this->wolf_killed) );
-					}
-				}
-
-			} else if ($this->isDay) {
-				// Has the time limit run out yet?
-				$lasted_time = time() - $this->current_day_start;
-				// If the time limit has run out
-				if ($lasted_time >= $this->setting["length_day"]) {
-					$this->turnNight($lasted_time);
-				} else {
-
-					foreach($this->lynch as $lyncher => $lynchee) {
-						if (isset($$lynchee)) {
-							$$lynchee = $$lynchee +1;
-						} else {
-							$$lynchee = 1;
-						}
-					}
-
-					// Lynch message, and how many required to kill a victim.
-					$amount = floor(count($this->players) / 2) + 1 - count($this->gunner_shot);
-					foreach(array_keys($this->players) as $player) {
-						if ( isset($$player) && $$player >= $amount) {
-							$lasted_time = time() - $this->current_day_start;
-							$this->turnNight($lasted_time, $player);
-						}
-					}
-
-				}
-			}
-
-			// This function is being repeated called, sleep for a hundreth of a second
-			usleep(10000);
-
+		if (!$this->ongoing) {
+			return false;
 		}
+
+		// Check if game has finished
+		if (count($this->wolf) == 0 && count($this->traitor) == 0 ) {
+			// All evildoers are dead
+			$this->endGame($this->channel, 1);
+		} else if (count($this->wolf) == 0 && count($this->traitor) > 0) {
+			// No more wolves, traitor transforms
+			$traitor_transform = $this->string('traitor_transform');
+			$this->say($this->channel, $traitor_transform);
+
+			// Transform traitor and tell them
+			$lucky_traitor = reset($this->traitor);
+			array_push($this->wolf, $lucky_traitor);
+			$traitor_notify = $this->string('traitor_notify');
+			$this->say($lucky_traitor, $traitor_notify);
+			unset($this->traitor[key($this->traitor)]);
+		} else if (count($this->players) / 2 <= count($this->wolf) + count($this->traitor) ) {
+			// Wolves equal villagers
+			$this->endGame($this->channel, 2);
+		}
+
+		if ($this->isNight) {
+			// Has the time limit run out yet?
+			$lasted_time = time() - $this->current_night_start;
+			// If the time limit has run out
+			if ($lasted_time >= $this->setting["length_night"]) {
+				$first_kill = reset($this->wolf_killed);
+				if ( !empty($first_kill) ) {
+					$this->turnDay($lasted_time, $first_kill);
+				} else {
+					$this->turnDay($lasted_time);
+				}
+			} else {
+
+				$i_role = 0;
+				$i_condition = 0;
+				foreach($this->role_names as $role) {
+					if (count($this->$role) > 0) {
+						if ($role == 'seer') {
+							if (count($this->seer_seen) == count($this->seer)) {
+								$i_condition++;
+							}
+						} else if ($role == 'wolf') {
+							if (count($this->wolf_killed) == count($this->wolf)) {
+								$i_condition++;
+							}
+						} else if ($role == 'harlot') {
+							if (count($this->harlot_visited) == count($this->harlot)) {
+								$i_condition++;
+							}
+						} else if ($role == 'angel') {
+							if (count($this->angel_guarded) == count($this->angel)) {
+								$i_condition++;
+							}
+						}
+
+						if ($role != 'drunk' && $role != 'cursed' && $role != 'traitor' && $role != 'gunner' && $role != 'detective') {
+							$i_role++;
+						}
+					}
+				}
+				if ($i_role == $i_condition) {
+					$this->turnDay( $lasted_time, reset($this->wolf_killed) );
+				}
+			}
+
+		} else if ($this->isDay) {
+			// Has the time limit run out yet?
+			$lasted_time = time() - $this->current_day_start;
+			// If the time limit has run out
+			if ($lasted_time >= $this->setting["length_day"]) {
+				$this->turnNight($lasted_time);
+			} else {
+
+				foreach($this->lynch as $lyncher => $lynchee) {
+					if (isset($$lynchee)) {
+						$$lynchee = $$lynchee +1;
+					} else {
+						$$lynchee = 1;
+					}
+				}
+
+				// Lynch message, and how many required to kill a victim.
+				$amount = floor(count($this->players) / 2) + 1 - count($this->gunner_shot);
+				foreach(array_keys($this->players) as $player) {
+					if ( isset($$player) && $$player >= $amount) {
+						$lasted_time = time() - $this->current_day_start;
+						$this->turnNight($lasted_time, $player);
+					}
+				}
+
+			}
+		}
+
+		// This function is being repeated called, sleep for a hundreth of a second
+		sleep(1/100);
 
 	}
 
