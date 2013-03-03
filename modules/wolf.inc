@@ -264,7 +264,7 @@ class wolf extends irc {
 
 		$bold_roles = (empty($options["bold_roles"])) ? true : $options["bold_roles"];
 		$show_cursed = (empty($options["show_cursed"])) ? false : $options["show_cursed"];
-		$cursed_wolf = (empty($options["cursed_villager"])) ? true : $options["cursed_villager"];
+		$cursed_wolf = (empty($options["cursed_wolf"])) ? false : $options["cursed_wolf"];
 		$show_gunner = (empty($options["show_gunner"])) ? false : $options["show_gunner"];
 		$show_traitor = (empty($options["show_traitor"])) ? false : $options["show_traitor"];
 
@@ -607,7 +607,9 @@ class wolf extends irc {
 			} else {
 				// Send quit message
 				if ($this->ongoing) {
-					$answer = $this->getRolesNice($nick, false, false, false);
+					$answer = $this->getRolesNice(array(
+						'nick' => $nick
+					));
 				} else {
 					$answer = "person";
 				}
@@ -1254,7 +1256,10 @@ class wolf extends irc {
 					$this->say($nick, $seer_see_self);
 				} else {
 					// parse this person
-					$person_roles = $this->getRolesNice($person, false, false, false, true);
+					$person_roles = $this->getRolesNice(array(
+						'nick' => $person,
+						'cursed_wolf' => true
+					));
 
 					// Tell the seer who this guy is
 					$seer_see = $this->string('seer_see', $person, $person_roles);
@@ -1488,7 +1493,12 @@ class wolf extends irc {
 				} else {
 					array_push($this->detective_ided, $nick);
 
-					$roles = $this->getRolesNice($person, true, true, true);
+					$roles = $this->getRolesNice(array(
+						'nick' => $person,
+						'show_cursed' => true,
+						'show_gunner' => true,
+						'show_traitor' => true
+					));
 
 					$detective_id=$this->string('detective_id', $person, $roles);
 					$this->say($nick, $detective_id);
@@ -1516,7 +1526,11 @@ class wolf extends irc {
 				$not_playing = $this->string('not_playing', $person);
 				$this->notice($nick, $not_playing);
 			} else {
-				$this->say($nick, "You currently hold the role(s): " . $this->getRolesNice($nick, true, false, true) );
+				$roles = $this->getRolesNice(array(
+					'nick' => $nick,
+					'show_gunner' => true
+				));
+				$this->say($nick, "You currently hold the role(s): " . $roles );
 			}
 		}
 
@@ -1789,7 +1803,9 @@ class wolf extends irc {
 			$this->say($this->channel, $day_angel);
 
 		} else {
-			$dead_guy_roles = $this->getRolesNice($victim, false, false, false);
+			$dead_guy_roles = $this->getRolesNice(array(
+				'nick' => $victim,
+			));
 
 			$day_victim = $this->string('day_victim', $victim, $dead_guy_roles);
 			$this->say($this->channel, $day_victim);
@@ -1883,7 +1899,9 @@ class wolf extends irc {
 			/*$night_nokill = $this->string('night_nokill');
 			$this->say($this->channel, $night_nokill);*/
 		} else {
-			$dead_guy_roles = $this->getRolesNice($victim, false, false, false);
+			$dead_guy_roles = $this->getRolesNice(array(
+				'nick' => $victim
+			));
 
 			$night_victim = $this->string('night_victim', $victim, $dead_guy_roles);
 			$this->say($this->channel, $night_victim);
