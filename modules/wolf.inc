@@ -609,6 +609,7 @@ class wolf extends irc {
 				if ($this->ongoing) {
 					$answer = $this->getRolesNice(array(
 						'nick' => $nick
+						'show_traitor' => true
 					));
 				} else {
 					$answer = "person";
@@ -1532,7 +1533,8 @@ class wolf extends irc {
 			} else {
 				$roles = $this->getRolesNice(array(
 					'nick' => $nick,
-					'show_gunner' => true
+					'show_gunner' => true,
+					'show_traitor' => true
 				));
 				$this->say($nick, "You currently hold the role(s): " . $roles );
 			}
@@ -1809,6 +1811,7 @@ class wolf extends irc {
 		} else {
 			$dead_guy_roles = $this->getRolesNice(array(
 				'nick' => $victim,
+				'show_traitor' => true
 			));
 
 			$day_victim = $this->string('day_victim', $victim, $dead_guy_roles);
@@ -1905,6 +1908,7 @@ class wolf extends irc {
 		} else {
 			$dead_guy_roles = $this->getRolesNice(array(
 				'nick' => $victim
+				'show_traitor' => true
 			));
 
 			$night_victim = $this->string('night_victim', $victim, $dead_guy_roles);
