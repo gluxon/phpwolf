@@ -8,6 +8,9 @@ $wolf['wait_stats']=60 * 1/2;
 $wolf['length_night']=60 * 2;
 $wolf['length_day']=60 * 15;
 
+$wolf['min_players'] = 4;
+$wolf['max_players'] = 30;
+
 $wolf['roles'] = array(
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // PLAYERS:           SEER    WOLF   CURSED   DRUNK  HARLOT  TRAITOR  GUNNER   CROW   ANGEL DETECTIVE //

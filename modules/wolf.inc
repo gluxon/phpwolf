@@ -753,7 +753,7 @@ class wolf extends irc {
 			}
 
 			// There are not a sufficient amount of players
-			else if ($count < 4) {
+			else if ($count < $this->setting['min_players']) {
 				$game_required = $this->string('game_required', $nick);
 				$this->say($recipient, $game_required);
 			}
