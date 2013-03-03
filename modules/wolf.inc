@@ -271,7 +271,7 @@ class wolf extends irc {
 		$roles = $this->getRoles($nick);
 
 		if ($roles == false) {
-			if ($options['bold_roles'])
+			if ($bold_roles)
 				return chr(2) . $this->string('villager') . chr(2);
 			else
 				return $this->string('villager');
@@ -284,7 +284,7 @@ class wolf extends irc {
 		}
 
 		// Replace cursed with wolf
-		if ($options['cursed_wolf']) {
+		if ($cursed_wolf) {
 			$search = array_search('cursed', $roles);
 			if ($search !== false) {
 				$roles[$search] = 'wolf';
@@ -292,7 +292,7 @@ class wolf extends irc {
 		}
 
 		// Remove cursed from roles unless specified
-		if (!$options['show_cursed']) {
+		if (!$show_cursed) {
 			$search = array_search('cursed', $roles);
 			if ($search !== false) {
 				unset($roles[$search]);
@@ -300,7 +300,7 @@ class wolf extends irc {
 		}
 
 		// Remove gunner from roles unless specified
-		if (!$options['show_gunner']) {
+		if (!$show_gunner) {
 			$search = array_search('gunner', $roles);
 			if ($search !== false) {
 				unset($roles[array_search('gunner', $roles)]);
@@ -308,7 +308,7 @@ class wolf extends irc {
 		}
 
 		// Remove gunner from roles unless specified
-		if (!$options['show_traitor']) {
+		if (!$show_traitor) {
 			$search = array_search('traitor', $roles);
 			if ($search !== false) {
 				unset($roles[array_search('traitor', $roles)]);
@@ -319,7 +319,7 @@ class wolf extends irc {
 		$roles = array_unique($roles);
 
 		if (count($roles) == 0) {
-			if ($options['bold_roles'])
+			if ($bold_roles)
 				return chr(2) . $this->string('villager') . chr(2);
 			else
 				return $this->string('villager');
@@ -338,7 +338,7 @@ class wolf extends irc {
 
 			$counter++;
 
-			if ($options['bold_roles'])
+			if ($bold_roles)
 				$list .= chr(2) . $this->string($role) . chr(2);
 			else
 				$list .= $this->string($role);
