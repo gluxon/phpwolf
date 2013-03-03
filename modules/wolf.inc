@@ -858,7 +858,7 @@ class wolf extends irc {
 				$not_playing = $this->string('not_playing', $this->nickAutocomplete($message));
 				$this->say($recipient, $not_playing);
 			} else if ($this->isNight) {
-				$this->say($nick, "Error, it is not day time");
+				$this->say($nick, "Sshh... the goats are sleeping.");
 			} else if ($this->goat_switch == false) {
 				$this->say($recipient, "That can only be done once per day.");
 			} else {
