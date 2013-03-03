@@ -1234,7 +1234,10 @@ class wolf extends irc {
 
 		// !execute
 		else if ( $this->isCommand($command, 'execute') && $this->isAdmin($host) ) {
-			eval($message);
+			$error = eval($message);
+			if ($error === false) {
+				$this->say($recipient, "An error occured in the eval'd code.");
+			}
 		}
 
 		// !language
