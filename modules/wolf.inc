@@ -1406,7 +1406,7 @@ class wolf extends irc {
 									'nick' => $person,
 									'show_traitor' => true
 								));
-								$gunner_reveal = $this->string('gunner_reveal', $person, $roles);
+								$gunner_reveal = $this->string('gunner_reveal', $roles);
 								$this->say($recipient, $gunner_reveal);
 
 								$this->removePlayer($this->channel, $person);
