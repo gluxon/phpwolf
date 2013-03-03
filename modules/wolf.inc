@@ -86,6 +86,7 @@ class wolf extends irc {
 
 		$this->isDay = null; $this->isNight = null;
 		$this->day_time = 0; $this->night_time = 0;
+		$this->gaveDayWarning = false; $this->gaveNightWarning = false;
 
 		$this->goat_switch = true;
 
@@ -1928,6 +1929,7 @@ class wolf extends irc {
 			// Set booleans for.... THE SUN
 			$this->isDay = true;
 			$this->isNight = false;
+			$this->gaveDayWarning = false;
 
 			$this->current_night_start = false;
 			$this->current_day_start = time();
@@ -1995,6 +1997,7 @@ class wolf extends irc {
 			// Set booleans for.... THE SUN
 			$this->isDay = false;
 			$this->isNight = true;
+			$this->gaveDayWarning = false;
 
 			$this->current_day_start = null;
 			$this->current_night_start = time();
@@ -2138,9 +2141,10 @@ class wolf extends irc {
 			$lasted_time = time() - $this->current_night_start;
 
 			// Run a warning that day is approaching
-			if ($lasted_time == $this->setting['day_warn']) {
+			if (!$this->gaveDayWarning && $lasted_time >= $this->setting['day_warn']) {
 				$day_warn = $this->string('day_warn');
 				$this->say($this->channel, $day_warn);
+				$this->gaveDayWarning = true;
 			}
 
 			// If the time limit has run out
@@ -2190,9 +2194,10 @@ class wolf extends irc {
 			$lasted_time = time() - $this->current_day_start;
 
 			// Run a warning that night is approaching
-			if ($lasted_time == $this->setting['night_warn']) {
+			if ($this->gaveNightWarning && $lasted_time >= $this->setting['night_warn']) {
 				$night_warn = $this->string('night_warn');
 				$this->say($this->channel, $night_warn);
+				$this->gaveNightWarning = true;
 			}
 
 			// If the time limit has run out
