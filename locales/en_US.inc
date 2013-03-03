@@ -48,8 +48,8 @@ $en_US["day_angel_dead"]="<bold>%answer1%</bold>, a <bold>guardian angel</bold> 
 $en_US["day_vote"]="The villagers must now vote for whom to lynch. Use \"!lynch <nick>\" to cast your vote. %answer1% votes are required to lynch.";
 
 // Game phase turning
-$en_US["day_warn"]="<bold>A few villagers awake early and notice it is still dark outside. The night is almost over and there are still whispers heard in the village.</bold>";
-$en_US["night_warn"]="As the sun sinks inexorably toward the horizon, turning the lanky pine trees into fire-edged silhouettes, the villagers are reminded that very little time remains for them to reach a decision; if darkness falls before they have done so, the majority will win the vote. No one will be lynched if there are no votes or an even split.";
+$en_US["night_warn"]="<bold>A few villagers awake early and notice it is still dark outside. The night is almost over and there are still whispers heard in the village.</bold>";
+$en_US["day_warn"]="As the sun sinks inexorably toward the horizon, turning the lanky pine trees into fire-edged silhouettes, the villagers are reminded that very little time remains for them to reach a decision; if darkness falls before they have done so, the majority will win the vote. No one will be lynched if there are no votes or an even split.";
 
 // Maintenance
 $en_US["idle_warn"]="%answer1%: <bold>You have been idling for a while. Please say something soon or you might be declared dead.</bold>";
