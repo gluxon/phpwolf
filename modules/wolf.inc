@@ -325,18 +325,21 @@ class wolf extends irc {
 				return $this->string('villager');
 		}
 
+		$amount = count($roles);
 		$list = '';
-		$counter = 1;
+		$i = 1;
 		foreach($roles as $role) {
 
-			if (count($roles) != 1) {
-				if ($counter == count($roles))
-					$list .= ', and ';
-				else if ($counter >= 2)
+			if ($amount >= 1 && $i != 1) {
+				if ($amount > 2)
 					$list .= ', ';
+				else if ($amount == 2)
+					$list .= ' ';
+				if ($i == $amount)
+					$list .= 'and ';
 			}
 
-			$counter++;
+			$i++;
 
 			if ($bold_roles)
 				$list .= chr(2) . $this->string($role) . chr(2);
