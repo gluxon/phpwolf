@@ -1642,8 +1642,12 @@ class wolf extends irc {
 					if ( in_array($players_sorted[$player_index], $this->cursed) && $role_name != 'traitor' ) {
 						continue;
 					}
-					// If the person is already harlot, angel, or detective, do not give them another role
-					if ( in_array($players_sorted[$player_index], $this->harlot) || in_array($players_sorted[$player_index], $this->angel) || in_array($players_sorted[$player_index], $this->detective) ) {
+					// If the person is already harlot, traitor, angel, or detective, do not give them another role
+					if ( in_array($players_sorted[$player_index], $this->harlot) ||
+						 in_array($players_sorted[$player_index], $this->angel) ||
+						 in_array($players_sorted[$player_index], $this->traitor) ||
+						 in_array($players_sorted[$player_index], $this->detective) )
+					{
 						continue;
 					}
 					// If the person is a wolf, they can't have anything else
