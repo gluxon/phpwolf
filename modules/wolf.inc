@@ -2136,6 +2136,13 @@ class wolf extends irc {
 		if ($this->isNight) {
 			// Has the time limit run out yet?
 			$lasted_time = time() - $this->current_night_start;
+
+			// Run a warning that day is approaching
+			if ($lasted_time == $this->setting['day_warn']) {
+				$day_warn = $this->string('day_warn');
+				$this->say($this->channel, $day_warn);
+			}
+
 			// If the time limit has run out
 			if ($lasted_time >= $this->setting["length_night"]) {
 				$first_kill = reset($this->wolf_killed);
@@ -2181,6 +2188,13 @@ class wolf extends irc {
 		} else if ($this->isDay) {
 			// Has the time limit run out yet?
 			$lasted_time = time() - $this->current_day_start;
+
+			// Run a warning that night is approaching
+			if ($lasted_time == $this->setting['night_warn']) {
+				$night_warn = $this->string('night_warn');
+				$this->say($this->channel, $night_warn);
+			}
+
 			// If the time limit has run out
 			if ($lasted_time >= $this->setting["length_day"]) {
 				$this->turnNight($lasted_time);
