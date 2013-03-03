@@ -1,6 +1,5 @@
 <?php
 define('NO_OPERATOR', true);
-define('AWAY_LIST', 'away_list');
 
 class wolf extends irc {
 
@@ -11,13 +10,19 @@ class wolf extends irc {
 	private $random, $locale;
 	protected $TokenBucket;
 
+	// Options passed
+	private $bot;
+	private $irc;
+	private $channel;
+	private $admins;
+	private $lang;
+
 	// List of players
 	private $players;
 	private $lynch, $away;
 
 	// In-game stores
 	private $people; // Full list of people in the channel
-	private $channel; // Current game wolf is playing in
 	private $ongoing; // Is the game still going?
 
 	// Counters and timeouts
@@ -32,26 +37,40 @@ class wolf extends irc {
 	private $goat_switch;
 
 	// Role variables
-	private $seer, $wolf, $cursed, $drunk, $harlot, $traitor, $gunner, $crow, $angel, $detective; // Store who has what role
+	private $seer, $wolf, $cursed, $drunk, $harlot, $traitor,
+		$gunner, $crow, $angel, $detective;
 
 	// Seen, visited, killed variables (per night/day)
-	private $seer_seen, $wolf_killed, $harlot_visited, $gunner_shot, $gunner_bullets, $angel_guarded, $detective_ided;
+	private $seer_seen, $wolf_killed, $harlot_visited, $gunner_shot,
+		$gunner_bullets, $angel_guarded, $detective_ided;
 
 	private $roles_set; // roles available corresponding to amount of players
 	private $roles_message; // Pre-generated and store end roles message
 
 	// Convenience array for looping
-	public $role_names = array("wolf", "seer", "cursed", "drunk", "harlot", "traitor", "gunner", "crow", "angel", "detective");
+	public $role_names = array("wolf", "seer", "cursed", "drunk", "harlot",
+		"traitor", "gunner", "crow", "angel", "detective");
 
 	/**
 	 * Constructor for werewolf, initialize variables with default values
 	 */
-	public function __construct() {
+	public function __construct($options) {
+		if ( empty($options) || !is_array($options) ) {
+			throw new Exception('Invalid arguments');
+		}
+
+		$this->bot = $options['bot'];
+		$this->irc = $options['irc'];
+		$this->channel = $options['channel'];
+		$this->admins = $options['admins'];
+		$this->lang = $options['lang'];
+		$this->settings_path = $options['settings_path'];
+		$this->locale_path = $options['locale_path'];
+		unset($options);
 
 		// The language handler.
-		global $lang;
 		$this->locale = new locale(LOCALES_PATH, '.inc');
-		$this->locale->setLanguage($lang);
+		$this->locale->setLanguage($this->lang);
 
 		// TokenBucket - Inherited IRC Class doesn't run through constructor since we overrided it here
 		$this->TokenBucket = new TokenBucket(23, 1.73);
@@ -92,11 +111,13 @@ class wolf extends irc {
 		$this->detective_ided = array();
 
 		// Import werewolf settings
-		include(SETTINGS_PATH . '/werewolf.inc');
+		include($this->settings_path . '/werewolf.inc');
 		$this->setting = $wolf;
 
-		if (file_exists(AWAY_LIST)) {
-			$this->away = explode(',', file_get_contents(AWAY_LIST) );
+		$this->away_file = $this->settings_path . '/werewolf/' . 'away_list';
+
+		if (file_exists($this->away_file)) {
+			$this->away = explode(',', file_get_contents($this->away_file) );
 		}
 	}
 
@@ -104,10 +125,6 @@ class wolf extends irc {
 	 * Alias call for locale->getSubbedString()
 	 * 
 	 * @param mixed $string Locale string
-	 * @param mixed $sub1 Answer 1
-	 * @param mixed $sub2 Answer 2
-	 * @param mixed $sub3 Answer 3
-	 * @param mixed $sub4 Answer 4
 	 * @return string String with bolded words and correct answer values
 	 */
 	public function string($string, $sub1=null, $sub2=null, $sub3=null, $sub4=null) {
@@ -160,9 +177,8 @@ class wolf extends irc {
 	* @return boolean True or False answer
 	*/
 	public function isAdmin($host) {
-		global $admins;
 
-		foreach($admins as $admin) {
+		foreach($this->admins as $admin) {
 			$admin = str_replace('.', '\\.', $admin);
 			$admin = str_replace('/', '\/', $admin);
 			$admin = str_replace('*', '.*', $admin);
@@ -234,67 +250,101 @@ class wolf extends irc {
 			return false;
 		}
 	}
+ 
+	public function getRolesNice($options) {
+		if ( empty($options) || !is_array($options) ) {
+			throw new Exception('Invalid arguments');
+		}
 
-	/**
-	 * Get all the roles a player has and return it as a nice string
-	 *
-	 * @param mixed $nick Nickname of player
-	 * @param boolean $bold_roles Bold roles if true
-	 * @param boolean $show_cursed Show the cursed as a villager
-	 * @param boolean $show_gunner Show the gunner as a villager
-	 * @param boolean $cursed_as_wolf Show the cursed as a wolf
-	 * @return string A string containing a list of roles in sensible English.
-	 */
-	public function getRolesNice($nick, $bold_roles, $show_cursed=false, $show_gunner=false, $cursed_as_wolf = false) {
+		if (empty($options["nick"])) {
+			throw new Exeption('No nick specified');
+		} else {
+			$nick = $options["nick"];
+		}
+
+		$bold_roles = (empty($options["bold_roles"])) ? true : $options["bold_roles"];
+		$show_cursed = (empty($options["show_cursed"])) ? false : $options["show_cursed"];
+		$cursed_wolf = (empty($options["cursed_villager"])) ? true : $options["cursed_villager"];
+		$show_gunner = (empty($options["show_gunner"])) ? false : $options["show_gunner"];
+		$show_traitor = (empty($options["show_traitor"])) ? false : $options["show_traitor"];
 
 		$roles = $this->getRoles($nick);
 
-		if ($roles === false) {
-			$role_list = chr(2) .  $this->string('villager') . chr(2);
-		} else {
+		if ($roles == false) {
+			if ($options['bold_roles'])
+				return chr(2) . $this->string('villager') . chr(2);
+			else
+				return $this->string('villager');
+		}
 
-			$role_amount = count($roles);
-			if (in_array('cursed', $roles) && !$show_cursed)
-				$role_amount--;
-			if (in_array('gunner', $roles) && !$show_gunner)
-				$role_amount--;
+		// Remove villager if in list, unneeded.
+		$search = array_search('villager', $roles);
+		if ($search !== false) {
+			unset($roles[$search]);
+		}
 
-			$role_list = "";
-			foreach($roles as $key => $role) {
+		// Replace cursed with wolf
+		if ($options['cursed_wolf']) {
+			$search = array_search('cursed', $roles);
+			if ($search !== false) {
+				$roles[$search] = 'wolf';
+			}
+		}
 
-				// Append "and" before the end of the list
-				if ( $key + 1 == $role_amount && $role_amount > 1 ) {
-					// Remove a space and comma if there is only two items
-					if ($role_amount == 2) {
-						$role_list = substr($role_list, 0, -2) . " ";
-					}
-					$role_list .= 'and ';
-				}
+		// Remove cursed from roles unless specified
+		if (!$options['show_cursed']) {
+			$search = array_search('cursed', $roles);
+			if ($search !== false) {
+				unset($roles[$search]);
+			}
+		}
 
-				if ( ($role=='cursed' && !$show_cursed) || ($role=='gunner' && !$show_gunner) ) {
-					if ($role=='cursed' && $cursed_as_wolf) {
-						$role_list .= chr(2) . $this->string('wolf') . chr(2);
-					} else if ( $role_amount <= 0 && empty($role_list) ) {
-						$role_list .= chr(2) . $this->string('villager') . chr(2);
-					}
-				} else {
-					$role_list .= chr(2) . $this->string($role) . chr(2);
-				}
+		// Remove gunner from roles unless specified
+		if (!$options['show_gunner']) {
+			$search = array_search('gunner', $roles);
+			if ($search !== false) {
+				unset($roles[array_search('gunner', $roles)]);
+			}
+		}
 
-				if ( $key + 1 < $role_amount ) {
-					$role_list .= ', ';
-				}
+		// Remove gunner from roles unless specified
+		if (!$options['show_traitor']) {
+			$search = array_search('traitor', $roles);
+			if ($search !== false) {
+				unset($roles[array_search('traitor', $roles)]);
+			}
+		}
 
+		// Remove duplicated values potentially created from above
+		$roles = array_unique($roles);
+
+		if (count($roles) == 0) {
+			if ($options['bold_roles'])
+				return chr(2) . $this->string('villager') . chr(2);
+			else
+				return $this->string('villager');
+		}
+
+		$list = '';
+		$counter = 1;
+		foreach($roles as $role) {
+
+			if (count($roles) != 1) {
+				if ($counter == count($roles))
+					$list .= ', and ';
+				else if ($counter >= 2)
+					$list .= ', ';
 			}
 
+			$counter++;
+
+			if ($options['bold_roles'])
+				$list .= chr(2) . $this->string($role) . chr(2);
+			else
+				$list .= $this->string($role);
 		}
 
-		if ($bold_roles) {
-			return $role_list;
-		} else {
-			return str_replace(chr(2), '', $role_list);
-		}
-
+		return $list;
 	}
 
 	/**
@@ -500,7 +550,6 @@ class wolf extends irc {
 	 * @param mixed $host Host of sender
 	 */
 	public function commands($recipient, $message, $nick, $host) {
-		global $user;
 
 		// Remove double, extraneous whitespaces
 		$message = preg_replace("/\s+/", " ", $message);
@@ -543,7 +592,7 @@ class wolf extends irc {
 				$back = $this->string('back');
 				$this->notice($nick, $back);
 
-				file_put_contents(AWAY_LIST, implode(',', $this->away) );
+				file_put_contents($this->away_file, implode(',', $this->away) );
 			} else {
 				$not_away = $this->string('not_away');
 				$this->notice($nick, $not_away);
@@ -572,7 +621,7 @@ class wolf extends irc {
 
 		// !stats
 		else if ( $this->isCommand($command, 'stats') ) {
-			if ($recipient == $user["nick"]) {
+			if ($recipient == $this->bot["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if (time() - $this->last_stats < $this->setting["wait_stats"]) {
 				$ratelimit = $this->string('ratelimit');
@@ -655,12 +704,12 @@ class wolf extends irc {
 				$this->notice($nick, $away);
 			}
 
-			file_put_contents(AWAY_LIST, implode(',', $this->away) );
+			file_put_contents($this->away_file, implode(',', $this->away) );
 		}
 
 		// !ping
 		else if ( $this->isCommand($command, 'ping') ) {
-			if ($recipient == $user["nick"]) {
+			if ($recipient == $this->bot["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if ($this->ongoing) {
 				$start_ongoing = $this->string('start_ongoing');
@@ -773,8 +822,7 @@ class wolf extends irc {
 				$this->roles_message = substr($this->roles_message, 0, -1); // remove trailing space
 
 				// We do not want socket blocking for werewolf now
-				global $irc;
-				$irc->setBlocking(false);
+				$this->irc->setBlocking(false);
 
 			}
 
@@ -782,7 +830,7 @@ class wolf extends irc {
 
 		// !retract
 		else if ( $this->isCommand($command, 'retract') ) {
-			if ($recipient == $user["nick"]) {
+			if ($recipient == $this->bot["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if ($this->ongoing == false) {
 				$start_ongoing = $this->string('start_ongoing');
@@ -819,7 +867,7 @@ class wolf extends irc {
 
 		// !votes
 		else if ( $this->isCommand($command, 'votes') ) {
-			if ($recipient == $user["nick"]) {
+			if ($recipient == $this->bot["nick"]) {
 				// ignore
 			} else if (!$this->ongoing) {
 				$game_none = $this->string('game_none');
@@ -863,7 +911,7 @@ class wolf extends irc {
 
 		// !lynch
 		else if ( $this->isCommand($command, 'lynch') || $this->isCommand($command, 'vote') ) {
-			if ($recipient == $user["nick"]) {
+			if ($recipient == $this->bot["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if (!$this->ongoing) {
 				$game_none = $this->string('game_none');
@@ -893,7 +941,7 @@ class wolf extends irc {
 
 		// !coin
 		else if ( $this->isCommand($command, 'coin') ) {
-			if ($recipient == $user["nick"]) {
+			if ($recipient == $this->bot["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else {
 				$coin_toss = $this->string('coin_toss', $nick);
@@ -914,7 +962,7 @@ class wolf extends irc {
 
 		// !wait
 		else if ( $this->isCommand($command, 'wait') ) {
-			if ($recipient == $user["nick"]) {
+			if ($recipient == $this->bot["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if ($this->ongoing == false) {
 				if ($this->wait_extended < $this->setting["game_add_wait_limit"]) {
@@ -936,7 +984,7 @@ class wolf extends irc {
 
 		// !join
 		else if ( $this->isCommand($command, 'join') ) {
-			if ($recipient == $user["nick"]) {
+			if ($recipient == $this->bot["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if ($this->ongoing) {
 				$start_ongoing = $this->string('start_ongoing', $nick);
@@ -1147,7 +1195,6 @@ class wolf extends irc {
 
 		// !access
 		else if ( $this->isCommand($command, 'access') ) {
-			global $admins;
 			$args = explode(" ", $message);
 			if (count($args) < 2) {
 				$this->say($recipient, "$nick, There are \002two\002 arguments required for this command, " . count($args) . " given.");
@@ -1156,12 +1203,12 @@ class wolf extends irc {
 			} else {
 				switch($args[0]) {
 					case '+admin':
-						array_push($admins, $args[1]);
+						array_push($this->admins, $args[1]);
 						$this->say($recipient, $nick . ", Operation executed successfully.");
 						break;
 					case '-admin':
-						$pos = array_search($args[1], $admins);
-						unset($admins[$pos]);
+						$pos = array_search($args[1], $this->admins);
+						unset($this->admins[$pos]);
 						$this->say($recipient, $nick . ", Operation executed successfully.");
 						break;
 				}
@@ -1296,7 +1343,7 @@ class wolf extends irc {
 
 		// !shoot
 		else if ( $this->isCommand($command, 'shoot') ) {
-			if ($recipient == $user["nick"]) {
+			if ($recipient == $this->bot["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if ( !in_array($nick, $this->gunner) ) {
 				// This person isn't the gunner
@@ -1370,7 +1417,7 @@ class wolf extends irc {
 
 		// !guard
 		else if ( $this->isCommand($command, 'guard', NO_OPERATOR) ) {
-			if ($recipient != $user["nick"]) {
+			if ($recipient != $this->bot["nick"]) {
 				// ignore this
 			} else if ( !in_array($nick, $this->angel) ) {
 				// This person isn't the angel
@@ -1413,7 +1460,7 @@ class wolf extends irc {
 
 		// !id
 		else if ( $this->isCommand($command, 'id') ) {
-			if ($recipient != $user["nick"]) {
+			if ($recipient != $this->bot["nick"]) {
 				$this->say($nick, "This feature is not available in a pm.");
 			} else if ( !in_array($nick, $this->detective) ) {
 				// This person isn't the detective
@@ -1892,10 +1939,9 @@ class wolf extends irc {
 	 * @param mixed $win 0 no win, 1 for villagers, 2 for wolves, 3 for all wolves dead
 	 */
 	public function endGame($channel, $win=0) {
-		global $irc;
 
 		// Game stopped, we can start blocking the socket again
-		$irc->setBlocking(true);
+		$this->irc->setBlocking(true);
 
 		// If !fstop is being used, time should be considered for current night/day time
 		if ($this->isDay == true) {
@@ -2095,7 +2141,6 @@ class wolf extends irc {
 	 * @param array $data explodeData() return
 	 */
 	public function run($socket, $data) {
-		global $channel, $user;
 
 		// Set the socket from the running instance
 		$this->setSocket($socket);
@@ -2129,7 +2174,7 @@ class wolf extends irc {
 
 					// Wolf relay for game
 					// If the game ongoing, recipient is phpwolf,          user is wolf or traitor,                         and there is more than one wolf
-					if ($this->ongoing && $recipient == $user["nick"] && ( in_array($nick, $this->wolf) || in_array($nick, $this->traitor) ) && count($this->wolf) > 1) {
+					if ($this->ongoing && $recipient == $this->bot["nick"] && ( in_array($nick, $this->wolf) || in_array($nick, $this->traitor) ) && count($this->wolf) > 1) {
 						$this->relayToWolves($nick, $message);
 					}
 
@@ -2152,7 +2197,7 @@ class wolf extends irc {
 				break;
 				case 'JOIN':
 					// Add to peoples list
-					if ($nick != $user["nick"]) {
+					if ($nick != $this->bot["nick"]) {
 						array_push($this->people, $nick);
 					}
 				break;
@@ -2198,7 +2243,7 @@ class wolf extends irc {
 						if ( strpbrk('@', $value) || strpbrk('+', $value) ) {
 							$value = substr($value, 1);
 						}
-						if ($value != $user["nick"]) {
+						if ($value != $this->bot["nick"]) {
 							array_push($this->people, $value);
 						}
 					}

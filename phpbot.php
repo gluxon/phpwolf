@@ -36,7 +36,15 @@ $irc->sendIdent($user["nick"], $user["mode"], $user["unused"], $user["realname"]
 $irc->joinChannel($channel["name"]);
 
 // Start wolf module
-$wolf = new wolf();
+$wolf = new wolf(array(
+	'bot' => $user,
+	'irc' => $irc,
+	'channel' => $channel,
+	'admins' => $admins,
+	'lang' => $lang,
+	'settings_path' => SETTINGS_PATH,
+	'locale_path' => LOCALES_PATH,
+));
 
 // Continously read new lines
 while (true) {
