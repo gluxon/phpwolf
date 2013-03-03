@@ -303,7 +303,7 @@ class wolf extends irc {
 		if (!$show_gunner) {
 			$search = array_search('gunner', $roles);
 			if ($search !== false) {
-				unset($roles[array_search('gunner', $roles)]);
+				unset($roles[$search]);
 			}
 		}
 
@@ -311,7 +311,7 @@ class wolf extends irc {
 		if (!$show_traitor) {
 			$search = array_search('traitor', $roles);
 			if ($search !== false) {
-				unset($roles[array_search('traitor', $roles)]);
+				unset($roles[$search]);
 			}
 		}
 
