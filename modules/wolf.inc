@@ -608,7 +608,7 @@ class wolf extends irc {
 				// Send quit message
 				if ($this->ongoing) {
 					$answer = $this->getRolesNice(array(
-						'nick' => $nick
+						'nick' => $nick,
 						'show_traitor' => true
 					));
 				} else {
@@ -1907,7 +1907,7 @@ class wolf extends irc {
 			$this->say($this->channel, $night_nokill);*/
 		} else {
 			$dead_guy_roles = $this->getRolesNice(array(
-				'nick' => $victim
+				'nick' => $victim,
 				'show_traitor' => true
 			));
 
