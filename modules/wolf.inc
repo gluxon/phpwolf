@@ -541,6 +541,42 @@ class wolf extends irc {
 		}
 	}
 
+	public function generateEndMessage() {
+		foreach($this->role_names as $role) {
+
+			$amount = count($this->$role);
+
+			if ( $amount == 0) {
+				continue;
+			}
+
+			$list = '';
+			$i = 1;
+
+			foreach($this->$role as $person) {
+				if ($amount >= 1 && $i != 1) {
+					if ($amount > 2)
+						$list .= ', ';
+					else if ($amount == 2)
+						$list .= ' ';
+					if ($i == $amount)
+						$list .= 'and ';
+				}
+
+				$list .= chr(2) . $person . chr(2);
+
+				$i++;
+			}
+
+			if ($amount > 1) {
+				$this->roles_message .= $this->string('end_roles_plural', $this->string($role . '_plural'), $list) . ' ';
+			} else {
+				$this->roles_message .= $this->string('end_roles', $this->string($role), $list) . ' ';
+			}
+		}
+		$this->roles_message = substr($this->roles_message, 0, -1); // remove trailing space
+	}
+
 	/**
 	 * Run the corresponding command
 	 *
@@ -793,36 +829,7 @@ class wolf extends irc {
 				$this->current_night_start = time();
 
 				// Pre-Generate end message
-				foreach($this->role_names as $role) {
-
-					if ( count($this->$role) > 0) {
-						$role_list = '';
-						$i = 0;
-						$numItems = count($this->$role);
-
-						foreach($this->$role as $person) {
-
-							++$i;
-							// Last element
-							if ($numItems > 1) {
-								if ($i == $numItems) {
-									// Remove ', ', and replace with ' and ', then append $person
-									$role_list = substr($role_list, 0, -2) . ' and ' . $person ;
-								} else {
-									$role_list = $role_list . $person . ', ';
-								}
-							}
-						}
-
-						if ($numItems > 1) {
-							$this->roles_message = $this->roles_message . $this->string('end_roles_plural', $this->string($role . '_plural'), $role_list) . ' ';
-						} else {
-							// This is a hackish workaround, $person is still the looped array since $numItems is 1
-							$this->roles_message = $this->roles_message . $this->string('end_roles', $this->string($role), $person) . ' ';
-						}
-					}
-				}
-				$this->roles_message = substr($this->roles_message, 0, -1); // remove trailing space
+				$this->generateEndMessage();
 
 				// We do not want socket blocking for werewolf now
 				$this->irc->setBlocking(false);
