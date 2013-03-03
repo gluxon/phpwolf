@@ -102,8 +102,8 @@ $en_US["win_villagers"]="Game over! All the wolves are dead! The villagers chop 
 $en_US["win_wolves"]="Game over! There are the same number of wolves as villagers. The wolves eat everyone and win.";
 $en_US["end_times"]="Game lasted <bold>%answer1%</bold>. <bold>%answer2%</bold> was day. <bold>%answer3%</bold> was night.";
 //The wolves were moriarty and Nascar1996
-$en_US["end_roles"]="The %answer1% was <bold>%answer2%</bold>.";
-$en_US["end_roles_plural"]="The %answer1% were <bold>%answer2%</bold>.";
+$en_US["end_roles"]="The %answer1% was %answer2%.";
+$en_US["end_roles_plural"]="The %answer1% were %answer2%.";
 
 // Directions
 $en_US["seer_assign"]="You are a <bold>seer</bold>. It is your job to detect the wolves, you may have a vision once per night. Use \"see <nick>\" to see the role of a player.";
