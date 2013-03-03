@@ -77,7 +77,7 @@ $en_US["goat"]="<bold>%answer1%</bold>'s goat walks by and kicks <bold>%answer2%
 
 // Game commands
 $en_US["join"]="<bold>%answer1%</bold> has joined the game.";
-$en_US["quit"]="<bold>%answer1%</bold> died of an unknown disease. S/He was a <bold>%answer2%</bold>.";
+$en_US["quit"]="<bold>%answer1%</bold> died of an unknown disease. S/He was a %answer2%.";
 $en_US["lynch"]="<bold>%answer1%</bold> votes for <bold>%answer2%</bold>.";
 $en_US["lynch_night"]="Lynching is only allowed during the day. Please wait patiently for morning.";
 $en_US["lynch_resting"]="%answer1%: You are wounded and resting, thus you are unable to vote for the day.";
