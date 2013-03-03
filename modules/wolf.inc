@@ -1114,6 +1114,10 @@ class wolf extends irc {
 		else if ( $this->isCommand($command, 'fstop') && $this->isAdmin($host) ) {
 			if ($this->ongoing) {
 				$this->endGame($this->channel);
+			} else {
+				foreach($this->players as $player) {
+					$this->removePlayer($player);
+				}
 			}
 		}
 
