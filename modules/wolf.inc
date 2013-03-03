@@ -1588,6 +1588,33 @@ class wolf extends irc {
 			}
 		}
 
+		// Remove from wolf kills
+		foreach($this->wolf_killed as $wolf => &$victim) {
+			if ($nick == $victim) {
+				unset($this->wolf_killed[$wolf]);
+			}
+		}
+
+		// Remove from gunner shot
+		$search = array_search($nick, $this->gunner_shot);
+		if ($search !== false) {
+			unset($this->gunner_shot[$search]);
+		}
+
+		// Remove from harlot visited
+		foreach($this->harlot_visited as $harlot => &$person) {
+			if ($nick == $person) {
+				unset($this->harlot_visited[$harlot]);
+			}
+		}
+
+		// Remove from angel guarded
+		foreach($this->angel_guarded as $angel => &$person) {
+			if ($nick == $person) {
+				unset($this->angel_guarded[$angel]);
+			}
+		}
+
 		// Remove player's lynch
 		if (isset($this->lynch[$nick])) {
 			unset($this->lynch[$nick]);
