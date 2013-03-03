@@ -9,3 +9,4 @@ node_modules
 
 # Configuration
 settings/bot.inc
+settings/werewolf
