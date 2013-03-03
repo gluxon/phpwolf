@@ -10,3 +10,6 @@ node_modules
 # Configuration
 settings/bot.inc
 settings/werewolf
+
+# php errors
+/error_log
