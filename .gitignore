@@ -1,1 +1,11 @@
-settings.inc
+# Editor backup files
+*~
+
+# Node.js libraries and modules
+node_modules
+
+# Eclipse project info
+.project
+
+# Configuration
+settings/bot.inc
