@@ -2300,8 +2300,8 @@ class wolf extends irc {
 				case 'NICK':
 					// Change nick in people list
 					$implode = implode(' ', $data);
-					$new_nick = explode(':', $implode, 3);
-					$new_nick = $new_nick["2"];
+					$new_nick = explode(':', $implode);
+					$new_nick = end($new_nick);
 
 					$key = array_search($nick, $this->people);
 					$this->people[$key] = $new_nick;
