@@ -38,7 +38,7 @@ class wolf extends irc {
 
 	// Role variables
 	private $seer, $wolf, $cursed, $drunk, $harlot, $traitor,
-		$gunner, $crow, $angel, $detective;
+		$gunner, $crow, $angel, $detective, $ghost;
 
 	// Seen, visited, killed variables (per night/day)
 	private $seer_seen, $wolf_killed, $harlot_visited, $gunner_shot,
@@ -49,7 +49,7 @@ class wolf extends irc {
 
 	// Convenience array for looping
 	public $role_names = array("wolf", "seer", "cursed", "drunk", "harlot",
-		"traitor", "gunner", "crow", "angel", "detective");
+		"traitor", "gunner", "crow", "angel", "detective", "ghost");
 
 	/**
 	 * Constructor for werewolf, initialize variables with default values
@@ -92,6 +92,7 @@ class wolf extends irc {
 
 		$this->roles_message = '';
 
+		$this->ghost = array();
 		$this->seer = array();
 		$this->wolf = array();
 		$this->cursed = array();
@@ -268,6 +269,7 @@ class wolf extends irc {
 		$cursed_wolf = (empty($options["cursed_wolf"])) ? false : $options["cursed_wolf"];
 		$show_gunner = (empty($options["show_gunner"])) ? false : $options["show_gunner"];
 		$show_traitor = (empty($options["show_traitor"])) ? false : $options["show_traitor"];
+		$show_ghost = (empty($options["show_ghost"])) ? false : $options["show_ghost"];
 
 		$roles = $this->getRoles($nick);
 
@@ -312,6 +314,14 @@ class wolf extends irc {
 		if (!$show_traitor) {
 			$search = array_search('traitor', $roles);
 			if ($search !== false) {
+				unset($roles[$search]);
+			}
+		}
+
+		// Remove ghost from roles unless specified
+		if(!$show_ghost) {
+			$search = array_search('ghost', $roles);
+			if($search !== false) {
 				unset($roles[$search]);
 			}
 		}
@@ -379,6 +389,8 @@ class wolf extends irc {
 				return 'angel';
 			case 9:
 				return 'detective';
+			case 10:
+				resturn 'ghost';
 			default:
 				return false;
 		}
@@ -414,6 +426,8 @@ class wolf extends irc {
 				return 8;
 			case 'detective':
 				return 9;
+			case 'ghost':
+				return 10;
 			default:
 				return false;
 		}
@@ -1678,16 +1692,16 @@ class wolf extends irc {
 					if ( in_array($players_sorted[$player_index], $this->$role_name) ) {
 						continue;
 					}
-					// If the person is a seer, only give them gunner
-					if ( in_array($players_sorted[$player_index], $this->seer) && $role_name != 'gunner' ) {
+					// If the person is a seer, only give them gunner or ghost
+					if ( in_array($players_sorted[$player_index], $this->seer) && ($role_name != 'gunner' && $role_name != 'ghost')) {
 						continue;
 					}
-					// If the person is a drunk, only give them gunner
-					if ( in_array($players_sorted[$player_index], $this->drunk) && $role_name != 'gunner' ) {
+					// If the person is a drunk, only give them gunner or ghost
+					if ( in_array($players_sorted[$player_index], $this->drunk) && ($role_name != 'gunner' && $role_name != 'ghost') ) {
 						continue;
 					}
-					// If the person is cursed, only give them traitor
-					if ( in_array($players_sorted[$player_index], $this->cursed) && $role_name != 'traitor' ) {
+					// If the person is cursed, only give them traitor or ghost
+					if ( in_array($players_sorted[$player_index], $this->cursed) && ($role_name != 'gunner' && $role_name != 'ghost') ) {
 						continue;
 					}
 					// If the person is already harlot, traitor, angel, or detective, do not give them another role
