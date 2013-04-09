@@ -2104,6 +2104,7 @@ class wolf extends irc {
 		$this->crow = array(); 
 		$this->angel = array();
 		$this->detective = array();
+		$this->ghost = array();
 
 		$this->seer_seen = array();
 		$this->wolf_killed = array();
