@@ -390,7 +390,7 @@ class wolf extends irc {
 			case 9:
 				return 'detective';
 			case 10:
-				resturn 'ghost';
+				return 'ghost';
 			default:
 				return false;
 		}
