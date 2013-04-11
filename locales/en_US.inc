@@ -175,7 +175,7 @@ $en_US["werecrow_observe_day"]="You may only transform into a crow at night.";
 $en_US["werecrow_not"]="Only a werecrow may use this command.";
 
 $en_US["ghost_victim"] = "It appears that <bold>%answer1%</bold> is a ghost. Ooooh-OOOOH-Ooooh! S/He will remain in the game.";
-$en_US["ghost_inform"] = "You are a ghost. This means you will remain alive. Happy haunting!"
+$en_US["ghost_inform"] = "You are a ghost. This means you will remain alive. Happy haunting!";
 
 $en_US["players_list"]="Players: %answer1%";
 ?>
