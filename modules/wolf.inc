@@ -38,18 +38,18 @@ class wolf extends irc {
 
 	// Role variables
 	private $seer, $wolf, $cursed, $drunk, $harlot, $traitor,
-		$gunner, $crow, $angel, $detective;
+		$gunner, $crow, $angel, $detective, $ghost;
 
 	// Seen, visited, killed variables (per night/day)
 	private $seer_seen, $wolf_killed, $harlot_visited, $gunner_shot,
-		$gunner_bullets, $angel_guarded, $detective_ided;
+		$gunner_bullets, $angel_guarded, $detective_ided, $ghosted;
 
 	private $roles_set; // roles available corresponding to amount of players
 	private $roles_message; // Pre-generated and store end roles message
 
 	// Convenience array for looping
 	public $role_names = array("wolf", "seer", "cursed", "drunk", "harlot",
-		"traitor", "gunner", "crow", "angel", "detective");
+		"traitor", "gunner", "crow", "angel", "detective", "ghost");
 
 	/**
 	 * Constructor for werewolf, initialize variables with default values
@@ -92,6 +92,7 @@ class wolf extends irc {
 
 		$this->roles_message = '';
 
+		$this->ghost = array();
 		$this->seer = array();
 		$this->wolf = array();
 		$this->cursed = array();
@@ -110,6 +111,7 @@ class wolf extends irc {
 		$this->gunner_bullets = array();
 		$this->angel_guarded = array();
 		$this->detective_ided = array();
+		$this->ghosted = false;
 
 		// Import werewolf settings
 		include($this->settings_path . '/werewolf.inc');
@@ -268,6 +270,7 @@ class wolf extends irc {
 		$cursed_wolf = (empty($options["cursed_wolf"])) ? false : $options["cursed_wolf"];
 		$show_gunner = (empty($options["show_gunner"])) ? false : $options["show_gunner"];
 		$show_traitor = (empty($options["show_traitor"])) ? false : $options["show_traitor"];
+		$show_ghost = (empty($options["show_ghost"])) ? false : $options["show_ghost"];
 
 		$roles = $this->getRoles($nick);
 
@@ -312,6 +315,14 @@ class wolf extends irc {
 		if (!$show_traitor) {
 			$search = array_search('traitor', $roles);
 			if ($search !== false) {
+				unset($roles[$search]);
+			}
+		}
+
+		// Remove ghost from roles unless specified
+		if(!$show_ghost) {
+			$search = array_search('ghost', $roles);
+			if($search !== false) {
 				unset($roles[$search]);
 			}
 		}
@@ -379,6 +390,8 @@ class wolf extends irc {
 				return 'angel';
 			case 9:
 				return 'detective';
+			case 10:
+				return 'ghost';
 			default:
 				return false;
 		}
@@ -414,6 +427,8 @@ class wolf extends irc {
 				return 8;
 			case 'detective':
 				return 9;
+			case 'ghost':
+				return 10;
 			default:
 				return false;
 		}
@@ -500,6 +515,10 @@ class wolf extends irc {
 
 		$list = "";
 		foreach(array_keys($this->players) as $player) {
+			// If the player is a ghost, skip them.
+			if (in_array($player, $this->ghost) && $this->ghosted) {
+				continue;
+			}
 			if ($player != $nick) {
 				$list = $list . $player;
 
@@ -1296,6 +1315,8 @@ class wolf extends irc {
 				// ignore this
 			} else if ( !in_array($nick, $this->wolf) ) {
 				$this->say($nick, "You are not a wolf. good thing too!");
+			} else if (in_array($nick, $this->ghost) && $this->ghosted) {
+				$this->say($nick, "You cannot kill a ghost! D'oh?!?!!");
 			} else {
 				$person = $this->nickAutocomplete($message);
 
@@ -1337,6 +1358,8 @@ class wolf extends irc {
 				// You've already visited
 				$harlot_visited=$this->string('harlot_visited', $this->harlot_visited[$nick]);
 				$this->notice($nick, $harlot_visited);
+			} else if (in_array($nick, $this->ghost) && $this->ghosted) {
+				$this->say($nick, "You cannot visit a ghost!");
 			} else {
 				$person = $this->nickAutocomplete($message);
 
@@ -1381,6 +1404,8 @@ class wolf extends irc {
 				// You've ran out of bullets!
 				$gunner_nobullets=$this->string('gunner_nobullets');
 				$this->say($nick, $gunner_nobullets);
+			} else if (in_array($nick, $this->ghost) && $this->ghosted) {
+				$this->say($this->channel, $nick . ", Don't waste precious bullets! Why, they'll go right through him!");
 			} else {
 				$person = $this->nickAutocomplete($message);
 
@@ -1462,6 +1487,8 @@ class wolf extends irc {
 				// You've already guarded
 				$angel_guarded=$this->string('angel_guarded', $this->angel_guarded[$nick]);
 				$this->say($nick, $angel_guarded);
+			} else if (in_array($nick, $this->ghost) && $this->ghosted) {
+				$this->say($nick, "You cannot guard a ghost!");
 			} else {
 				$person = $this->nickAutocomplete($message);
 
@@ -1523,7 +1550,8 @@ class wolf extends irc {
 						'nick' => $person,
 						'show_cursed' => true,
 						'show_gunner' => true,
-						'show_traitor' => true
+						'show_traitor' => true,
+						'show_ghost' => true
 					));
 
 					$detective_id=$this->string('detective_id', $person, $roles);
@@ -1543,7 +1571,7 @@ class wolf extends irc {
 			}
 		}
 
-		// whoami (needs official locale)
+		// !whoami (needs official locale)
 		else if ( $this->isCommand($command, 'whoami', NO_OPERATOR) ) {
 			if (!$this->ongoing) {
 				//No game is currently running.
@@ -1579,10 +1607,13 @@ class wolf extends irc {
 	 * 
 	 * @param mixed $nick Nickname of player
 	 */
-	public function removePlayer($channel, $nick) {
-		unset($this->players[$nick]);
-		// Remove Voice
-		$this->sendData("MODE $channel -v $nick");
+	public function removePlayer($channel, $nick, $unset = true) {
+		if($unset) {
+			// Remove the players from the list of players
+			unset($this->players[$nick]);
+			// Remove voice
+			$this->sendData("MODE $channel -v $nick");
+		}
 
 		foreach($this->role_names as $role) {
 			foreach($this->$role as $key => &$person) {
@@ -1678,16 +1709,16 @@ class wolf extends irc {
 					if ( in_array($players_sorted[$player_index], $this->$role_name) ) {
 						continue;
 					}
-					// If the person is a seer, only give them gunner
-					if ( in_array($players_sorted[$player_index], $this->seer) && $role_name != 'gunner' ) {
+					// If the person is a seer, only give them gunner or ghost
+					if ( in_array($players_sorted[$player_index], $this->seer) && ($role_name != 'gunner' && $role_name != 'ghost')) {
 						continue;
 					}
-					// If the person is a drunk, only give them gunner
-					if ( in_array($players_sorted[$player_index], $this->drunk) && $role_name != 'gunner' ) {
+					// If the person is a drunk, only give them gunner or ghost
+					if ( in_array($players_sorted[$player_index], $this->drunk) && ($role_name != 'gunner' && $role_name != 'ghost') ) {
 						continue;
 					}
 					// If the person is cursed, only give them traitor
-					if ( in_array($players_sorted[$player_index], $this->cursed) && $role_name != 'traitor' ) {
+					if ( in_array($players_sorted[$player_index], $this->cursed) && $role_name != 'gunner' ) {
 						continue;
 					}
 					// If the person is already harlot, traitor, angel, or detective, do not give them another role
@@ -1860,6 +1891,17 @@ class wolf extends irc {
 			$day_angel = $this->string('day_angel', $victim);
 			$this->say($this->channel, $day_angel);
 
+		// Victim is a ghost
+		} else if(in_array($victim, $this->ghost) && !$this->ghosted){
+			$ghost_victim = $this->string('ghost_victim', $victim);
+			$ghost_inform = $this->string('ghost_inform');
+			$this->say($this->channel, $ghost_victim);
+			$this->say($victim, $ghost_inform);
+			$this->removePlayer($this->channel, $victim, $unset = false);
+			// Remove all of the player's other roles
+			$this->players[$victim] = array("ghost");
+			$this->ghosted = true;
+
 		} else {
 			$dead_guy_roles = $this->getRolesNice(array(
 				'nick' => $victim,
@@ -1958,6 +2000,24 @@ class wolf extends irc {
 			// I don't believe there's a message for no kill at night
 			/*$night_nokill = $this->string('night_nokill');
 			$this->say($this->channel, $night_nokill);*/
+
+		// If the victim is a ghost, kill them, but don't remove them from the game
+		} else if(in_array($victim, $this->ghost) && !$this->ghosted){
+			$dead_guy_roles = $this->getRolesNice(array(
+				'nick' => $victim,
+				'show_traitor' => true
+			));
+
+			$night_victim = $this->string('night_victim', $victim, $dead_guy_roles);
+			$this->say($this->channel, $night_victim);
+			$ghost_victim = $this->string('ghost_victim', $victim);
+			$ghost_inform = $this->string('ghost_inform');
+			$this->say($this->channel, $ghost_victim);
+			$this->say($victim, $ghost_inform);
+			$this->removePlayer($this->channel, $victim, $unset = false);
+			// Remove all of the player's other roles
+			$this->players[$victim] = array("ghost");
+			$this->ghosted = true;
 		} else {
 			$dead_guy_roles = $this->getRolesNice(array(
 				'nick' => $victim,
@@ -2090,6 +2150,7 @@ class wolf extends irc {
 		$this->crow = array(); 
 		$this->angel = array();
 		$this->detective = array();
+		$this->ghost = array();
 
 		$this->seer_seen = array();
 		$this->wolf_killed = array();
