@@ -515,6 +515,10 @@ class wolf extends irc {
 
 		$list = "";
 		foreach(array_keys($this->players) as $player) {
+			// If the player is a ghost, skip them.
+			if (in_array($player, $this->ghost) && $this->ghosted) {
+				continue;
+			}
 			if ($player != $nick) {
 				$list = $list . $player;
 
@@ -1311,6 +1315,8 @@ class wolf extends irc {
 				// ignore this
 			} else if ( !in_array($nick, $this->wolf) ) {
 				$this->say($nick, "You are not a wolf. good thing too!");
+			} else if (in_array($nick, $this->ghost) && $this->ghosted) {
+				$this->say($nick, "You cannot kill a ghost! D'oh?!?!!");
 			} else {
 				$person = $this->nickAutocomplete($message);
 
@@ -1352,6 +1358,8 @@ class wolf extends irc {
 				// You've already visited
 				$harlot_visited=$this->string('harlot_visited', $this->harlot_visited[$nick]);
 				$this->notice($nick, $harlot_visited);
+			} else if (in_array($nick, $this->ghost) && $this->ghosted) {
+				$this->say($nick, "You cannot visit a ghost!");
 			} else {
 				$person = $this->nickAutocomplete($message);
 
@@ -1396,6 +1404,8 @@ class wolf extends irc {
 				// You've ran out of bullets!
 				$gunner_nobullets=$this->string('gunner_nobullets');
 				$this->say($nick, $gunner_nobullets);
+			} else if (in_array($nick, $this->ghost) && $this->ghosted) {
+				$this->say($this->channel, $nick . ", Don't waste precious bullets! Why, they'll go right through him!");
 			} else {
 				$person = $this->nickAutocomplete($message);
 
@@ -1477,6 +1487,8 @@ class wolf extends irc {
 				// You've already guarded
 				$angel_guarded=$this->string('angel_guarded', $this->angel_guarded[$nick]);
 				$this->say($nick, $angel_guarded);
+			} else if (in_array($nick, $this->ghost) && $this->ghosted) {
+				$this->say($nick, "You cannot guard a ghost!");
 			} else {
 				$person = $this->nickAutocomplete($message);
 
@@ -1538,7 +1550,8 @@ class wolf extends irc {
 						'nick' => $person,
 						'show_cursed' => true,
 						'show_gunner' => true,
-						'show_traitor' => true
+						'show_traitor' => true,
+						'show_ghost' => true
 					));
 
 					$detective_id=$this->string('detective_id', $person, $roles);
@@ -1704,8 +1717,8 @@ class wolf extends irc {
 					if ( in_array($players_sorted[$player_index], $this->drunk) && ($role_name != 'gunner' && $role_name != 'ghost') ) {
 						continue;
 					}
-					// If the person is cursed, only give them traitor or ghost
-					if ( in_array($players_sorted[$player_index], $this->cursed) && ($role_name != 'gunner' && $role_name != 'ghost') ) {
+					// If the person is cursed, only give them traitor
+					if ( in_array($players_sorted[$player_index], $this->cursed) && $role_name != 'gunner' ) {
 						continue;
 					}
 					// If the person is already harlot, traitor, angel, or detective, do not give them another role
