@@ -717,7 +717,7 @@ class wolf extends irc {
 					foreach ($this->role_names as $role_name) {
 						$role_id = $this->getRoleID($role_name);
 						// ignore gunner and cursed, do not count them in specials_total either
-						if ($this->roles_set[$role_id] > 0 && $role_name != 'cursed' && $role_name != 'gunnder' ) {
+						if ($this->roles_set[$role_id] > 0 && $role_name != 'cursed' && $role_name != 'gunner' ) {
 							$amount = count($this->$role_name);
 
 							$specials_total = $specials_total + $amount; // Add to total
