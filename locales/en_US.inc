@@ -174,7 +174,8 @@ $en_US["werecrow_observe_wolf"]="Flying to another wolf's house is a waste of ti
 $en_US["werecrow_observe_day"]="You may only transform into a crow at night.";
 $en_US["werecrow_not"]="Only a werecrow may use this command.";
 
-$en_US["ghost_transform"] = "It appears that <bold>%answer1%</bold> is a ghost. Ooooh-OOOOH-Ooooh! S/He will remain in the game.";
+$en_US["ghost_assign"] = "You are a ghost. You will remain in the world of the living to finish your business. Happy haunting!";
+$en_US["ghost_transform"] = "It appears that <bold>%answer1%</bold> come back as a ghost. Ooooh-OOOOH-Ooooh! S/He will remain in the game.";
 
 $en_US["players_list"]="Players: %answer1%";
 ?>
