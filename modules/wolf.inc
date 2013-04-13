@@ -331,7 +331,7 @@ class wolf extends irc {
 		// Remove ghost from roles unless specified
 		if(!$show_ghost) {
 			$search = array_search('ghost', $roles);
-			if($search !== false) {
+			if ($search !== false) {
 				unset($roles[$search]);
 			}
 		}
