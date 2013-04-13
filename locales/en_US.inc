@@ -12,6 +12,7 @@ $en_US["gunner"]="gunner";
 $en_US["crow"]="crow";
 $en_US["angel"]="guardian angel";
 $en_US["detective"]="detective";
+$en_US["ghost"]="ghost";
 $en_US["villager"]="villager";
 
 $en_US["seer_plural"]="seers";
@@ -24,6 +25,7 @@ $en_US["gunner_plural"]="gunners";
 $en_US["crow_plural"]="crows";
 $en_US["angel_plural"]="guardian angels";
 $en_US["detective_plural"]="detectives";
+$en_US["ghost_plural"]="ghosts";
 $en_US["villager_plural"]="villagers";
 
 // Before Game
