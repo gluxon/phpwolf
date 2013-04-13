@@ -42,7 +42,8 @@ class wolf extends irc {
 
 	// Seen, visited, killed variables (per night/day)
 	private $seer_seen, $wolf_killed, $harlot_visited, $gunner_shot,
-		$gunner_bullets, $angel_guarded, $detective_ided, $ghosted;
+		$gunner_bullets, $crow_observed, $angel_guarded, $detective_ided,
+		$ghosted;
 
 	private $roles_set; // roles available corresponding to amount of players
 	private $roles_message; // Pre-generated and store end roles message
@@ -233,7 +234,7 @@ class wolf extends irc {
 
 	public function isBadGuy($nick) {
 		if (in_array($nick, $this->wolf) || in_array($nick, $this->traitor) ||
-				in_array($nick, $this->werecrow)) {
+				in_array($nick, $this->crow)) {
 			return true;
 		}
 		return false;
@@ -2349,7 +2350,7 @@ class wolf extends irc {
 					$message=implode(" ", $implode);
 
 					// Wolf relay for game
-					$totalBadGuys = count($this->wolf) + count($this->traitor) + count($this->werecrow);
+					$totalBadGuys = count($this->wolf) + count($this->traitor) + count($this->crow);
 
 					if ($this->ongoing && $recipient == $this->bot["nick"] &&
 							$this->isBadGuy($nick) && $totalBadGuys > 1) {
