@@ -1717,12 +1717,19 @@ class wolf extends irc {
 					if ( in_array($players_sorted[$player_index], $this->$role_name) ) {
 						continue;
 					}
-					// If the person is a seer, only give them gunner or ghost
-					if ( in_array($players_sorted[$player_index], $this->seer) && ($role_name != 'gunner' && $role_name != 'ghost')) {
+
+					// Exception: Ghost can be anyone! Just can't have it already
+					if ($role_name == 'ghost') {
+						array_push($this->ghost, $players_sorted[$player_index]);
+						break;
+					}
+
+					// If the person is a seer, only give them gunner
+					if ( in_array($players_sorted[$player_index], $this->seer) && $role_name != 'gunner' ) {
 						continue;
 					}
-					// If the person is a drunk, only give them gunner or ghost
-					if ( in_array($players_sorted[$player_index], $this->drunk) && ($role_name != 'gunner' && $role_name != 'ghost') ) {
+					// If the person is a drunk, only give them gunner
+					if ( in_array($players_sorted[$player_index], $this->drunk) && $role_name != 'gunner' ) {
 						continue;
 					}
 					// If the person is cursed, only give them traitor
@@ -1869,6 +1876,10 @@ class wolf extends irc {
 
 				$detective_assign3 = $this->string('detective_assign3');
 				$this->say($nick, $detective_assign3);
+			break;
+
+			case 'ghost':
+				// Ghost does not get directions
 			break;
 		}
 	}
