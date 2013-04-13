@@ -6,6 +6,8 @@ node_modules
 
 # Eclipse project info
 .project
+.buildpath
+.settings
 
 # Configuration
 settings/bot.inc
