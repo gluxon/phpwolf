@@ -168,13 +168,13 @@ $en_US["detective_ided"]="You may only investigate one person per round.";
 $en_US["detective_night"]="You may only investigate people during the day.";
 $en_US["detective_revealed"]="<bold>%answer1%</bold> accidentally drops a paper. The paper reveals that (s)he is the detective!";
 
-$en_US["werecrow_assign"]="You are a <bold>werecrow</bold>. You are able to fly at night. Use \"kill <nick>\" to kill a a villager. Alternatively, you can use \"observe <nick>\" to check if someone is in bed or not. Observing will prevent you from participating in a killing.";
-$en_US["werecrow_observe"]="You transform into a large crow and start your flight to <bold>%answer1%</bold>'s house. You will return after collecting your observations when day begins.";
-$en_US["werecrow_observed"]="You are already flying to <bold>%answer1%</bold>'s house.";
-$en_US["werecrow_observe_self"]="Instead of doing that, you should probably go kill someone.";
-$en_US["werecrow_observe_wolf"]="Flying to another wolf's house is a waste of time.";
-$en_US["werecrow_observe_day"]="You may only transform into a crow at night.";
-$en_US["werecrow_not"]="Only a werecrow may use this command.";
+$en_US["crow_assign"]="You are a <bold>werecrow</bold>. You are able to fly at night. Use \"kill <nick>\" to kill a a villager. Alternatively, you can use \"observe <nick>\" to check if someone is in bed or not. Observing will prevent you from participating in a killing.";
+$en_US["crow_observe"]="You transform into a large crow and start your flight to <bold>%answer1%</bold>'s house. You will return after collecting your observations when day begins.";
+$en_US["crow_observed"]="You are already flying to <bold>%answer1%</bold>'s house.";
+$en_US["crow_observe_self"]="Instead of doing that, you should probably go kill someone.";
+$en_US["crow_observe_wolf"]="Flying to another wolf's house is a waste of time.";
+$en_US["crow_observe_day"]="You may only transform into a crow at night.";
+$en_US["crow_not"]="Only a werecrow may use this command.";
 
 $en_US["ghost_assign"] = "You are a ghost. You will remain in the world of the living to finish your business. Happy haunting!";
 $en_US["ghost_transform"] = "It appears that <bold>%answer1%</bold> came back as a ghost. Ooooh-OOOOH-Ooooh! S/He will remain in the game.";
