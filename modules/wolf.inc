@@ -1495,6 +1495,47 @@ class wolf extends irc {
 			}
 		}
 
+		// !observe
+		else if ( $this->isCommand($command, 'observe', NO_OPERATOR) ) {
+			if ($recipient == $this->channel) {
+				// ignore this
+			} else if ( !in_array($nick, $this->crow) ) {
+				$crow_not = $this->string('crow_not');
+				$this->say($nick, $crow_not);
+			} else if ($this->isDay) {
+				$crow_observe_day = $this->string('crow_observe_day');
+				$this->say($nick, $crow_observe_day);
+			} else {
+				$person = $this->nickAutocomplete($message);
+
+				if (!$this->isPlaying($person)) {
+					$not_playing=$this->string('not_playing', $person);
+					$this->notice($nick, $not_playing);
+				} else {
+					if ($nick == $person) {
+						// You can't kill yourself
+						$crow_observe_self = $this->string('crow_observe_self');
+						$this->say($nick, $crow_observe_self);
+					} else if (in_array($person, $this->wolf)) {
+						// You can't kill another wolf
+						$crow_observe_wolf = $this->string('crow_observe_wolf');
+						$this->say($nick, $crow_observe_wolf);
+					} else if (in_array($person, $this->crow)) {
+						// You can't kill another crow
+						$crow_observe_crow = $this->string('crow_observe_crow');
+						$this->say($nick, $crow_observe_crow);
+					} else {
+						// This person has been selected for observation.
+						$this->crow_observed[$nick] = $person;
+
+						// Send Message
+						$crow_observe = $this->string('crow_observe', $person);
+						$this->say($nick, $crow_observe);
+					}
+				}
+			}
+		}
+
 		// !guard
 		else if ( $this->isCommand($command, 'guard', NO_OPERATOR) ) {
 			if ($recipient != $this->bot["nick"]) {
