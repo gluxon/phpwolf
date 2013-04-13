@@ -231,6 +231,14 @@ class wolf extends irc {
 		return false;
 	}
 
+	public function isBadGuy($nick) {
+		if (in_array($nick, $this->wolf) || in_array($nick, $this->traitor) ||
+				in_array($nick, $this->werecrow)) {
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Get all the roles a player has
 	 * 
@@ -2330,8 +2338,10 @@ class wolf extends irc {
 					$message=implode(" ", $implode);
 
 					// Wolf relay for game
-					// If the game ongoing, recipient is phpwolf,          user is wolf or traitor,                         and there is more than one wolf
-					if ($this->ongoing && $recipient == $this->bot["nick"] && ( in_array($nick, $this->wolf) || in_array($nick, $this->traitor) ) && count($this->wolf) + count($this->traitor) > 1) {
+					$totalBadGuys = count($this->wolf) + count($this->traitor) + count($this->werecrow);
+
+					if ($this->ongoing && $recipient == $this->bot["nick"] &&
+							$this->isBadGuy($nick) && $totalBadGuys > 1) {
 						$this->relayToWolves($nick, $message);
 					}
 
