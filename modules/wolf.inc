@@ -1226,10 +1226,27 @@ class wolf extends irc {
 
 		// !fwait
 		else if ( $this->isCommand($command, 'fwait') && $this->isAdmin($host) ) {
+			$args = explode(' ', trim($message));
+			$time = $args[0];
+
+			// If parameter wasn't given, use default
+			if (!ctype_digit($time)) {
+				$time = $this->setting["game_add_wait"];
+			}
+
+			// Decrease amount of times wait was called if limit has reached
 			if ($this->wait_extended >= $this->setting["game_add_wait_limit"]) {
 				$this->wait_extended--;
 			}
+
+			// Temporarily change and store default game add wait time
+			$game_add_wait = $this->setting["game_add_wait"];
+			$this->setting["game_add_wait"] = $time;
+
 			$this->commands($recipient, "!wait", $nick, $host);
+
+			// Restore default game add wait time
+			$this->setting["game_add_wait"] = $game_add_wait;
 		}
 
 		// !frestart
