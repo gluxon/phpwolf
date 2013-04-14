@@ -2310,7 +2310,9 @@ class wolf extends irc {
 							}
 						}
 
-						if ($role != 'drunk' && $role != 'cursed' && $role != 'traitor' && $role != 'gunner' && $role != 'detective') {
+						if ($role != 'drunk' && $role != 'cursed' &&
+								$role != 'traitor' && $role != 'gunner' &&
+								$role != 'detective' && $role != 'ghost') {
 							$i_role++;
 						}
 					}
