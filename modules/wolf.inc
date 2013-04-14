@@ -2185,6 +2185,11 @@ class wolf extends irc {
 		// Unmute the channel
 		$this->sendData('MODE ' . $channel . ' -m');
 
+		// Add ghosts back into players to remove their voice
+		foreach($this->ghost_died as $ghost) {
+			$this->players[$ghost] = 0;
+		}
+
 		// Generate list of players
 		$players_list = implode(' ', array_keys($this->players) );
 
