@@ -2217,7 +2217,7 @@ class wolf extends irc {
 		}
 
 		// Generate list of players
-		$players_list = implode(' ', array_keys($this->players) );
+		$players_list = implode(', ', array_keys($this->players) );
 
 		$players_list_split = SplitByEveryNthOccurrence($players_list, ' ', 3);
 		foreach($players_list_split as $list) {
