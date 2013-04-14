@@ -1256,7 +1256,12 @@ class wolf extends irc {
 		else if ( $this->isCommand($command, 'access') ) {
 			$args = explode(" ", $message);
 			if (count($args) < 2) {
-				$this->say($recipient, "$nick, There are \002two\002 arguments required for this command, " . count($args) . " given.");
+				if (isset($this->admins[$nick])) {
+					$message = $nick . ", You are a bot admin.";
+				} else {
+					$message = $nick . ", You are not a bot admin.";
+				}
+				$this->say($recipient, $message)
 			} else if (!$this->isAdmin($host) ) {
 				$this->say($recipient, $nick . ", You are not a bot admin.");
 			} else {
