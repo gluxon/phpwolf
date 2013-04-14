@@ -15,7 +15,8 @@ $user["password"]="password";
 $channel["name"]="##phpwolf";
 
 // Admins array
-$admins = array('~gluxon@unaffiliated/gluxon',
+$admins = array('*@freenode/staff/*',
+                '~gluxon@unaffiliated/gluxon',
                 '~Snuupy@unaffiliated/snuupy',
                 '~ceradon@wikimedia/Ceradon',
                 '~mithadon@unaffiliated/mithadon',
