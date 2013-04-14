@@ -48,9 +48,12 @@ class wolf extends irc {
 	private $roles_set; // roles available corresponding to amount of players
 	private $roles_message; // Pre-generated and store end roles message
 
-	// Convenience array for looping
+	// Convenience arrays for looping
 	public $role_names = array("wolf", "seer", "cursed", "drunk", "harlot",
 		"traitor", "gunner", "crow", "angel", "detective", "ghost");
+	public $role_vars = array("seer_seen", "wolf_killed", "harlot_visited", 
+		"gunner_shot", "crow_observed", "angel_guarded", "detective_ided",
+		"gunner_bullets", "ghost_died");
 
 	/**
 	 * Constructor for werewolf, initialize variables with default values
@@ -1441,7 +1444,7 @@ class wolf extends irc {
 				$this->say($nick, $gunner_nobullets);
 			} else if ( in_array($nick, $this->ghost_died) ) {
 				// Ghosts can not be shot
-				$this->say($this->channel, $nick . ", Don't waste precious bullets! Why, they'll go right through him!");
+				$this->say($this->channel, $nick . ", Don't waste precious bullets! Why, they'll go right through him/her!");
 			} else {
 				$person = $this->nickAutocomplete($message);
 
@@ -2481,6 +2484,16 @@ class wolf extends irc {
 					if (isset($this->away[$nick])) {
 						$this->away[$new_nick] = $this->away[$nick];
 						unset($this->away[$nick]);
+					}
+
+					foreach($this->role_vars as $role) {
+						foreach($this->{$role} as $player => $target) {
+							if (!$nick == $player) {
+								continue;
+							}
+							$this->{$role}[$new_nick] = $target;
+							unset($this->{$role}[$player]);
+						}
 					}
 
 					foreach($this->role_names as $role) {
