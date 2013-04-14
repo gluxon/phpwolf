@@ -2186,11 +2186,7 @@ class wolf extends irc {
 		$this->sendData('MODE ' . $channel . ' -m');
 
 		// Generate list of players
-		$players_list = "";
-		foreach(array_keys($this->players) as $person) {
-			$players_list = $players_list . $person . " ";
-		}
-		$players_list = substr($players_list, 0, -1);
+		$players_list = implode(' ', array_keys($this->players) );
 
 		$players_list_split = SplitByEveryNthOccurrence($players_list, ' ', 3);
 		foreach($players_list_split as $list) {
