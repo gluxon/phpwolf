@@ -1339,6 +1339,10 @@ class wolf extends irc {
 				$this->say($nick, "You are not a wolf. good thing too!");
 			} else if ( in_array($nick, $this->ghost_died) ) {
 				$this->say($nick, "You cannot kill a ghost! D'oh?!?!!");
+			} else if (isset($this->crow_observed[$nick])) {
+				// User has already observed
+				$crow_observed = $this->string('crow_observed', $this->crow_observed[$nick]);
+				$this->say($nick, $crow_observed);
 			} else {
 				$person = $this->nickAutocomplete($message);
 
@@ -1505,6 +1509,10 @@ class wolf extends irc {
 			} else if ($this->isDay) {
 				$crow_observe_day = $this->string('crow_observe_day');
 				$this->say($nick, $crow_observe_day);
+			} else if (isset($this->wolf_killed[$nick])) {
+				// User has already killed
+				$wolf_observed = $this->string('wolf_observed', $this->wolf_killed[$nick]);
+				$this->say($nick, $wolf_observed);
 			} else {
 				$person = $this->nickAutocomplete($message);
 
@@ -2028,6 +2036,16 @@ class wolf extends irc {
 					$this->removePlayer($this->channel, $angel);
 				}
 			}
+		}
+
+		// Send results of crow observation
+		foreach($this->crow_observed as $observer => $target) {
+			if (in_array($target, $this->seer_seen) || in_array($target, $this->wolf_killed) || in_array($target, $this->harlot_visited) || in_array($target, $this->angel_guarded || in_array($target, $this->detective_ided)) {
+				$crow_result = $this->string('crow_observed_got_up', $target);
+			else {
+				$crow_result = $this->string('crow_observed_stayed', $target);
+			}
+			$this->say($observer, $crow_result);
 		}
 
 		// Night has ended, we can reset the night actions
