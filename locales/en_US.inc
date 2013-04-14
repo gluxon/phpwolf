@@ -121,6 +121,7 @@ $en_US["wolf_multiple"]="Also, if you PM me, your message will be relayed to oth
 $en_US["wolf_kill"]="You have selected <bold>%answer1%</bold> to be killed.";
 $en_US["wolf_kill_self"]="Suicide is bad. Don't do it.";
 $en_US["wolf_relay"]="<bold>%answer1%</bold> says: %answer2%";
+$en_US["wolf_observed"] = "You have already selected <bold>%answer1%</bold> to be killed. You cannot kill and observe in the same night.";
 
 $en_US["drunk_assign"]="You have been drinking too much! You are the <bold>village drunk</bold>.";
 
@@ -175,6 +176,8 @@ $en_US["crow_observe_self"]="Instead of doing that, you should probably go kill 
 $en_US["crow_observe_wolf"]="Flying to another wolf's house is a waste of time.";
 $en_US["crow_observe_day"]="You may only transform into a crow at night.";
 $en_US["crow_not"]="Only a werecrow may use this command.";
+$en_US["crow_observed_stayed"] = "As the sun rises, you conclude that <bold>%answer1%</bold> was sleeping all night long, and you fly back to your house.";
+$en_US["crow_observed_got_up"] = "As the sun rises, you conclude that <bold>%answer1%</bold> was not asleep all during the night, and you fly back to your house.";
 
 $en_US["ghost_assign"] = "You are a ghost. You will remain in the world of the living to finish your business. Happy haunting!";
 $en_US["ghost_transform"] = "It appears that <bold>%answer1%</bold> came back as a ghost. Ooooh-OOOOH-Ooooh! S/He will remain in the game.";
