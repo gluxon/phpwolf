@@ -679,10 +679,10 @@ class wolf extends irc {
 					$answer = "person";
 				}
 
-				$this->removePlayer($recipient, $nick, $ghost = false);
+				$this->removePlayer($this->channel, $nick, $ghost = false);
 
 				$quit = $this->string('quit', $nick, $answer);
-				$this->say($recipient, $quit);
+				$this->say($this->channel, $quit);
 			}
 		}
 
