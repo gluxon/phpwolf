@@ -679,10 +679,10 @@ class wolf extends irc {
 					$answer = "person";
 				}
 
-				$this->removePlayer($recipient, $nick, $ghost = false);
+				$this->removePlayer($this->channel, $nick, $ghost = false);
 
 				$quit = $this->string('quit', $nick, $answer);
-				$this->say($recipient, $quit);
+				$this->say($this->channel, $quit);
 			}
 		}
 
@@ -2211,12 +2211,13 @@ class wolf extends irc {
 		// Unmute the channel
 		$this->sendData('MODE ' . $channel . ' -m');
 
-		// Generate list of players
-		$players_list = "";
-		foreach(array_keys($this->players) as $person) {
-			$players_list = $players_list . $person . " ";
+		// Add ghosts back into players to remove their voice
+		foreach($this->ghost_died as $ghost) {
+			$this->players[$ghost] = 0;
 		}
-		$players_list = substr($players_list, 0, -1);
+
+		// Generate list of players
+		$players_list = implode(' ', array_keys($this->players) );
 
 		$players_list_split = SplitByEveryNthOccurrence($players_list, ' ', 3);
 		foreach($players_list_split as $list) {
@@ -2335,7 +2336,9 @@ class wolf extends irc {
 							}
 						}
 
-						if ($role != 'drunk' && $role != 'cursed' && $role != 'traitor' && $role != 'gunner' && $role != 'detective') {
+						if ($role != 'drunk' && $role != 'cursed' &&
+								$role != 'traitor' && $role != 'gunner' &&
+								$role != 'detective' && $role != 'ghost') {
 							$i_role++;
 						}
 					}
