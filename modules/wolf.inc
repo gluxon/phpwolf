@@ -960,6 +960,9 @@ class wolf extends irc {
 
 				if (!$this->isPlaying($nick)) {
 					// This person is not playing, let's just ignore them (and hope they go away)
+				} else if (empty($victim)) {
+					$m = "You must specify a victim.";
+					$this->notice($nick, $m);
 				} else if (!$this->isPlaying($victim)) {
 					$not_playing = $this->string('not_playing', $victim);
 					$this->notice($nick, $not_playing);
