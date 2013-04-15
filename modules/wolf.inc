@@ -2486,16 +2486,6 @@ class wolf extends irc {
 						unset($this->away[$nick]);
 					}
 
-					foreach($this->role_vars as $role) {
-						foreach($this->{$role} as $player => $target) {
-							if (!$nick == $player) {
-								continue;
-							}
-							$this->{$role}[$new_nick] = $target;
-							unset($this->{$role}[$player]);
-						}
-					}
-
 					foreach($this->role_names as $role) {
 						foreach($this->$role as $key => &$person) {
 							if ($nick == $person) {
