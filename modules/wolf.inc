@@ -1039,14 +1039,14 @@ class wolf extends irc {
 			} else {
 				$this->addPlayer($recipient, $nick);
 
-				// 1 player for player already added
-				if ( count($this->players) == 1 ) {
+				// No players have joined yet. Start a game.
+				if ( count($this->players) == 0 ) {
 					$this->channel = $recipient;
 					$game_start = $this->string('game_start', $nick);
 					$this->say($recipient, $game_start);
 					$this->game_wait = time();
 				} else {
-					// There are more than one players
+					// There is more than one player
 					$join = $this->string('join', $nick);
 					$this->say($recipient, $join);
 				}
