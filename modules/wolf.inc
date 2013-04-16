@@ -1267,7 +1267,7 @@ class wolf extends irc {
 				} else {
 					$message = $nick . ", You are not a bot admin.";
 				}
-				$this->say($recipient, $message)
+				$this->say($recipient, $message);
 			} else if (!$this->isAdmin($host) ) {
 				$this->say($recipient, $nick . ", You are not a bot admin.");
 			} else {
@@ -1522,8 +1522,8 @@ class wolf extends irc {
 				$this->say($nick, $crow_observe_day);
 			} else if (isset($this->wolf_killed[$nick])) {
 				// User has already killed
-				$wolf_observed = $this->string('wolf_observed', $this->wolf_killed[$nick]);
-				$this->say($nick, $wolf_observed);
+				$crow_killed = $this->string('crow_killed', $this->wolf_killed[$nick]);
+				$this->say($nick, $crow_killed);
 			} else {
 				$person = $this->nickAutocomplete($message);
 
@@ -2051,9 +2051,13 @@ class wolf extends irc {
 
 		// Send results of crow observation
 		foreach($this->crow_observed as $observer => $target) {
-			if (in_array($target, $this->seer_seen) || in_array($target, $this->wolf_killed) || in_array($target, $this->harlot_visited) || in_array($target, $this->angel_guarded || in_array($target, $this->detective_ided)) {
+			if (in_array($target, $this->seer_seen) ||
+					in_array($target, $this->wolf_killed) ||
+					in_array($target, $this->harlot_visited) ||
+					in_array($target, $this->angel_guarded) ||
+					in_array($target, $this->detective_ided) ) {
 				$crow_result = $this->string('crow_observed_got_up', $target);
-			else {
+			} else {
 				$crow_result = $this->string('crow_observed_stayed', $target);
 			}
 			$this->say($observer, $crow_result);
