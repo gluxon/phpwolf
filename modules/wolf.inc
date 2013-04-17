@@ -113,6 +113,7 @@ class wolf extends irc {
 		$this->harlot_visited = array();
 		$this->gunner_shot = array();
 		$this->gunner_bullets = array();
+		$this->crow_observed = array();
 		$this->angel_guarded = array();
 		$this->detective_ided = array();
 		$this->ghost_died = array();
@@ -2050,7 +2051,7 @@ class wolf extends irc {
 		}
 
 		// Send results of crow observation
-		foreach($this->crow_observed as $observer => $target) {
+		foreach($this->crow_observed as $crow => $target) {
 			if (in_array($target, $this->seer_seen) ||
 					in_array($target, $this->wolf_killed) ||
 					in_array($target, $this->harlot_visited) ||
@@ -2060,13 +2061,14 @@ class wolf extends irc {
 			} else {
 				$crow_result = $this->string('crow_observed_stayed', $target);
 			}
-			$this->say($observer, $crow_result);
+			$this->say($crow, $crow_result);
 		}
 
 		// Night has ended, we can reset the night actions
 		$this->seer_seen = array();
 		$this->wolf_killed = array();
 		$this->harlot_visited = array();
+		$this->crow_observed = array();
 		$this->angel_guarded = array();
 
 		// Check if game has finished
@@ -2259,6 +2261,7 @@ class wolf extends irc {
 		$this->harlot_visited = array();
 		$this->gunner_shot = array();
 		$this->gunner_bullets = array();
+		$this->crow_observed = array();
 		$this->angel_guarded = array();
 		$this->detective_ided = array();
 		$this->ghost_died = array();
