@@ -1252,6 +1252,12 @@ class wolf extends irc {
 			$this->setting["game_add_wait"] = $game_add_wait;
 		}
 
+		// !fgoat
+		else if ( $this->isCommand($command, 'fstart') && $this->isAdmin($host) ) {
+			$this->goat_switch = true;
+			$this->commands($recipient, "!goat", $nick, $host);
+		}
+
 		// !frestart
 		else if ( $this->isCommand($command, 'frestart') && $this->isAdmin($host) ) {
 			// Hack from -> http://debuggable.com/posts/restarting-a-php-command-line-script:4988968d-b9d0-4fe8-af30-05544834cda3
